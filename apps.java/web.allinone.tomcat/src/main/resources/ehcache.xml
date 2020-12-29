@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ehcache>
+
+    <diskStore path="${server.cache.ehcache.diskStore.path}"/>
+
+    <cache name="getAppInitArgs"
+
+           eternal="false"
+           maxEntriesLocalHeap="1"
+           maxEntriesLocalDisk="10"
+           timeToIdleSeconds="100000"
+           memoryStoreEvictionPolicy="LRU"/>
+
+    <cache name="getStructure3dModels"
+           eternal="false"
+           maxEntriesLocalHeap="10000"
+           maxEntriesLocalDisk="1000000"
+           timeToIdleSeconds="1000000"
+           memoryStoreEvictionPolicy="LRU"/>
+
+    <cache name="getModelMeshArr"
+           eternal="false"
+           maxEntriesLocalHeap="10000"
+           maxEntriesLocalDisk="1000000"
+           timeToIdleSeconds="1000000"
+           memoryStoreEvictionPolicy="LRU"/>
+
+    <cache name="getSectionsByPlane"
+           eternal="false"
+           maxEntriesLocalHeap="100000"
+           maxEntriesLocalDisk="100000000"
+           timeToIdleSeconds="1000000"
+           memoryStoreEvictionPolicy="LRU"/>
+
+    <cache name="getImageSectionsByImgId"
+           eternal="false"
+           maxEntriesLocalHeap="100000"
+           maxEntriesLocalDisk="100000000"
+           timeToIdleSeconds="1000000"
+           memoryStoreEvictionPolicy="LRU"/>
+
+    <cache name="getExpressionLevel"
+           eternal="false"
+           maxEntriesLocalHeap="100000"
+           maxEntriesLocalDisk="100000000"
+           timeToIdleSeconds="1000000"
+           memoryStoreEvictionPolicy="LRU"/>
+
+    <cache name="isExprLevelAvail"
+           eternal="false"
+           maxEntriesLocalHeap="100000"
+           maxEntriesLocalDisk="100000000"
+           timeToIdleSeconds="1000000"
+           memoryStoreEvictionPolicy="LRU"/>
+
+    <cache name="getTooltip"
+           eternal="false"
+           maxEntriesLocalHeap="1000"
+           maxEntriesLocalDisk="100000"
+           timeToIdleSeconds="1800"
+           memoryStoreEvictionPolicy="LRU"/>
+
+    <cache name="getTooltipHelp"
+           eternal="false"
+           maxEntriesLocalHeap="1000"
+           maxEntriesLocalDisk="100000"
+           timeToIdleSeconds="1800"
+           memoryStoreEvictionPolicy="LRU"/>
+
+    <cache name="facetQuery"
+           eternal="false"
+           maxEntriesLocalHeap="1000000"
+           maxEntriesLocalDisk="1000000000"
+           timeToIdleSeconds="600"
+           memoryStoreEvictionPolicy="LRU"/>
+    <cache name="suggest"
+           eternal="false"
+           maxEntriesLocalHeap="1000000"
+           maxEntriesLocalDisk="1000000000"
+           timeToIdleSeconds="300"
+           memoryStoreEvictionPolicy="LRU"/>
+    <cache name="count"
+           eternal="false"
+           maxEntriesLocalHeap="1000000"
+           maxEntriesLocalDisk="1000000000"
+           timeToIdleSeconds="300"
+           memoryStoreEvictionPolicy="LRU"/>
+
+</ehcache>

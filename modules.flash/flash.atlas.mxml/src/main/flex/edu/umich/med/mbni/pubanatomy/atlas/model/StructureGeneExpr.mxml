@@ -1,0 +1,87 @@
+<?xml version="1.0"?>
+<as3lib:MxmlEventDispatcher xmlns:fx="http://ns.adobe.com/mxml/2009"
+                            xmlns:as3lib="com.flashflexpro.as3lib.*"
+                            xmlns:s="library://ns.adobe.com/flex/spark">
+    <fx:Script><![CDATA[
+        import mx.events.CollectionEvent;
+        import mx.events.CollectionEventKind;
+
+        [Bindable]
+        public var gene:MDLGene;
+
+        [Bindable]
+        public var structure:StructureItem;
+
+        public function getTypeDs( ds:MDLDataSet, type:String ):StructureGeneExprTypeDs{
+            for( var j:int = typeDsList.length - 1; j >= 0; j-- ){
+                var sds:StructureGeneExprTypeDs = typeDsList.getItemAt( j ) as StructureGeneExprTypeDs;
+                if( sds.exprType == type && sds.sectionDataSet == ds ){
+                    return sds;
+                }
+            }
+            return typeDsList.getItemAt( MDLDataSet.EXPR_Types.getItemIndex( type ) ) as StructureGeneExprTypeDs;
+        }
+
+        public function destroy():void{
+            for( var j:int = typeDsList.length - 1; j >= 0; j-- ){
+                var gt:StructureGeneExprTypeDs = typeDsList.getItemAt( j ) as StructureGeneExprTypeDs;
+                gt.destroy();
+            }
+            structureGeneExprChainEndWatcher.destroy();
+        }
+
+        private function rfrTypeDsLst( ev:CollectionEvent ):void{
+            if( ev.kind == CollectionEventKind.UPDATE || ev.kind == CollectionEventKind.MOVE ){
+                return;
+            }
+
+            CONFIG::debugging{
+                try{
+                    refrehTypeDsLst();
+                }
+                catch( e:Error ){
+                    trace( e.getStackTrace() );
+                }
+                return;
+            }//debug
+
+            refrehTypeDsLst();
+        }
+
+        private function refrehTypeDsLst():void{
+
+            if( gene != null && gene.dataSets != null && gene.dataSets.length > 0 ){
+                for( var i:int = gene.dataSets.length - 1; i >= 0; i-- ){
+                    var currentDs:MDLDataSet = gene.dataSets.getItemAt( i ) as MDLDataSet;
+
+                    exist:
+                            for( var j:int = MDLDataSet.EXPR_Types.length - 1; j >= 0; j-- ){
+                                var currentExprType:String = MDLDataSet.EXPR_Types.getItemAt( j ) as String;
+                                for( var k:int = typeDsList.length - 1; k >= 0; k-- ){
+                                    var exist:StructureGeneExprTypeDs = typeDsList.getItemAt( k ) as StructureGeneExprTypeDs;
+                                    if( exist.exprType == currentExprType
+                                            && exist.sectionDataSet == currentDs
+                                            && exist.structure == structure ){
+                                        continue exist;
+                                    }
+                                }
+
+                                var rt:StructureGeneExprTypeDs = new StructureGeneExprTypeDs();
+                                rt.sectionDataSet = currentDs;
+                                rt.exprType = currentExprType;
+                                rt.structure = structure;
+
+                                typeDsList.addItem( rt );
+                            }
+                }
+            }
+        }
+        ]]></fx:Script>
+    <fx:Declarations>
+        <as3lib:ChainEndWatcher
+                eventDispatcher="{gene.dataSets}" id="structureGeneExprChainEndWatcher"
+                                eventType="{CollectionEvent.COLLECTION_CHANGE}"
+                                eventHandler="rfrTypeDsLst"/>
+        <s:ArrayList id="typeDsList"/>
+    </fx:Declarations>
+</as3lib:MxmlEventDispatcher>

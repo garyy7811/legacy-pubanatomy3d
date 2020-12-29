@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<model:ResultFacetTerm2Count xmlns:fx="http://ns.adobe.com/mxml/2009"
+                             xmlns:model="edu.umich.med.mbni.pubanatomy.search.model.*">
+
+    <fx:Script><![CDATA[
+        import edu.umich.med.mbni.pubanatomy.flash.dto.DtoGene;
+
+        [Bindable]
+        public var gene:DtoGene;
+
+        [Bindable(event="fromChanged")]
+        public function get facetGene():ResultFacetGeneSymbols{
+            return facet as ResultFacetGeneSymbols;
+        }
+        ]]></fx:Script>
+</model:ResultFacetTerm2Count>

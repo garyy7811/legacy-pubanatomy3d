@@ -1,0 +1,71 @@
+<?xml version="1.0"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" xmlns:s="library://ns.adobe.com/flex/spark"
+         creationComplete="onCreated();">
+    <fx:Script><![CDATA[
+        import edu.umich.med.mbni.pubanatomy.search.model.QueryTermR;
+
+        import spark.events.TextOperationEvent;
+
+        [Bindable]
+        public var queryTerm:QueryTermR;
+
+        private static const _restrict:RegExp = /^(\d*|\*{1})$/;
+
+        private function onInputTxtChanged( event:TextOperationEvent ):void{
+            var ipt:TextInput = event.target as TextInput;
+            if( _restrict.test( ipt.text ) ){
+                if( ipt == fr ){
+                    queryTerm.inputRangeFromTxt = ipt.text;
+                }
+                else{
+                    queryTerm.inputRangeToTxt = ipt.text;
+                }
+            }
+            else{
+                if( ipt == fr ){
+                    ipt.text = queryTerm.inputRangeFromTxt;
+                }
+                else{
+                    ipt.text = queryTerm.inputRangeToTxt;
+                }
+            }
+        }
+
+        private function onCreated():void{
+            stage.addEventListener( MouseEvent.MOUSE_DOWN, onMouseDownAnyWhere, false, 0, true );
+        }
+
+        private function onMouseDownAnyWhere( event:MouseEvent ):void{
+            if( stage != null && !getBounds( this ).contains( mouseX, mouseY ) ){
+                queryTerm.commit();
+            }
+        }
+        ]]></fx:Script>
+    <s:layout>
+        <s:HorizontalLayout verticalAlign="middle" gap="5"/>
+    </s:layout>
+    <s:HGroup gap="1" verticalAlign="middle">
+        <s:Label text="From: " fontWeight="bold"/>
+        <s:TextInput id="fr" change="onInputTxtChanged( event );"
+                     text="{queryTerm.inputRangeFromTxt}"
+                     enter="queryTerm.commit();"/>
+    </s:HGroup>
+    <s:HGroup gap="1" verticalAlign="middle">
+        <s:Label text="To: " fontWeight="bold"/>
+        <s:TextInput text="{queryTerm.inputRangeToTxt}" change="onInputTxtChanged( event );"
+                     enter="queryTerm.commit();"/>
+    </s:HGroup>
+    <fx:Binding source="queryTerm.query.focusedOnTerm" destination="rfrFocused"/>
+    <fx:Binding source="queryTerm.query.queryResult.searchModel.callInNext" destination="rfrFocused"/>
+    <fx:Script><![CDATA[
+        private function set rfrFocused( ignoreVar:* ):void{
+            queryTerm.query.queryResult.searchModel.callInNext.putIn( refreshFocused );
+        }
+
+        private function refreshFocused():void{
+            if( queryTerm != null && queryTerm == queryTerm.query.focusedOnTerm ){
+                fr.setFocus();
+            }
+        }
+        ]]></fx:Script>
+</s:Group>

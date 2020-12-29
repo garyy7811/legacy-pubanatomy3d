@@ -1,0 +1,126 @@
+<?xml version="1.0"?>
+<ww:TiBoTlePanel xmlns:fx="http://ns.adobe.com/mxml/2009" xmlns:s="library://ns.adobe.com/flex/spark"
+                 xmlns:v3d="edu.umich.med.mbni.pubanatomy.voxel3d.view.*" xmlns:mx="library://ns.adobe.com/flex/mx"
+                 xmlns:v="edu.umich.med.mbni.pubanatomy.integrate.view.*"
+                 xmlns:atlasView="edu.umich.med.mbni.pubanatomy.atlas.view.*" xmlns:utils="edu.umich.med.mbni.utils.*"
+                 width="100%" height="100%"
+                 cornerRadius="9" borderWeight="2" borderColor="0xffffff" backgroundAlpha="0"
+                 xmlns:ww="edu.umich.med.mbni.webdesktop.*"
+                 titleTooltip="#t(3dpaneltitle)p#"
+        >
+    <fx:Metadata>
+        [ResourceBundle("TextIntegrate")]
+    </fx:Metadata>
+    <fx:Binding source="rootAppModel.rootModelVoxel3d.on3dStageStructureTreeGridData.selectedGeneColumn"
+                destination="rfr"/>
+    <fx:Binding source="rootAppModel.show3dSceneTreeStructures"
+                destination="rfr"/>
+    <fx:Script><![CDATA[
+        import edu.umich.med.mbni.pubanatomy.integrate.model.MDLIntegrationRootModel;
+
+        private function set rfr( v:* ):void{
+            rootAppModel.callInNext.putIn( refresh );
+        }
+
+        private function refresh():void{
+            var img:Boolean = ( rootAppModel.rootModelVoxel3d.on3dStageStructureTreeGridData.selectedGeneColumn != null );
+            if( img && rootAppModel.show3dSceneTreeStructures ){
+                currentState = "treeImgs";
+            }
+            else if( rootAppModel.show3dSceneTreeStructures ){
+                currentState = "tree";
+            }
+            else{
+                currentState = "n";
+            }
+        }
+
+        [Bindable]
+        public var rootAppModel:MDLIntegrationRootModel;
+        ]]></fx:Script>
+    <ww:states>
+        <s:State name="n"/>
+        <s:State name="tree"/>
+        <s:State name="treeImgs"/>
+    </ww:states>
+    <fx:Declarations>
+        <v3d:V3dScene model="{rootAppModel.rootModelVoxel3d.scene3d}" id="v3dScene"/>
+    </fx:Declarations>
+    <mx:HDividedBox id="tree3dview" width="100%" height="100%" liveDragging="true"
+                    dividerSkin="edu.umich.med.mbni.utils.DividerSkin">
+        <ww:TiBoTlePanel height="100%" width="30%" id="treeGroup" minWidth="1">
+            <ww:titleGroupContent>
+                <s:Label text="3D Controls"
+                         fontWeight="bold" width="100%" maxDisplayedLines="1"
+                         toolTip="#t(widget3dscene.treetitle)p#"
+                        />
+                <s:Button label="Save" click="rootAppModel.rootModelVoxel3d.on3dStageStructureTreeGridData.onSave()"
+                          width="47" height="100%"
+                          toolTip="#t(widget3dscene.save)p#"/>
+                <s:Button label="Load" click="rootAppModel.rootModelVoxel3d.on3dStageStructureTreeGridData..onLoad()"
+                          width="49" height="100%"
+                          toolTip="#t(widget3dscene.load)p#"/>
+                <atlasView:StructureTreeGridMoreOptions
+                        data="{rootAppModel.rootModelVoxel3d.on3dStageStructureTreeGridData}"/>
+                <s:Button skinClass="spark.skins.spark.TitleWindowCloseButtonSkin" width="16" height="16"
+                          click="onCloseCtrl()">
+                    <fx:Script><![CDATA[
+                        import spark.components.Alert;
+
+                        private function onCloseCtrl():void{
+                            if( rootAppModel.userClosed3dView ){
+                                rootAppModel.show3dSceneTreeStructures = false;
+                                return;
+                            }
+
+                            rootAppModel.userClosed3dView = true;
+                            Alert.show(
+                                    "3D View Control will be closed, a \"View Controller\"button will appear on top, click it to open View control again",
+                                    "How to open 3D View Control again", Alert.OK, null, function ( ev:Event ):void{
+                                        rootAppModel.show3dSceneTreeStructures = false;
+                                    } )
+                        }
+                        ]]></fx:Script>
+                </s:Button>
+            </ww:titleGroupContent>
+            <ww:titleGroupLayout>
+                <s:HorizontalLayout verticalAlign="middle" gap="1"/>
+            </ww:titleGroupLayout>
+            <ww:layout>
+                <s:VerticalLayout/>
+            </ww:layout>
+            <mx:HDividedBox width="100%" height="100%" dividerSkin="edu.umich.med.mbni.utils.DividerSkin">
+                <v3d:V3dStructureTreeGrid rootVoxelModel="{rootAppModel.rootModelVoxel3d}"
+                                          height="100%" width="100%"/>
+                <v:Widget3dTreeSceneImgLst height="100%" id="imgLst"
+                                           treeGrid="{rootAppModel.rootModelVoxel3d.on3dStageStructureTreeGridData}"/>
+            </mx:HDividedBox>
+            <ww:botleGroupContent>
+                <!--
+                     <atlasView:StructureGeneLevelHistogramView includeIn="levels"
+                       width="100%" height="200" id="t3dHistogram"
+                       model="{rootAppModel.rootModelVoxel3d.on3dStageStructureTreeGridData.geneLevelHistogram}"/>
+                       -->
+            </ww:botleGroupContent>
+        </ww:TiBoTlePanel>
+        <v:WidgetDividable id="rootCameraSection" width="70%" height="100%"
+                           model="{rootAppModel.cameraDiv}" scene="{v3dScene}"/>
+    </mx:HDividedBox>
+    <ww:titleGroupContent>
+        <v:Widget3dTreeSceneTitle rootAppModel="{rootAppModel}" width="100%"/>
+    </ww:titleGroupContent>
+    <ww:botleGroupContent>
+        <v3d:V3dStructureTreeGridSelectionOperations maxHeight="{ height - 150 }" width="100%"
+                                                     includeIn="tree,treeImgs"
+                                                     v3dTreeGridData="{rootAppModel.rootModelVoxel3d.on3dStageStructureTreeGridData}"/>
+    </ww:botleGroupContent>
+    <ww:transitions>
+        <utils:CommonTransition fromState="n" toState="tree" target="{treeGroup}" currentState="{currentState}"/>
+
+        <utils:CommonTransition fromState="tree" toState="treeImgs" target="{imgLst}" currentState="{currentState}"/>
+
+        <utils:CommonTransition fromState="n" toState="treeImgs" target="{treeGroup}" currentState="{currentState}"/>
+
+        <utils:CommonTransition fromState="n" toState="treeImgs" target="{imgLst}" currentState="{currentState}"/>
+    </ww:transitions>
+</ww:TiBoTlePanel>

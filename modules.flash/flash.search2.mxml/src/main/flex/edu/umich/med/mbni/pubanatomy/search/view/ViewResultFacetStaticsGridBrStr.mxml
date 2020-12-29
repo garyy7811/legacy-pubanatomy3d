@@ -1,0 +1,56 @@
+<?xml version="1.0"?>
+<view:ViewResultFacetStaticsGrid xmlns:fx="http://ns.adobe.com/mxml/2009"
+                                 xmlns:view="edu.umich.med.mbni.pubanatomy.search.view.*">
+
+    <fx:Script><![CDATA[
+        import edu.umich.med.mbni.pubanatomy.flash.dto.DtoStructure;
+        import edu.umich.med.mbni.pubanatomy.search.model.ResultFacetBrainStrSymbols;
+        import edu.umich.med.mbni.pubanatomy.search.model.ResultFacetTerm2CountBrainStr;
+        import edu.umich.med.mbni.utils.RootModelModule;
+
+        import mx.core.DragSource;
+
+        import spark.components.gridClasses.GridColumn;
+
+        import spark.events.GridEvent;
+
+        override protected function getDragSource( event:GridEvent ):DragSource{
+            var rt:DragSource = new DragSource();
+            var ds:DtoStructure = ( event.item as ResultFacetTerm2CountBrainStr).structure;
+            if( ds == null ){
+                return null;
+            }
+            /**
+             * this one is only the dto, it has no citation number!!!
+             */
+            rt.addData( new <Object>[ ds ], RootModelModule.DRAGGING_FORMAT );
+            return rt;
+        }
+
+        [Bindable(event="facetChanged")]
+        public function get facetBrainStr():ResultFacetBrainStrSymbols{
+            return facet as ResultFacetBrainStrSymbols;
+        }
+
+        override protected function onCreated():void{
+            super.onCreated();
+            var gridColumn:GridColumn;
+            gridColumn = new GridColumn();
+            gridColumn.dataField = "structure.structureId";
+            gridColumn.dataTipField = "structure.structureId";
+            gridColumn.sortable = false;
+            gridColumn.headerText = "Structure Id";
+            columns.addItem( gridColumn );
+
+            gridColumn = new GridColumn();
+            gridColumn.dataField = "structure.name";
+            gridColumn.dataTipField = "structure.name";
+            gridColumn.sortable = false;
+            gridColumn.headerText = "Structure name";
+            columns.addItem( gridColumn );
+        }
+
+        override protected function columnHeaderGroup_clickHandler( event:GridEvent ):void{
+        }
+        ]]></fx:Script>
+</view:ViewResultFacetStaticsGrid>

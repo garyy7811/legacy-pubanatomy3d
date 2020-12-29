@@ -1,0 +1,108 @@
+<?xml version="1.0"?>
+<s:List xmlns:fx="http://ns.adobe.com/mxml/2009"
+        xmlns:s="library://ns.adobe.com/flex/spark"
+        dragEnter="onDragEnterOverDropExit( event );"
+        dragOver="onDragEnterOverDropExit( event );"
+        dragDrop="onDragEnterOverDropExit( event );"
+        dragExit="onDragEnterOverDropExit( event );"
+        dragEnabled="true" dropEnabled="false"
+
+        allowMultipleSelection="true" minHeight="22"
+        itemRenderer="edu.umich.med.mbni.pubanatomy.integrate.view.TmpStructureListHR"
+
+        toolTip="Drag from an structure grid and drop into here!"
+        >
+    <s:layout>
+        <s:HorizontalLayout useVirtualLayout="false" variableColumnWidth="true" verticalAlign="middle"/>
+    </s:layout>
+    <fx:Script><![CDATA[
+        import edu.umich.med.mbni.pubanatomy.atlas.model.StructureItem;
+        import edu.umich.med.mbni.pubanatomy.integrate.model.MDLIntegrationRootModel;
+        import edu.umich.med.mbni.treemodel.TreeBranchItem;
+        import edu.umich.med.mbni.utils.RootModelModule;
+
+        import mx.collections.ArrayList;
+        import mx.core.DragSource;
+        import mx.core.UIComponent;
+
+        import mx.events.DragEvent;
+        import mx.managers.DragManager;
+
+        [Bindable]
+        public var rootModel:RootModelModule;
+
+        [Bindable]
+        public var restrictStructureIds:Vector.<int>;
+
+        private var _draggingStructures:ArrayList;
+
+        protected function onDragEnterOverDropExit( event:DragEvent ):void{
+
+            if( event.isDefaultPrevented() ){
+                return;
+            }
+
+            if( event.type == DragEvent.DRAG_ENTER ){
+                var strArr:Vector.<StructureItem> = ( rootModel as MDLIntegrationRootModel ).rootModelAtlas.draggingStructureItems;
+                if( strArr == null ){
+                    return;
+                }
+
+                var sarr:Array = [];
+                for( var j:int = strArr.length - 1; j >= 0; j-- ){
+                    var s:StructureItem = strArr[j];
+
+                    if( restrictStructureIds != null ){
+                        var sallp:Vector.<TreeBranchItem> = s.getAllParents();
+                        sallp.unshift( s );
+                        const len:int = sallp.length;
+                        var found = null;
+                        for( var p:int = 0; p < len; p++ ){
+                            var sp:StructureItem = sallp[p] as StructureItem;
+                            if( restrictStructureIds.indexOf( sp.dtoStructure.structureId ) >= 0 ){
+                                found = sp;
+                                break;
+                            }
+                        }
+                        if( found == null ){
+                            return;
+                        }
+                        s = found;
+                    }
+                    if( sarr.indexOf( s ) < 0 ){
+                        sarr.push( s );
+                    }
+                }
+                _draggingStructures = new ArrayList( sarr );
+                DragManager.acceptDragDrop( event.target as UIComponent );
+                drawFocus( true );
+            }
+            else if( event.type == DragEvent.DRAG_OVER ){
+                DragManager.showFeedback( DragManager.COPY );
+            }
+            else{
+                drawFocus( false );
+                if( event.type == DragEvent.DRAG_DROP ){
+                    for( var k:int = _draggingStructures.length - 1; k >= 0; k-- ){
+                        var drR:StructureItem = _draggingStructures.getItemAt( k ) as StructureItem;
+                        if( dataProvider.getItemIndex( drR ) < 0 ){
+                            dataProvider.addItem( drR );
+                        }
+                    }
+                }
+            }
+        }
+
+        override protected function dragStartHandler( event:DragEvent ):void{
+            if( event.isDefaultPrevented() ){
+                return;
+            }
+
+            if( rootModel.rootApp.dragging == null ){
+                var dragSource:DragSource = new DragSource();
+                dragSource.addData( selectedItems, RootModelModule.DRAGGING_FORMAT );
+                rootModel.doDrag( this, dragSource, event, createDragIndicator(), 0, 0, 0.5, false );
+            }
+        }
+        ]]></fx:Script>
+</s:List>

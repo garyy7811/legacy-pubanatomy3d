@@ -1,0 +1,83 @@
+<?xml version="1.0"?>
+<m:ModelSection2dPlaneStructureEdge xmlns:fx="http://ns.adobe.com/mxml/2009"
+                                    xmlns:m="edu.umich.med.mbni.pubanatomy.sectioninteract.model.*">
+    <fx:Script><![CDATA[
+        override public function equals( another:ModelSection2dPlaneStructureEdge ):Boolean{
+            if( another is ModelSection2dPlaneStructureEdgeModel ){
+                if( sectionPlane == another.sectionPlane
+                        && modelSection.equals( ( another as ModelSection2dPlaneStructureEdgeModel ).modelSection ) ){
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        override public function destroy():void{
+
+        }
+        ]]></fx:Script>
+    <fx:Script><![CDATA[
+        import edu.umich.med.mbni.pubanatomy.flash.dto.DtoImageSection;
+        import edu.umich.med.mbni.pubanatomy.flash.dto.IModelSectionEdge;
+
+        import mx.collections.IList;
+
+        private function set rfrEdges( v:* ):void{
+            sectionPlane.rootModelSection2d.callInNext.putIn( refreshEdges );
+        }
+
+        private function refreshEdges():void{
+            if( modelSection == null || structure2d.textBitMapData == null || ( sectionPlane.v3dPlane.image != null && sectionPlane.v3dPlane.image.svgImg == null ) ){
+                setGraphicsEdges( null );
+                return;
+            }
+            var pathes:Vector.<IGraphicsData> = new Vector.<IGraphicsData>();
+            var ul:int = sectionPlane.rootModelSection2d.rootModelVoxel3d.config.unitLength;
+            var edges:IList = modelSection.getEdge();
+            for( var j:int = edges.length - 1; j >= 0; j-- ){
+                var path:Vector.<Number> = new Vector.<Number>();
+                var cmd:Vector.<int> = new Vector.<int>();
+
+                var line:IList = edges.getItemAt( j ) as IList;
+                var lLen:int = line.length;
+                for( var i:uint = 0; i < lLen; i++ ){
+                    var p:Array = line.getItemAt( i ) as Array;
+                    var ip:Point;
+                    if( modelSection is DtoImageSection ){
+                        var tv:Vector3D = new Vector3D( p[ 0 ], p[ 1 ], p[ 2 ] );
+                        tv.scaleBy( ul );
+                        ip = sectionPlane.v3dPlane.vector3dToPoint( tv );
+                        ip = new Point( ip.x / ul, ip.y / ul );
+                    }
+                    else{
+                        ip = new Point( p[ 0 ], p[ 1 ] );
+                    }
+
+                    var g:Point = sectionPlane.model2view( ip );
+
+                    if( i == 0 ){
+                        cmd.push( GraphicsPathCommand.MOVE_TO );
+                    }
+                    else{
+                        cmd.push( GraphicsPathCommand.LINE_TO );
+                    }
+                    path.push( g.x, g.y );
+                }
+                pathes.push( new GraphicsPath( cmd, path ) )
+            }
+            setGraphicsEdges( pathes );
+        }
+
+        [Bindable]
+        public var modelSection:IModelSectionEdge;
+        ]]></fx:Script>
+    <fx:Binding source="sectionPlane.dirHor" destination="rfrEdges"/>
+    <fx:Binding source="sectionPlane.dirVer" destination="rfrEdges"/>
+    <fx:Binding source="sectionPlane.dirVerBigHor" destination="rfrEdges"/>
+    <fx:Binding source="sectionPlane.viewScale" destination="rfrEdges"/>
+    <fx:Binding source="sectionPlane.v3dPlane.imageSectionMode" destination="rfrEdges"/>
+    <fx:Binding source="sectionPlane.v3dPlane.image.svgImg" destination="rfrEdges"/>
+
+    <fx:Binding source="modelSection" destination="rfrEdges"/>
+    <fx:Binding source="structure2d.textBitMapData" destination="rfrEdges"/>
+</m:ModelSection2dPlaneStructureEdge>

@@ -1,0 +1,95 @@
+<?xml version="1.0"?>
+<s:DataGrid xmlns:fx="http://ns.adobe.com/mxml/2009" xmlns:s="library://ns.adobe.com/flex/spark"
+            xmlns:aslib="com.flashflexpro.as3lib.*" rowHeight="22"
+            enabled="{ modelResult.rpc == null }"
+            initialize="onInit();"
+            dataProvider="{modelResult.resultList}"
+            resize="rfrVisibleRowIndices=null;"
+            rollOver="checkNeedToLoadMore();"
+            selectionMode="multipleRows"
+            skinClass="edu.umich.med.mbni.utils.DataGridBusySkin">
+    <fx:Script><![CDATA[
+        import edu.umich.med.mbni.pubanatomy.search.model.QueryField;
+        import edu.umich.med.mbni.pubanatomy.search.model.Result;
+
+        import spark.components.gridClasses.GridColumn;
+        import spark.events.GridEvent;
+
+        [Bindable]
+        public var modelResult:Result;
+
+
+        private function termField2Column( termField:QueryField ):SearchViewRecordGridColum{
+            var col:SearchViewRecordGridColum = new SearchViewRecordGridColum();
+            col.queryField = termField;
+            return col;
+        }
+
+        public function removeColumn( column:GridColumn ):void{
+            modelResult.removeColumnAt( columnsDisplay.getItemIndex( column ) );
+        }
+
+        override protected function columnHeaderGroup_clickHandler( event:GridEvent ):void{
+            if( event.column.sortable ){
+                event.column.sortDescending = !event.column.sortDescending;
+                var idx:int = columnsDisplay.getItemIndex( event.column );
+                modelResult.sortResultBy( modelResult.columnFields.getItemAt( idx ) as QueryField, event.column.sortDescending );
+                if( columnHeaderGroup ){
+                    columnHeaderGroup.visibleSortIndicatorIndices = Vector.<int>( [event.column.columnIndex] );
+                }
+            }
+        }
+        ]]></fx:Script>
+    <fx:Declarations>
+        <aslib:Sync2Lists
+                source="{modelResult.queryResult.searchModel.query_fullText==null?null:modelResult.columnFields}"
+                getDestInst="{termField2Column}"
+                destination="{columnsDisplay}" id="sync2Lists"/>
+    </fx:Declarations>
+    <s:columns>
+        <s:ArrayList id="columnsDisplay"/>
+    </s:columns>
+
+    <fx:Script><![CDATA[
+        private function onInit():void{
+            scroller.verticalScrollBar.addEventListener( Event.CHANGE, checkNeedToLoadMore );
+            sync2Lists.enabled = true;
+        }
+
+        private function checkNeedToLoadMore( event:Event = null ):void{
+            if( modelResult.numFound > 0
+                    && scroller.verticalScrollBar.value > 0
+                    && scroller.verticalScrollBar.value == scroller.verticalScrollBar.maximum
+                    ){
+                modelResult.getMoreResults();
+            }
+            rfrVisibleRowIndices = null;
+        }
+
+        [Bindable]
+        public var visibleRowBegin:uint;
+
+        [Bindable]
+        public var visibleRowEnd:uint;
+
+        public function set rfrVisibleRowIndices( ignoreVar:* ):void{
+            modelResult.queryResult.searchModel.callInNext.putIn( refreshVisibleRowIndices );
+        }
+
+        private function refreshVisibleRowIndices():void{
+            var vv:Vector.<int> = grid.getVisibleRowIndices();
+            if( vv == null || vv.length == 0 ){
+                return;
+            }
+            visibleRowBegin = vv[ 0 ] + 1;
+            if( visibleRowEnd > modelResult.resultList.length ){
+                visibleRowEnd = modelResult.resultList.length;
+            }
+            else{
+                visibleRowEnd = vv[ vv.length - 1 ] + 1;
+            }
+        }
+        ]]></fx:Script>
+    <fx:Binding source="modelResult.queryResult.searchModel.callInNext" destination="rfrVisibleRowIndices"/>
+    <fx:Binding source="modelResult.resultList.length" destination="rfrVisibleRowIndices"/>
+</s:DataGrid>

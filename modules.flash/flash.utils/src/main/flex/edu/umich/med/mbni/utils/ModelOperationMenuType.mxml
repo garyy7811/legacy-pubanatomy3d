@@ -1,0 +1,26 @@
+<?xml version="1.0"?>
+<utils:ModelOperation xmlns:fx="http://ns.adobe.com/mxml/2009" xmlns:utils="edu.umich.med.mbni.utils.*">
+    <fx:Script><![CDATA[
+        public static const TYPE_CHECK:String = "check";
+        public static const TYPE_RADIO:String = "radio";
+        public static const TYPE_SEPARATOR:String = "separator";
+
+        public var type:String = TYPE_SEPARATOR;
+
+
+        internal var _parent:ModelOperationMenuChildren;
+        public function get parent():ModelOperationMenuChildren{
+            return _parent;
+        }
+
+
+        override public function destroy():void{
+            super.destroy();
+            _parent = null;
+        }
+
+        [Bindable]
+        public var labelColor:uint = 0x000000;
+
+        ]]></fx:Script>
+</utils:ModelOperation>

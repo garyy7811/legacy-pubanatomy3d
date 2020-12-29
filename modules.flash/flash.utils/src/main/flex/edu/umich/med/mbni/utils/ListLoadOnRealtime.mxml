@@ -1,0 +1,82 @@
+<?xml version="1.0"?>
+<as3lib:MxmlEventDispatcher xmlns:fx="http://ns.adobe.com/mxml/2009" xmlns:as3lib="com.flashflexpro.as3lib.*">
+    <fx:Script><![CDATA[
+        import mx.collections.IList;
+
+        [Bindable]
+        public var visibleRowIndices:Vector.<int>;
+
+        private var _item2rpc:Dictionary = new Dictionary();
+
+        [Bindable]
+        public var itemList:IList;
+
+        private function set rfrGene( ignoreVar:* ):void{
+            if( visibleRowIndices == null ){
+                return;
+            }
+            try{
+                var indiceLen:uint = visibleRowIndices.length;
+                if( indiceLen > 0 && itemList != null && itemList.length > 0 ){
+                    var items:Array = [];
+                    for( var i:int = 0; i < indiceLen; i ++ ){
+                        var index:int = visibleRowIndices[i] as int;
+                        if( index >= itemList.length ){
+                            if( items.length > 0 ){
+                                break;
+                            }
+                            return;
+                        }
+                        var ci:Object = itemList.getItemAt( index );
+                        if( ! isItemLoaded( ci ) ){
+                            var rpc:Object = _item2rpc[ ci ];
+                            if( rpc != null ){
+                                //loading
+                                continue;
+                            }
+
+                            CONFIG::debugging{
+                                if( items.indexOf( ci ) >= 0 ){
+                                    throw new Error( this + ".refreshGene " );
+                                }
+                            }
+                            items.push( ci );
+                        }
+                    }
+                    if( items.length > 0 ){
+                        var rpc:Object = fireRpc( items );
+
+                        CONFIG::debugging{
+                            if( rpc == null ){
+                                throw new Error( this + ".rfrGene " );
+                            }
+                        }
+
+                        for each( var itm:Object in items ){
+                            _item2rpc[ itm ] = rpc;
+                        }
+                    }
+                }
+            }
+            catch( bindingError:Error ){
+                CONFIG::debugging{
+                    trace( this + ":" + bindingError.getStackTrace() );
+                }
+            }
+        }
+
+        public var fireRpc:Function;
+
+        public var isItemLoaded:Function;
+
+        public function onEachItemLoad( item:Object ):void{
+            CONFIG::debugging{
+                if( _item2rpc[item] == null ){
+                    throw new Error( this + ".onEachItemLoad " );
+                }
+            }
+            delete _item2rpc[ item ];
+        }
+        ]]></fx:Script>
+    <fx:Binding source="visibleRowIndices" destination="rfrGene"/>
+</as3lib:MxmlEventDispatcher>

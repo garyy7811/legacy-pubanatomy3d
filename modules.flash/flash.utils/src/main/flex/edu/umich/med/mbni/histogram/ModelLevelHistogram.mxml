@@ -1,0 +1,196 @@
+<?xml version="1.0"?>
+<his:ModelLevelHistogramImpl xmlns:fx="http://ns.adobe.com/mxml/2009"
+                             xmlns:his="edu.umich.med.mbni.histogram.*">
+    <fx:Script><![CDATA[
+        import mx.collections.ArrayList;
+
+        [Bindable]
+        public var mouseOver:ArrayList;
+
+        [Bindable]
+        public var selected:ArrayList;
+
+        private function set rfrCalculate( ignoreVar:* ):void{
+            setBusy( true );
+            rootModel.callInNext.putIn( refreshBasSets );
+        }
+
+        protected function refreshBasSets():void{
+
+            if( inputLevelArray == null || inputLevelArray.length == 0 ){
+                outputBarSetArray = new <ModelLevelBarSet>[];
+                setSelectedLevelSet( null );
+                return;
+            }
+            try{
+                mouseOver = null;
+                selected = null;
+
+                var minLevel:Number = Number.MAX_VALUE;
+                var maxLevel:Number = Number.MIN_VALUE;
+
+                var tmpMaxDiv:uint = 0;
+                for( var k:int = inputLevelArray.length - 1; k >= 0; k-- ){
+                    var ns:Vector.<Number> = inputLevelArray[k] as Vector.<Number>;
+                    tmpMaxDiv = Math.max( tmpMaxDiv, ns.length );
+                    for( var kk:int = ns.length - 1; kk >= 0; kk-- ){
+                        var tmpNum:Number = ns[kk] as Number;
+                        if( !isNaN( tmpNum ) ){
+                            minLevel = Math.min( minLevel, tmpNum );
+                            maxLevel = Math.max( maxLevel, tmpNum );
+                        }
+                    }
+                }
+                if( isNaN( minLevel ) || isNaN( maxLevel ) ){
+                    return;
+                }
+
+                if( _maxLevelDivided != tmpMaxDiv ){
+                    _maxLevelDivided = tmpMaxDiv;
+                    dispatchEvent( new Event( "maxLevelDividedChanged" ) );
+                }
+
+                if( minLevel != _levelMinimum ){
+                    _levelMinimum = minLevel;
+                    dispatchEvent( new Event( "levelMinimumChanged" ) );
+                }
+
+                if( maxLevel != _levelMaximum ){
+                    _levelMaximum = maxLevel;
+                    dispatchEvent( new Event( "levelMaximumChanged" ) );
+                }
+
+                var minLevelNum:uint = uint.MAX_VALUE;
+                var maxLevelNum:uint = uint.MIN_VALUE;
+
+                var bsAr:Vector.<ModelLevelBarSet> = new Vector.<ModelLevelBarSet>( inputLevelArray.length );
+                for( var j:int = inputLevelArray.length - 1; j >= 0; j-- ){
+                    var lbst:ModelLevelBarSet = popularBarSet( inputLevelArray[j] as Vector.<Number> );
+                    minLevelNum = Math.min( minLevelNum, lbst.minBarLevelNum );
+                    maxLevelNum = Math.max( maxLevelNum, lbst.maxBarLevelNum );
+                    bsAr[ j ] = lbst;
+                }
+
+                if( minLevelNum != _barLevelNumMinimum ){
+                    _barLevelNumMinimum = minLevelNum;
+                    dispatchEvent( new Event( "barLevelNumMinimumChanged" ) )
+                }
+                if( maxLevelNum != _barLevelNumMaximum ){
+                    _barLevelNumMaximum = maxLevelNum;
+                    dispatchEvent( new Event( "barLevelNumMaximumChanged" ) )
+                }
+
+                //reset
+                selectedLevelMinimum = _levelMinimum;
+                selectedLevelMaximum = _levelMaximum;
+
+                setStep( ( levelMaximum - levelMinimum) / getDivideLevelInto() );
+                outputBarSetArray = bsAr;
+            }
+            catch( bindingError:Error ){
+                CONFIG::debugging{
+                    trace( this + ":" + bindingError.getStackTrace() );
+                }
+            }
+            setBusy( false );
+        }
+
+        private function popularBarSet( levelSet:Vector.<Number> ):ModelLevelBarSet{
+            var levelLen:uint = levelSet.length;
+
+            if( levelLen > 0 ){
+                levelSet.sort( Array.NUMERIC );
+            }
+            var minLevelNum:uint = uint.MAX_VALUE;
+            var maxLevelNum:uint = uint.MIN_VALUE;
+
+            var minLevel:Number = Number.MAX_VALUE;
+            var maxLevel:Number = Number.MIN_VALUE;
+
+            var dv:Number = ( _levelMaximum - _levelMinimum ) / getDivideLevelInto();
+
+            var barSet:ModelLevelBarSet = new ModelLevelBarSet();
+            barSet.histogram = this;
+            var levelIndex:uint = 0;
+            for( var i:uint = 0; i < getDivideLevelInto(); i++ ){
+                var ceiling:Number = (i + 1) * dv + _levelMinimum;
+                var bar:Vector.<Number> = new Vector.<Number>();
+                while( levelIndex < levelLen ){
+                    var level:Number = levelSet[ levelIndex ] as Number;
+                    if( !isNaN( level ) && level > ceiling ){
+                        break;
+                    }
+                    levelIndex++;
+                    bar.push( level );
+                    if( !isNaN( level ) ){
+                        minLevel = Math.min( minLevel, level );
+                        maxLevel = Math.max( maxLevel, level );
+                    }
+                    else{
+                        trace();
+                    }
+                }
+                barSet.levelBars.push( bar );
+                maxLevelNum = Math.max( maxLevelNum, bar.length );
+                minLevelNum = Math.min( minLevelNum, bar.length );
+            }
+            barSet.maxBarLevelNum = maxLevelNum;
+            barSet.minBarLevelNum = minLevelNum;
+            barSet.maxLevel = maxLevel;
+            barSet.minLevel = minLevel;
+            return barSet;
+        }
+
+        private function set rfrSelected( ignoreVar:* ):void{
+            rootModel.callInNext.putIn( refreshSelected );
+        }
+        private function refreshSelected():void{
+            try{
+                if( outputBarSetArray == null || outputBarSetArray.length == 0 ){
+                    return;
+                }
+                if( selectedLevelMaximum <= selectedLevelMinimum ){
+                    if( selectedLevelMinimum + step >= levelMaximum ){
+                        selectedLevelMaximum = selectedLevelMinimum;
+                        selectedLevelMinimum -= step;
+                    }
+                    else if( selectedLevelMaximum - step <= levelMinimum ){
+                        selectedLevelMinimum = selectedLevelMaximum;
+                        selectedLevelMaximum += step;
+                    }
+                    else{
+                        var min:Number = Math.min( selectedLevelMaximum, selectedLevelMinimum );
+                        var max:Number = Math.min( selectedLevelMaximum, selectedLevelMinimum );
+                        selectedLevelMinimum = min - step;
+                        selectedLevelMaximum = max + step;
+                    }
+                }
+            }
+            catch( bindingError:Error ){
+                CONFIG::debugging{
+                    trace( this + ":" + bindingError.getStackTrace() );
+                }
+            }
+        }
+
+        private var _busy:Boolean = true;
+
+        [Bindable(event="busyChanged")]
+        public function get busy():Boolean{
+            return _busy;
+        }
+
+        protected function setBusy( value:Boolean ):void{
+            if( value != _busy ){
+                _busy = value;
+                dispatchEvent( new Event( "busyChanged" ) );
+            }
+        }
+        ]]></fx:Script>
+    <fx:Binding source="inputLevelArray" destination="rfrCalculate"/>
+    <fx:Binding source="levelDividedInto" destination="rfrCalculate"/>
+
+    <fx:Binding source="selectedLevelMinimum" destination="rfrSelected"/>
+    <fx:Binding source="selectedLevelMaximum" destination="rfrSelected"/>
+    <fx:Binding source="outputBarSetArray" destination="rfrSelected"/>
+</his:ModelLevelHistogramImpl>

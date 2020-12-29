@@ -1,0 +1,425 @@
+<?xml version="1.0"?>
+<tg:TreeGridData xmlns:fx="http://ns.adobe.com/mxml/2009"
+                 xmlns:s="library://ns.adobe.com/flex/spark"
+                 xmlns:tg="edu.umich.med.mbni.treedatagrid.*"
+                 xmlns:as3lib="com.flashflexpro.as3lib.*"
+                 xmlns:atlasModel="edu.umich.med.mbni.pubanatomy.atlas.model.*">
+    <fx:Script><![CDATA[
+        import edu.umich.med.mbni.pubanatomy.flash.dto.DtoGene;
+        import edu.umich.med.mbni.treedatagrid.TreeGridDataRow;
+        import edu.umich.med.mbni.treemodel.TreeBranchItem;
+        import edu.umich.med.mbni.utils.ModelOperationMenuChildren;
+        import edu.umich.med.mbni.utils.ModelOperationMenuItem;
+        import edu.umich.med.mbni.utils.ModelOperationMenuType;
+
+        import mx.collections.ArrayCollection;
+
+        import mx.resources.ResourceManager;
+
+        [Bindable]
+        public var selectedGeneExprType:String = MDLDataSet.EXPR_TYPE_energy;
+
+        [Bindable]
+        public var selectedGeneColumn:StructureTreeGridDataColumnGene;
+
+        [Bindable]
+        public var geneList:ArrayList = new ArrayList();
+
+        public var str2countCol:StructureTreeGridDataColumnStrCount;
+
+        public function findClosestImages( dir:uint, position:int ):Dictionary{
+            var rt:Dictionary;
+            for( var j:int = geneList.length - 1; j >= 0; j-- ){
+
+                var g:MDLGene = geneList.getItemAt( j ) as MDLGene;
+                for( var k:int = g.dataSets.length - 1; k >= 0; k-- ){
+                    var ds:MDLDataSet = g.dataSets.getItemAt( k ) as MDLDataSet;
+                    var foundFromDs:MDLISHImage = ds.findClosestImage( dir, position );
+                    if( foundFromDs != null ){
+                        if( rt == null ){
+                            rt = new Dictionary();
+                        }
+                        rt[ ds ] = foundFromDs;
+                    }
+                }
+            }
+
+            return rt;
+        }
+
+        private var _inputStructureItems:Vector.<StructureItem>;
+
+        [Bindable(event="inputStructureItemsChanged")]
+        public function get inputStructureItems():Vector.<StructureItem>{
+            return _inputStructureItems;
+        }
+
+        protected function setInputStructureItems( value:Vector.<StructureItem> ):void{
+            if( value != _inputStructureItems ){
+                _inputStructureItems = value;
+                dispatchEvent( new Event( "inputStructureItemsChanged" ) );
+            }
+        }
+
+        [Bindable(event="rootModelChanged")]
+        public function get atlasModel():RootModelAtlas{
+            return rootModel as RootModelAtlas;
+        }
+
+        [Bindable]
+        public var autoOpenMouseOverStructure:Boolean = false;
+
+        [Bindable]
+        public var autoOpenMouseOverImg:Boolean = true;
+
+        public function showConfigMenu():void{
+            var menu:ArrayCollection = new ArrayCollection();
+
+            var keepTreeOpen:ModelOperationMenuItem = new ModelOperationMenuItem();
+            keepTreeOpen.label = ResourceManager.getInstance().getString( 'TextAtlas', 'treegrid.ctrls.keepMouseOverVisible' );
+            keepTreeOpen.toolTip = "#t(treegrid.ctrls.keepMouseOverVisible.toolTip)p#";
+            keepTreeOpen.type = ModelOperationMenuType.TYPE_CHECK;
+            keepTreeOpen.toggled = autoOpenMouseOverStructure;
+            keepTreeOpen.toExe = function ():void{
+                autoOpenMouseOverStructure = !autoOpenMouseOverStructure;
+            };
+            menu.addItem( keepTreeOpen );
+
+            if( selectedGeneColumn != null ){
+                var keepImgOpen:ModelOperationMenuItem = new ModelOperationMenuItem();
+                keepImgOpen.label = ResourceManager.getInstance().getString( 'TextAtlas', 'treegrid.imglst.keepMouseOverVisible.chk.label' );
+                keepImgOpen.toolTip = "#t(treegrid.imglst.keepMouseOverVisible.chk.tooltip)p#";
+                keepImgOpen.type = ModelOperationMenuType.TYPE_CHECK;
+                keepImgOpen.toggled = autoOpenMouseOverStructure;
+                keepImgOpen.toExe = function ():void{
+                    autoOpenMouseOverImg = !autoOpenMouseOverImg;
+                };
+                menu.addItem( keepImgOpen );
+            }
+
+            if( geneColumns.length > 0 ){
+                var typeMenuItems:ArrayCollection = new ArrayCollection();
+                for( var j:int = MDLDataSet.EXPR_Types.length - 1; j >= 0; j-- ){
+                    var t:String = MDLDataSet.EXPR_Types.getItemAt( j ) as String;
+                    var tmp:ModelOperationMenuItem = new ModelOperationMenuItem();
+                    tmp.type = ModelOperationMenuType.TYPE_RADIO;
+                    tmp.label = t;
+                    tmp.toggled = ( t == selectedGeneExprType);
+                    tmp.toExe = function ():void{
+                        selectedGeneExprType = this.label;
+                    };
+                    typeMenuItems.addItem( tmp );
+                }
+
+                var selectExprType:ModelOperationMenuChildren = new ModelOperationMenuChildren( typeMenuItems.toArray(), null, "Gene Expression Type" );
+                selectExprType.toolTip = "#t(treegrid.gene.selectExprType.select.tooltip)p#";
+                menu.addItem( selectExprType );
+            }
+
+            rootModel.setMenuOperations( new ModelOperationMenuChildren( menu.toArray() ) );
+        }
+
+
+        private function set rfrGeneDsImg( ignoreVar:* ):void{
+            rootModel.callInNext.putIn( refreshGeneDsImg );
+        }
+
+        private function refreshGeneDsImg():void{
+            if( selectedGeneColumn != null && selectedGeneColumn.selectedDataSet != null ){
+                selectedGeneColumn.selectedDataSet.refreshSectionImages();
+            }
+        }
+        ]]></fx:Script>
+    <fx:Binding source="selectedGeneColumn.selectedDataSet" destination="rfrGeneDsImg"/>
+
+    <!--static columns-->
+    <fx:Script><![CDATA[
+        protected var _columnTree:StructureTreeGridDataColumnTree;
+        public function get columnTree():StructureTreeGridDataColumnTree{
+            return _columnTree;
+        }
+
+        protected var _columnIdName:StructureTreeGridDataColumnIdName;
+        public function get columnIdName():StructureTreeGridDataColumnIdName{
+            return _columnIdName;
+        }
+
+        protected var _columnSelection:StructureTreeGridDataColumnSelection;
+        public function get columnSelection():StructureTreeGridDataColumnSelection{
+            return _columnSelection;
+        }
+
+        override protected function initStaticColumns():void{
+            if( _columnTree == null ){
+                _columnTree = new StructureTreeGridDataColumnTree();
+                _columnTree.treeGridData = this;
+            }
+            columns.addItemAt( _columnTree, 0 );
+
+            if( _columnIdName == null ){
+                _columnIdName = new StructureTreeGridDataColumnIdName();
+                _columnIdName.treeGridData = this;
+            }
+            columns.addItemAt( _columnIdName, 1 );
+            if( _columnSelection == null ){
+                _columnSelection = new StructureTreeGridDataColumnSelection();
+                _columnSelection.treeGridData = this;
+            }
+            columns.addItemAt( _columnSelection, 2 );
+        }
+        ]]></fx:Script>
+
+    <!--add/remove gene columne-->
+    <fx:Script><![CDATA[
+        import edu.umich.med.mbni.pubanatomy.flash.v02tmp.TermToCount;
+
+        protected function addGeneCol( g:MDLGene ):StructureTreeGridDataColumnGene{
+            var sgcol:StructureTreeGridDataColumnGene = new StructureTreeGridDataColumnGene();
+            sgcol.treeGridData = this;
+            sgcol.gene = g;
+            columns.addItem( sgcol );
+            return sgcol;
+        }
+
+        private function removeGeneCol( sgcol:StructureTreeGridDataColumnGene ):void{
+            columns.removeItem( sgcol );
+            sgcol.destroy();
+        }
+
+        public function onDragEnter():Boolean{
+            CONFIG::debugging{
+                if( _draggingStructureRowsInThis != null ){
+                    throw new Error( this + ".onDragEnter " );
+                }//debug
+            }
+            _draggingStructureRowsInThis = null;
+            var rt:Boolean = onDragGeneEnter();
+            if( rt ){
+                return true;
+            }
+            rt = onDragStructuresEnter();
+            if( rt ){
+                return true;
+            }
+            return onDragStructureCountEnter();
+        }
+
+        protected var _draggingGene:DtoGene;
+        public function get draggingGene():DtoGene{
+            return _draggingGene;
+        }
+
+        private function onDragGeneEnter():Boolean{
+            _draggingGene = atlasModel.draggingGene;
+            if( _draggingGene == null ){
+                return false;
+            }
+
+            var count:uint = 0;
+            for( var j:int = geneList.length - 1; j >= 0; j-- ){
+                var tmpGn:MDLGene = geneList.getItemAt( j ) as MDLGene;
+                if( tmpGn.dtoGene.geneId == _draggingGene.geneId ){
+                    count++;
+                    /*
+                    if( count > 0 && rootModel.pressedKeys.getItemIndex( Keyboard.CONTROL ) < 0 ){
+                        return false;
+                    }*/
+                    if( count > 1 ){
+                        return false;
+                    }
+                }
+            }
+            return true;
+        }
+
+        protected var _draggingStructureRowsInThis:Vector.<Object>;
+
+        private function onDragStructuresEnter():Boolean{
+            var draggingStructures:Vector.<StructureItem> = atlasModel.draggingStructureItems as Vector.<StructureItem>;
+            if( draggingStructures == null || draggingStructures.length == 0 ){
+                return false;
+            }
+
+            if( inputRowDataList != null ){
+                inputRowDataList.forEach(
+                        function ( row:TreeGridDataRow, idx:int, v:Vector.<TreeGridDataRow> ):void{
+                            var sRw:StructureTreeGridDataRow = row as StructureTreeGridDataRow;
+                            if( draggingStructures.indexOf( sRw.structure ) >= 0 ){
+                                if( sRw.parentRow != null ){
+                                    sRw.parentRow.setOpenOrClose( true );
+                                }
+                                if( _draggingStructureRowsInThis == null ){
+                                    _draggingStructureRowsInThis = new Vector.<Object>();
+                                }
+                                _draggingStructureRowsInThis.push( sRw );
+                                ensureVisibleRow = sRw;
+                            }
+                        }
+                )
+            }
+
+            return (_draggingStructureRowsInThis != null );
+        }
+
+        protected var _draggingStructureCount:Vector.<TermToCount>;
+        public function get draggingStructureCount():Vector.<TermToCount>{
+            return _draggingStructureCount;
+        }
+
+        private function onDragStructureCountEnter():Boolean{
+            _draggingStructureCount = atlasModel.draggingStructure2Count;
+            if( _draggingStructureCount != null
+                    && _draggingStructureCount.length > 0
+                    && _draggingStructureCount[ 0 ] is TermToCount
+                    ){
+                return true;
+            }
+            _draggingStructureCount = null;
+            return false;
+        }
+
+        public function onDragDone( isDrop:Boolean ):void{
+            if( isDrop ){
+                if( _draggingStructureRowsInThis != null ){
+                    selectedItems = _draggingStructureRowsInThis;
+                }
+                else if( _draggingGene != null ){
+                    addGene( _draggingGene );
+                }
+                else if( _draggingStructureCount != null ){
+                    if( str2countCol == null ){
+                        str2countCol = new StructureTreeGridDataColumnStrCount();
+                        str2countCol.treeGridData = this;
+                    }
+                    if( columns.getItemIndex( str2countCol ) < 0 ){
+                        columns.addItem( str2countCol );
+                    }
+                    str2countCol.structureSymbol2Count = _draggingStructureCount;
+                }
+            }
+            _draggingStructureRowsInThis = null;
+            _draggingGene = null;
+            _draggingStructureCount = null;
+        }
+
+        public function addGene( dtoG:DtoGene ):void{
+            var addedIndex:int = atlasModel.addGene( dtoG );
+            var g:MDLGene = atlasModel.geneModelList.getItemAt( addedIndex ) as MDLGene;
+            geneList.addItem( g );
+            g.refreshDataSetList();
+        }
+
+
+        public function getGeneColByDataSet( sectionDataSet:MDLDataSet ):StructureTreeGridDataColumnGene{
+            for( var j:int = geneColumns.length - 1; j >= 0; j-- ){
+                var gcol:StructureTreeGridDataColumnGene = geneColumns.getItemAt( j ) as StructureTreeGridDataColumnGene;
+                if( gcol.selectedDataSet == sectionDataSet ){
+                    return gcol;
+                }
+            }
+            return null;
+        }
+        ]]></fx:Script>
+    <fx:Declarations>
+        <as3lib:Sync2Lists
+                source="{geneList}" getDestInst="addGeneCol" destroyInst="removeGeneCol">
+            <as3lib:destination>
+                <s:ArrayList id="geneColumns"/>
+            </as3lib:destination>
+        </as3lib:Sync2Lists>
+        <atlasModel:StructureGeneLevelHistogram id="geneLevelHistogram"
+                                                structureTreeGridData="{this}"/>
+    </fx:Declarations>
+
+
+    <!-- wire input structures-->
+    <fx:Script><![CDATA[
+        private function set rfrInput( ignoreVar:* ):void{
+            rootModel.callInNext.putIn( refreshInput );
+        }
+
+        private function refreshInput():void{
+            if( inputStructureItems == null || inputStructureItems.length == 0 ){
+                setInputRowDataList( null );
+            }
+            else{
+                setInputRowDataList( wireTree( inputStructureItems ), inputRowDataList == null ? 4 : 0 );
+            }
+        }
+
+        private function byDepth( a:StructureItem, b:StructureItem ):int{
+            if( a.dtoStructure.depth > b.dtoStructure.depth ){
+                return 1;
+            }
+            else if( a.dtoStructure.depth < b.dtoStructure.depth ){
+                return -1;
+            }
+            else{
+                return 0;
+            }
+        }
+
+        protected function wireTree( inputStructureList:Vector.<StructureItem> ):Vector.<TreeGridDataRow>{
+            inputStructureList.sort( byDepth );
+            const len:int = inputStructureList.length;
+            var rt:Vector.<TreeGridDataRow> = new Vector.<TreeGridDataRow>();
+            for( var j:int = 0; j < len; j++ ){
+                var sdgd:StructureTreeGridDataRow = getNewRowData();
+                sdgd.structure = inputStructureList[j] as StructureItem;
+                sdgd.treeGridData = this;
+
+                putNewIntoExistingTree( sdgd, rt );
+
+                rt.push( sdgd );
+            }
+            return rt;
+        }
+
+        protected function getNewRowData():StructureTreeGridDataRow{
+            return new StructureTreeGridDataRow();
+        }
+
+        protected function putNewIntoExistingTree( addingRow:StructureTreeGridDataRow, exist:Vector.<TreeGridDataRow> ):void{
+            var ap:Vector.<TreeBranchItem> = addingRow.structure.getAllParents();
+            const len:int = ap.length;
+            for( var j:int = 0; j < len; j++ ){
+                var eap:StructureItem = ap[j] as StructureItem;
+                for( var k:int = exist.length - 1; k >= 0; k-- ){
+                    var eex:StructureTreeGridDataRow = exist[k] as StructureTreeGridDataRow;
+
+                    CONFIG::debugging{
+                        if( eex == null ){
+                            throw new Error( this + ".putNewIntoExistingTree " );
+                        }
+                    }
+
+                    if( eex.structure == eap ){
+                        addingRow.parent = eex;
+                        CONFIG::debugging{
+                            for( var q:int = eex.directChildren.length - 1; q >= 0; q-- ){
+                                var ttsssdddd:StructureTreeGridDataRow = eex.directChildren.getItemAt( q ) as StructureTreeGridDataRow;
+                                if( ttsssdddd.structure == addingRow.structure ){
+                                    throw new Error( this + ".putNewIntoExistingTree"
+                                                             + "check how many edges return from server!" );
+                                }
+                            }
+                        }
+                        eex.directChildren.addItem( addingRow );
+                        return;
+                    }
+                }
+            }
+        }
+
+        public function getRowByStructure( structure:StructureItem ):StructureTreeGridDataRow{
+            for( var j:int = inputRowDataList.length - 1; j >= 0; j-- ){
+                var r:StructureTreeGridDataRow = inputRowDataList[j] as StructureTreeGridDataRow;
+                if( r.structure == structure ){
+                    return r;
+                }
+            }
+            return null;
+        }
+        ]]></fx:Script>
+    <fx:Binding source="inputStructureItems" destination="rfrInput"/>
+</tg:TreeGridData>

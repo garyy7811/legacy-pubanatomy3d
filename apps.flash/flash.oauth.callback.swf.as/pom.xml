@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>pubanatomy.app.desktop.web.oauth.callback.as.swf</artifactId>
+    <version>0.2-SNAPSHOT</version>
+    <packaging>swf</packaging>
+
+    <parent>
+        <groupId>edu.umich.med.mbni</groupId>
+        <artifactId>pubanatomy.parent.flash.swf</artifactId>
+        <version>0.1-SNAPSHOT</version>
+        <relativePath>../../mvn.parent.flash.web/pom.xml</relativePath>
+    </parent>
+
+    <properties>
+        <web.dir>${pubanatomy.hostSWF.webapp.dir}/oauth/callbackflash</web.dir>
+        <html.title>Pubanatomy Google Authentication</html.title>
+    </properties>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>net.flexmojos.oss</groupId>
+                <artifactId>flexmojos-maven-plugin</artifactId>
+                <configuration>
+                    <sourceFile>${project.build.sourceDirectory}/OAuthCallBack.as</sourceFile>
+                    <storepass/>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
+    <dependencies>
+        <dependency>
+            <groupId>edu.umich.med.mbni</groupId>
+            <artifactId>pubanatomy.module.flash.oauth.callback.as</artifactId>
+            <version>0.1-SNAPSHOT</version>
+            <type>swc</type>
+        </dependency>
+    </dependencies>
+</project>

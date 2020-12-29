@@ -1,0 +1,63 @@
+<?xml version="1.0"?>
+<tg:TreeGridDataColumn xmlns:fx="http://ns.adobe.com/mxml/2009"
+                       xmlns:tg="edu.umich.med.mbni.treedatagrid.*"
+                       cellDataClass="edu.umich.med.mbni.pubanatomy.voxel3d.view.V3dStructureTreeGridDataCellVisible">
+
+    <fx:Script><![CDATA[
+        import edu.umich.med.mbni.treedatagrid.TreeGridDataRow;
+        import edu.umich.med.mbni.utils.ModelOperation;
+
+        [Bindable(event="treeGridDataChanged")]
+        public function get v3dTreeGridData():Voxel3dStructureOn3dTreeGridData{
+            return treeGridData as Voxel3dStructureOn3dTreeGridData;
+        }
+
+        override public function compare2RowData( a:TreeGridDataRow, b:TreeGridDataRow ):int{
+            var va:Voxel3dStructure = (a as Voxel3dStructureTreeGridDataRow).v3dStructure;
+            var vb:Voxel3dStructure = ( b as Voxel3dStructureTreeGridDataRow ).v3dStructure;
+            if( va.structure3dModel == null || vb.structure3dModel == null
+                    || va.structure3dModel.visible == vb.structure3dModel.visible ){
+                return nextOr0( a, b );
+            }
+            return va.structure3dModel.visible ? ( sortDesc ? 1 : -1 ) : ( sortDesc ? -1 : 1 );
+        }
+
+        override public function getAvailMultiOperations( selectedItems:Vector.<Object> ):Vector.<ModelOperation>{
+            if( selectedItems == null || selectedItems.length < 2 ){
+                return null;
+            }
+
+            var visibleRows:Vector.<Voxel3dStructureTreeGridDataRow> = new Vector.<Voxel3dStructureTreeGridDataRow>();
+            var inVisibleRows:Vector.<Voxel3dStructureTreeGridDataRow> = new Vector.<Voxel3dStructureTreeGridDataRow>();
+            for( var j:int = selectedItems.length - 1; j >= 0; j-- ){
+                var row:Voxel3dStructureTreeGridDataRow = selectedItems[ j ] as Voxel3dStructureTreeGridDataRow;
+                if( row.v3dStructure.structure3dModel.visible ){
+                    visibleRows.push( row );
+                }
+                else{
+                    inVisibleRows.push( row );
+                }
+            }
+
+            var onlyVisible:Voxel3dOperation3dModelVisibility = new Voxel3dOperation3dModelVisibility( null, selectedItems, true );
+            var onlyInVisi:Voxel3dOperation3dModelVisibility = new Voxel3dOperation3dModelVisibility( null, selectedItems, false );
+
+            var rt:Vector.<ModelOperation> = new <ModelOperation>[];
+            if( visibleRows.length == 0 ){
+                rt = new <ModelOperation>[ new Voxel3dOperation3dModelVisibility( inVisibleRows, null, true ), onlyVisible, onlyInVisi];
+            }
+            else if( inVisibleRows.length == 0 ){
+                rt = new <ModelOperation>[ new Voxel3dOperation3dModelVisibility( visibleRows, null, false ), onlyVisible, onlyInVisi];
+            }
+            else{
+                rt = new <ModelOperation>[ new Voxel3dOperation3dModelVisibility( inVisibleRows, selectedItems, true ),
+                                           new Voxel3dOperation3dModelVisibility( visibleRows, selectedItems, false ),
+                                           onlyVisible, onlyInVisi];
+            }
+            if( selectedItems.length > 1 ){
+                rt.push( new Voxel3dOperation3dModelAlpha( v3dTreeGridData ) );
+            }
+            return rt;
+        }
+        ]]></fx:Script>
+</tg:TreeGridDataColumn>

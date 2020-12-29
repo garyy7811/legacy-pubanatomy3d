@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009"
+         xmlns:s="library://ns.adobe.com/flex/spark">
+    <fx:Script>
+        <![CDATA[
+        import edu.umich.med.mbni.pubanatomy.search.model.QueryResult;
+
+        [Bindable]
+        public var model:QueryRelate2Terms;
+
+        [Bindable]
+        private var _queryResult:QueryResult;
+        ]]>
+    </fx:Script>
+    <fx:Binding source="model.query.queryResult" destination="_queryResult"/>
+    <fx:Script><![CDATA[
+        import edu.umich.med.mbni.pubanatomy.search.model.QueryRelate2Terms;
+
+        private function set rfrState( ignoreVar:* ):void{
+            if( _queryResult.draggingOverTerm == model ){
+                currentState = "draggingOver";
+                return;
+            }
+            if( _queryResult.searchModel.draggingTerm == model ){
+                currentState = "beingDragged";
+                return;
+            }
+
+            if( _queryResult.mouseOverTerm == model ){
+                currentState = "mouseOver";
+                return;
+            }
+
+            if( model.parent != null
+                    && model.parent == _queryResult.mouseOverTerm ){
+                currentState = "dirParentMouseOver";
+                return;
+            }
+
+            if( _queryResult.searchModel.draggingTerm != null ){
+                currentState = "someDragging";
+                return;
+            }
+
+            currentState = "normal";
+        }
+        ]]></fx:Script>
+
+    <s:states>
+        <s:State name="normal"/>
+        <s:State name="disabled"/>
+
+        <s:State name="beingDragged"/>
+        <s:State name="someDragging"/>
+
+        <s:State name="draggingOver" stateGroups="over"/>
+
+        <s:State name="mouseOver" stateGroups="over"/>
+        <s:State name="dirParentMouseOver" stateGroups="over"/>
+    </s:states>
+    <fx:Binding source="_queryResult.draggingOverTerm" destination="rfrState"/>
+    <fx:Binding source="_queryResult.mouseOverTerm" destination="rfrState"/>
+    <fx:Binding source="_queryResult.searchModel.draggingTerm" destination="rfrState"/>
+
+    <!-- layer 1: border -->
+    <!--- @private -->
+    <s:Rect left="0" right="0" top="0" bottom="0" id="rect">
+        <s:stroke>
+            <!--- @private -->
+            <s:SolidColorStroke
+                    weight.normal="1" weight.over="5"
+                    color.normal="0xcccccc" color.over="0x555555"
+                    />
+        </s:stroke>
+    </s:Rect>
+</s:Group>

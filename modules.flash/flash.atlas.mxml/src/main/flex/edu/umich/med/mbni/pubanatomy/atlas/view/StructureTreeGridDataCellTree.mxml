@@ -1,0 +1,102 @@
+<?xml version="1.0"?>
+<view:StructureTreeGridDataCell xmlns:fx="http://ns.adobe.com/mxml/2009"
+                                xmlns:view="edu.umich.med.mbni.pubanatomy.atlas.view.*">
+    <fx:Script><![CDATA[
+        [Bindable]
+        public var allHitsLabel:String;
+
+        private function set rfrMatch( ignoreVar:* ):void{
+            row.treeGridData.rootModel.callInNext.putIn( refreshMatching );
+        }
+
+        private function refreshMatching():void{
+            var allHitsLen:uint = row.matchingChildren != null ? row.matchingChildren.length : 0;
+            allHitsLabel = allHitsLen > 0 ? ( allHitsLen + ' found' ) : null;
+        }
+
+        public function onDropDown( ev:MouseEvent ):void{
+            row.treeGridData.rootModel.setMenuOperations( row.getMenuItems( ev ) );
+        }
+        ]]></fx:Script>
+    <fx:Binding source="row.matchingChildren" destination="rfrMatch"/>
+
+    <fx:Binding source="( row.depth - 2 )*structureDataRow.structureTreeGridData.depthIndent"
+                destination="parentLstWidth"/>
+    <fx:Script><![CDATA[
+        import edu.umich.med.mbni.pubanatomy.atlas.model.StructureItem;
+        import edu.umich.med.mbni.pubanatomy.atlas.model.StructureTreeGridDataRow;
+        import edu.umich.med.mbni.treemodel.TreeBranchItem;
+
+        import mx.collections.ArrayList;
+
+        [Bindable]
+        public var parentLstWidth:uint;
+
+        private function set rfrParents( ignoreVar:* ):void{
+            parentList.removeAll();
+            if( structureDataRow != null ){
+                structureDataRow.treeGridData.rootModel.callInNext.putIn( refreshParents, this, null, 15 );
+            }
+        }
+
+        private function refreshParents():void{
+
+            var rowPl:Vector.<TreeBranchItem> = structureDataRow.getAllParents();
+            var strPl:Vector.<TreeBranchItem> = structureDataRow.structure.getAllParents();
+            structure:
+                    for( var j:int = strPl.length - 1; j >= 0; j -- ){
+                        var p:StructureItem = strPl[j] as StructureItem;
+                        if( p.dtoStructure.parent == null ){
+                            continue;
+                        }
+
+                        for( var k:int = rowPl.length - 1; k >= 0; k -- ){
+                            var row:StructureTreeGridDataRow = rowPl[k] as StructureTreeGridDataRow;
+                            if( row.structure == p ){
+                                parentList.addItem( row );
+                                continue structure;
+                            }
+                        }
+                        parentList.addItem( p );
+                    }
+        }
+
+        [Bindable]
+        public var parentList:ArrayList = new ArrayList();
+        ]]></fx:Script>
+    <fx:Binding source="structureDataRow" destination="rfrParents"/>
+    <fx:Script><![CDATA[
+        [Bindable]
+        public var openCloseLabel:String;
+
+        [Bindable]
+        public var openCloseVisible:Boolean;
+
+        [Bindable]
+        public var openCloseColor:uint;
+
+        [Bindable]
+        public var openCloseWeight:String;
+
+        private function set rfrOpenCloseLabel( v:* ):void{
+            if( structureDataRow.structure.directChildren.length == 0 ){
+                openCloseVisible = false;
+                return;
+            }
+            openCloseVisible = true;
+            if( structureDataRow.directChildren.length == 0 ){
+                openCloseLabel = " + ";
+                return;
+            }
+
+            openCloseLabel = (structureDataRow.openOrClose ? '[ - ]' : '[ + ]');
+        }
+        ]]></fx:Script>
+    <fx:Binding source="structureDataRow.directChildren.length" destination="rfrOpenCloseLabel"/>
+    <fx:Binding source="structureDataRow.openOrClose" destination="rfrOpenCloseLabel"/>
+    <fx:Binding source="structureDataRow.structure.directChildren.length" destination="rfrOpenCloseLabel"/>
+
+
+    <fx:Binding source="{row.treeGridData.depthRollOver==row.depth?0x0000ff:0x000000}" destination="openCloseColor"/>
+    <fx:Binding source="{row.treeGridData.depthRollOver==row.depth?'bold':'normal'}" destination="openCloseWeight"/>
+</view:StructureTreeGridDataCell>

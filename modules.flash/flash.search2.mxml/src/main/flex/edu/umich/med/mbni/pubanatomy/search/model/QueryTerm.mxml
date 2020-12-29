@@ -1,0 +1,91 @@
+<?xml version="1.0"?>
+<as3lib:MxmlEventDispatcher xmlns:fx="http://ns.adobe.com/mxml/2009" xmlns:as3lib="com.flashflexpro.as3lib.*"
+                            implements="flash.utils.IExternalizable">
+    <fx:Metadata>
+        [RemoteClass]
+    </fx:Metadata>
+    <fx:Script><![CDATA[
+        import mx.collections.ArrayList;
+
+        [Bindable]
+        public var query:Query;
+
+        [Bindable]
+        public var field:QueryField;
+
+        private var _queryStr:String;
+        [Bindable(event="queryStrChanged")]
+        public function get queryStr():String{
+            return _queryStr;
+        }
+
+        private var _queryStrAsChild:String;
+        [Bindable(event="queryStrChanged")]
+        public function get queryStrAsChild():String{
+            return _queryStrAsChild;
+        }
+
+        protected function setQueryStr( asChild:String, asSelf:String = null ):void{
+            if( asSelf == null && asChild != null ){
+                asSelf = field.queryField + ":" + asChild;
+            }
+            if( asSelf != _queryStr || asChild != _queryStrAsChild ){
+                _queryStr = asSelf;
+                _queryStrAsChild = asChild;
+                dispatchEvent( new Event( "queryStrChanged" ) );
+                CONFIG::debugging{
+                    trace( ".setQueryStr: queryStr:{" + _queryStr + "}======{" + _queryStrAsChild + "}" );
+                }//debug
+            }
+        }
+
+        public function clone( newQuery:Query = null, newInst:QueryTerm = null ):QueryTerm{
+            if( newQuery == null ){
+                newQuery = query;
+            }
+            newInst.query = newQuery;
+
+            if( field == null ){
+                var qfs:ArrayList = newQuery.queryResult.searchModel.queryFields;
+                for( var j:int = qfs.length - 1; j >= 0; j-- ){
+                    var q:QueryField = qfs.getItemAt( j ) as QueryField;
+                    if( q.id == field_id ){
+                        field = q;
+                        break;
+                    }
+                }
+            }
+
+            newInst.field = field;
+            return newInst;
+        }
+
+        public function commit():Boolean{
+            query.setFocusedOnTerm( null );
+            return true;
+        }
+
+        public function revert():void{
+            throw new Error( "override me" );
+        }
+
+        [Bindable]
+        public var label:String;
+
+        public function destroy():void{
+            query = null;
+            field = null;
+        }
+
+        public function writeExternal( output:IDataOutput ):void{
+            output.writeUTF( label );
+            output.writeUTF( field.id );
+        }
+
+        public var field_id:String;
+        public function readExternal( input:IDataInput ):void{
+            label = input.readUTF();
+            field_id = input.readUTF();
+        }
+        ]]></fx:Script>
+</as3lib:MxmlEventDispatcher>

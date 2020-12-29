@@ -1,0 +1,69 @@
+<?xml version="1.0"?>
+<webdesktop:TiBoTlePanel xmlns:fx="http://ns.adobe.com/mxml/2009" xmlns:webdesktop="edu.umich.med.mbni.webdesktop.*"
+                         xmlns:s="library://ns.adobe.com/flex/spark" xmlns:mx="library://ns.adobe.com/flex/mx"
+                         xmlns:as3lib="com.flashflexpro.as3lib.*" xmlns:utils="edu.umich.med.mbni.utils.*">
+    <fx:Script><![CDATA[
+        import edu.umich.med.mbni.pubanatomy.search.model.Result;
+        import edu.umich.med.mbni.pubanatomy.search.model.ResultFacet;
+        import edu.umich.med.mbni.pubanatomy.search.model.ResultFacetBrainStrSymbols;
+        import edu.umich.med.mbni.pubanatomy.search.model.ResultFacetGeneSymbols;
+
+        [Bindable]
+        public var modelResult:Result;
+
+        private function facet2view( f:ResultFacet ):ViewResultFacetStatics{
+            var vfsCls:Class;
+            if( f is ResultFacetBrainStrSymbols ){
+                vfsCls = ViewResultFacetStaticsBrainStr;
+            }
+            else if( f is ResultFacetGeneSymbols ){
+                vfsCls = ViewResultFacetStaticsGene;
+            }
+            else{
+                vfsCls = ViewResultFacetStatics;
+            }
+
+            var vf:ViewResultFacetStatics = modelResult.queryResult.searchModel.instantiate( vfsCls ) as ViewResultFacetStatics;
+            vf.model = f;
+            vf.percentHeight = 100;
+            vf.percentWidth = 100;
+            dividedBox.addElement( vf );
+            return  vf;
+        }
+
+        private function destroyFacet( vf:ViewResultFacetStatics ):void{
+            dividedBox.removeElement( vf );
+        }
+        ]]></fx:Script>
+    <fx:Declarations>
+        <as3lib:Sync2Lists id="sync2Lists"
+                           getDestInst="facet2view"
+                           destroyInst="destroyFacet"
+                >
+            <as3lib:destination>
+                <s:ArrayList id="___facetDummy"/>
+            </as3lib:destination>
+        </as3lib:Sync2Lists>
+    </fx:Declarations>
+    <mx:DividedBox id="dividedBox" creationComplete="sync2Lists.source = modelResult.facets;" width="100%" height="100%"
+                   paddingLeft="5" paddingRight="5" paddingBottom="5" paddingTop="5"
+                   dividerSkin="edu.umich.med.mbni.utils.DividerSkin" />
+    <fx:Script><![CDATA[
+
+        public function setDividedBoxDirection( dir:String ):void{
+            if( dividedBox != null ){
+                dividedBox.direction = dir;
+            }
+        }
+
+        ]]></fx:Script>
+    <webdesktop:titleGroupContent>
+        <s:HGroup width="100%" verticalAlign="middle">
+            <s:Label text="Search result statistics:" width="100%" fontWeight="bold"
+                     toolTip="#t(searchResultStatisticsTitle)p#" maxDisplayedLines="1"/>
+            <s:Button height="16" label="Summary options"
+                                     click="modelResult.showFacetsMenu();"
+                                     toolTip="#t(searchResultStatisticsCloseBtn)p#"/>
+        </s:HGroup>
+    </webdesktop:titleGroupContent>
+</webdesktop:TiBoTlePanel>

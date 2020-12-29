@@ -1,0 +1,42 @@
+<?xml version="1.0"?>
+<s:BorderContainer xmlns:fx="http://ns.adobe.com/mxml/2009" xmlns:s="library://ns.adobe.com/flex/spark"
+                   minWidth="1" minHeight="1"
+
+                   backgroundAlpha="0"
+                   borderWeight="1"
+
+                   borderVisible="false"
+                   borderVisible.exprReady="true"
+
+                   toolTip="{data.toolTipDynamics}#t(strtrcolglvlrdr0)p#"
+                   currentState="{data==null?'loading':data.exprState}"
+                   rightClick="trace( this );"
+        >
+    <fx:Script><![CDATA[
+        [Bindable]
+        public var data:StructureTreeGridDataCellGene;
+        ]]></fx:Script>
+    <s:states>
+        <s:State name="loading"/>
+        <s:State name="noExpr"/>
+        <s:State name="calculating"/>
+        <s:State name="exprReady"/>
+    </s:states>
+    <s:layout>
+        <s:VerticalLayout gap="0" paddingTop="1" paddingBottom="1" verticalAlign="middle"/>
+    </s:layout>
+    <s:Label text.loading="loading" text.noExpr="N/A" text.calculating="calculating"
+             width="100%" textAlign="center" text="{data.label}"/>
+    <s:Rect percentWidth="{data.ratio*100}" height="100%"
+            visible="false" visible.exprReady="true"
+            includeInLayout="false" includeInLayout.exprReady="true"
+            >
+        <s:fill>
+            <s:SolidColor color="{data.colGene.selectedDataSet.color}"
+                          alpha="{data.selected?1:0}"/>
+        </s:fill>
+        <s:stroke>
+            <s:SolidColorStroke color="{data.colGene.selectedDataSet.color}" weight="1"/>
+        </s:stroke>
+    </s:Rect>
+</s:BorderContainer>

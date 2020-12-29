@@ -1,0 +1,87 @@
+<?xml version="1.0"?>
+<view:WebWinBase xmlns:fx="http://ns.adobe.com/mxml/2009"
+                 xmlns:view="edu.umich.med.mbni.pubanatomy.integrate.view.*" xmlns:s="library://ns.adobe.com/flex/spark"
+                 title="{structure3d.atlasStructure.dtoStructure.acronym}---{structure3d.structure3dModel.dtoModel.dividedBy}"
+                 enabled="{structure3d.structure3dModel.loader == null}"
+        >
+    <fx:Script><![CDATA[
+        import edu.umich.med.mbni.pubanatomy.atlas.model.StructureTreeGridDataRow;
+        import edu.umich.med.mbni.pubanatomy.flash.dto.DtoModel;
+        import edu.umich.med.mbni.pubanatomy.voxel3d.model.Voxel3dOperationMove3dCenter;
+        import edu.umich.med.mbni.pubanatomy.voxel3d.model.Voxel3dStructure;
+
+        import mx.collections.ArrayList;
+
+
+        import spark.events.IndexChangeEvent;
+
+
+        [Bindable]
+        public var structure3d:Voxel3dStructure;
+
+
+        public function onModels( array:Array ):void{
+            models = new ArrayList( array );
+        }
+
+        [Bindable]
+        public var models:ArrayList;
+
+        private function onChange( event:IndexChangeEvent ):void{
+            structure3d.structure3dModel.dtoModel = lst.selectedItem as DtoModel;
+            if( structure3d.structure3dModel.dtoModel == null ){
+                throw new Error();
+            }
+            structure3d.structure3dModel.loadMesh( true );
+        }
+
+        private var _defaultModel:SaveStructureDefaultModel;
+        [Bindable(event="defaultModelChanged")]
+        public function get defaultModel():SaveStructureDefaultModel{
+            return _defaultModel;
+        }
+
+        private function setDefaultModel( value:SaveStructureDefaultModel ):void{
+            if( value != _defaultModel ){
+                _defaultModel = value;
+                dispatchEvent( new Event( "defaultModelChanged" ) );
+            }
+        }
+
+        private function submit():void{
+            setDefaultModel( new SaveStructureDefaultModel() );
+            _defaultModel.winModelsSelection = this;
+            _defaultModel.callRemote();
+        }
+
+        public function onSubmitResult( b:Boolean ):void{
+            setDefaultModel( null );
+        }
+
+
+        private function set rfrTarget( ignoreVar:* ):void{
+            var a:Vector.<Object> = rootView.rootAppModel.rootModelVoxel3d.on3dStageStructureTreeGridData.selectedItems;
+            if( a == null || a.length != 1 ){
+                structure3d = null;
+                return;
+            }
+
+            structure3d = rootView.rootAppModel.rootModelVoxel3d.syncAllStructuresToVoxels.getDestBySource( (a[ 0 ] as StructureTreeGridDataRow).structure ) as Voxel3dStructure;
+            var rpc:GetStructure3dModels = new GetStructure3dModels();
+            rpc.win = this;
+            rpc.callRemote();
+            var tmp:Voxel3dOperationMove3dCenter = new Voxel3dOperationMove3dCenter();
+            tmp.newCentralStructure = structure3d.structure3dModel;
+            tmp.v3dSceneModel = rootView.rootAppModel.rootModelVoxel3d.scene3d;
+            tmp.execute();
+        }
+        ]]></fx:Script>
+    <view:layout>
+        <s:VerticalLayout/>
+    </view:layout>
+    <fx:Binding source="rootView.rootAppModel.rootModelVoxel3d.on3dStageStructureTreeGridData.selectedItems"
+                destination="rfrTarget"/>
+    <s:List dataProvider="{models}" width="100%" height="100%" change="onChange( event );"
+            id="lst" labelField="dividedBy" selectedItem="{structure3d.structure3dModel.dtoModel}"/>
+    <s:Button label="Submit" click="submit();" enabled="{defaultModel==null}"/>
+</view:WebWinBase>

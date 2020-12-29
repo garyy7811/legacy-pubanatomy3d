@@ -1,0 +1,36 @@
+<?xml version="1.0"?>
+<s:DefaultGridHeaderRenderer xmlns:fx="http://ns.adobe.com/mxml/2009" xmlns:s="library://ns.adobe.com/flex/spark"
+                             creationComplete="callLater( onCreated );" rollOver="onRollOver();"
+                             rollOut="_btn.visible=false;">
+    <fx:Script><![CDATA[
+        import spark.components.HGroup;
+
+        [Bindable("columnChanged")]
+        public function get myColumn():SearchViewRecordGridColum{
+            return column as SearchViewRecordGridColum;
+        }
+
+        private function onRemoveColumn():void{
+            ( owner as SearchViewRecordGrid ).removeColumn( column );
+        }
+
+        private function onCreated():void{
+            if( myColumn.queryField != myColumn.queryField.searchModel.pmid ){
+                ( getElementAt( numElements - 1 ) as HGroup).addElement( _btn );
+            }
+        }
+
+
+        private function onRollOver():void{
+            var tip:String = "#t(searchField_" + myColumn.queryField.toolTip + ")p#";
+            if( labelDisplay.toolTip != tip ){
+                labelDisplay.toolTip = tip;
+            }
+            _btn.visible = true;
+        }
+        ]]></fx:Script>
+    <fx:Declarations>
+        <s:Button skinClass="spark.skins.spark.TitleWindowCloseButtonSkin" id="_btn" top="0" right="0" visible="false"
+                  mouseDown="event.stopImmediatePropagation();" click="onRemoveColumn();" width="15" height="15"/>
+    </fx:Declarations>
+</s:DefaultGridHeaderRenderer>

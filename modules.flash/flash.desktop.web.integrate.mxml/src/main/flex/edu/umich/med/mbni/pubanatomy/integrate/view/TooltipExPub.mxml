@@ -1,0 +1,96 @@
+<?xml version="1.0"?>
+<utils:ToolTipEx xmlns:fx="http://ns.adobe.com/mxml/2009" xmlns:utils="edu.umich.med.mbni.utils.*">
+    <fx:Script><![CDATA[
+        import edu.umich.med.mbni.pubanatomy.AppSkin;
+        import edu.umich.med.mbni.pubanatomy.integrate.model.MDLIntegrationRootModel;
+        import edu.umich.med.mbni.pubanatomy.integrate.model.MDLTooltipExPub;
+
+        import mx.core.FlexGlobals;
+
+        [Bindable]
+        public var model:MDLTooltipExPub;
+
+        override public function set text( value:String ):void{
+            CONFIG::debugging{
+                if( value == null ){
+                    throw new Error( this + " tip can't be null!!" );
+                }//debug
+            }
+            var tmp:String = MDLTooltipExPub.TOOLTIP_MATCH.exec( value );
+
+            if( tmp == null ){
+                model = null;
+                super.text = value;
+                return;
+            }
+
+            var tooltipId:String = tmp.substring( 3, tmp.length - 3 );
+            var editorTip:String = value.substring( 0, value.length - tmp.length );
+
+            var rootModel:MDLIntegrationRootModel = ( FlexGlobals.topLevelApplication.skin as AppSkin ).rootAppModel;
+            model = rootModel.dicTargetUid2Help[ tooltipId ];
+            if( model == null ){
+                var mdl:MDLTooltipExPub = newModel();
+                mdl.rootModel = rootModel;
+                mdl.toolTipId = tooltipId;
+                rootModel.dicTargetUid2Help[ tooltipId ] = mdl;
+                model = mdl;
+            }
+            model.editorTip = editorTip;
+        }
+
+        protected function newModel():MDLTooltipExPub{
+            return new MDLTooltipExPub();
+        }
+
+        override protected function onClick( event:MouseEvent = null ):void{
+            model.rootModel.popUpHelpNow();
+        }
+
+        override protected function commitProperties():void{
+            super.commitProperties();
+            if( model == null ){
+                return;
+            }
+            if( model.htmlHelp != null && model.htmlHelp.length > 4 ){
+                mouseEnabled = true;
+                var tmp:String = ( model.rootModel.moreHelpClickable ? " or click here" : "" );
+                textField.htmlText = "<b>" + _displayTip + "</b>" +
+                        "<br><br>" +
+                        "Double hit SHIFT" + tmp + " to see more help.";
+                /* +
+                 "<img id='embimg' src='edu.umich.med.mbni.pubanatomy.integrate.view.TooltipExPubImg'" +
+                 "  align='right' width='24' height='24' hspace='2' vspace='2'/>";*/
+            }
+            else{
+                mouseEnabled = false;
+                textField.text = _displayTip;
+            }
+            invalidateSize();
+        }
+
+        private var _displayTip:String;
+
+        private function set rfrEvery( i:* ):void{
+            visible = false;
+            if( model == null ){
+                return;
+            }
+
+            if( model.shortTip == null ){
+                textField.text = "loading ...";
+                return;
+            }
+
+            _displayTip = model.firstLevelDisplay;
+
+            if( _displayTip.length > 3 ){
+                visible = true;
+            }
+
+            invalidateProperties();
+        }
+        ]]></fx:Script>
+    <fx:Binding source="model.firstLevelDisplay" destination="rfrEvery"/>
+    <fx:Binding source="model.htmlHelp" destination="rfrEvery"/>
+</utils:ToolTipEx>

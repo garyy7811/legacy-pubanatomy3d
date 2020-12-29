@@ -1,0 +1,127 @@
+<?xml version="1.0"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009"
+         xmlns:s="library://ns.adobe.com/flex/spark"
+         xmlns:utils="edu.umich.med.mbni.utils.*" xmlns:mx="library://ns.adobe.com/flex/mx">
+    <fx:Metadata>
+        [ResourceBundle("Text3d")]
+    </fx:Metadata>
+    <fx:Script><![CDATA[
+        import edu.umich.med.mbni.pubanatomy.integrate.model.MDLDividableWidget;
+
+        [Bindable]
+        public var model:MDLDividableWidget;
+        ]]></fx:Script>
+    <fx:Declarations>
+        <fx:String id="cmrCutRdMM">{(model.rootApp.rootModelAtlas.config !=null )?model.rootApp.rootModelAtlas.format(
+            model.modelCamera.cameraCutRadius ):''}
+        </fx:String>
+        <fx:String id="ctrDistMM">{(model.rootApp.rootModelAtlas.config !=null )?model.rootApp.rootModelAtlas.format(
+            model.modelCamera.cameraCtrlDistance ):''}
+        </fx:String>
+    </fx:Declarations>
+    <s:BorderContainer width="100%" borderVisible="false" backgroundAlpha="0">
+        <s:layout>
+            <s:HorizontalLayout paddingBottom="0" paddingTop="0" paddingLeft="0" paddingRight="0" gap="3"
+                                verticalAlign="middle"/>
+        </s:layout>
+        <s:Button
+                label="{resourceManager.getString( 'Text3d', 'cameraCtrls.labelPerspRadius')
+                }:{cmrCutRdMM}"
+                skinClass="edu.umich.med.mbni.utils.UpLabelOverBtnSkin"
+                toolTip="lenghth in mm|^|{ cmrCutRdMM + '\r\n'}#t(cmrprspctvrds0)p#"
+                click="onCameraLensNear();" fontWeight="bold">
+            <fx:Script><![CDATA[
+                private function onCameraLensNear():void{
+                    var c:V3dCameraNearSlider = new V3dCameraNearSlider();
+                    c.model = model.modelCamera;
+                    c.dataTipFormatFunction = model.rootApp.rootModelAtlas.format;
+                    c.show();
+                }
+                ]]></fx:Script>
+        </s:Button>
+        <s:Button
+                label="{resourceManager.getString( 'Text3d', 'cameraCtrls.labelCamDis' )
+                }:{ctrDistMM}"
+                minWidth="15"
+                skinClass="edu.umich.med.mbni.utils.UpLabelOverBtnSkin"
+                toolTip="length in mm:|^|{ ctrDistMM + '\r\n' }#t(cmrdisctvrds0)p#"
+                click="onCameraDis();" fontWeight="bold">
+            <fx:Script><![CDATA[
+                private function onCameraDis():void{
+                    var c:V3dCameraDisSlider = new V3dCameraDisSlider();
+                    c.model = model.modelCamera;
+                    c.dataTipFormatFunction = model.rootApp.rootModelAtlas.format;
+                    c.show();
+                    c.y = 5;
+                }
+                ]]></fx:Script>
+        </s:Button>
+
+        <s:Button label="Auto rotate: {model.modelCamera.autoRotate}"
+                  minWidth="15" doubleClickEnabled="true"
+                  doubleClick="model.modelCamera.autoRotate=0;"
+                  skinClass="edu.umich.med.mbni.utils.UpLabelOverBtnSkin"
+                  click="onAutoRot();" fontWeight="bold" toolTip="#t(v3dviewAutoRotate)p#">
+            <fx:Script><![CDATA[
+                private function onAutoRot():void{
+                    var c:V3dAutoRotate = new V3dAutoRotate();
+                    c.model = model.modelCamera;
+                    c.show();
+                }
+                ]]></fx:Script>
+        </s:Button>
+
+        <mx:ColorPicker selectedColor="@{model.backgroundColor}" toolTip="#t(3dviewbackgroundcolor)p#"/>
+    </s:BorderContainer>
+    <utils:MoreOptionsButton click="model.onMenu();" toolTip="#t(more3DOptions.tip)p#" right="1" top="1"/>
+    <fx:Declarations>
+        <fx:Component className="V3dCameraNearSlider">
+            <utils:PopupSlider minWidth="16"
+                               minimum="0" maximum="500" height="99"
+
+                               stepSize="5" snapInterval="5"
+
+                               value="@{model.cameraCutRadius}">
+                <fx:Script><![CDATA[
+                    import edu.umich.med.mbni.pubanatomy.datadriven3dwindow.Dd3dModelCamera;
+
+                    [Bindable]
+                    public var model:Dd3dModelCamera;
+                    ]]></fx:Script>
+
+            </utils:PopupSlider>
+        </fx:Component>
+        <fx:Component className="V3dCameraDisSlider">
+            <utils:PopupSlider minWidth="16"
+                               minimum="5" maximum="2000" height="550"
+
+                               stepSize="1" snapInterval="1"
+
+                               value="@{model.cameraCtrlDistance}">
+                <fx:Script><![CDATA[
+                    import edu.umich.med.mbni.pubanatomy.datadriven3dwindow.Dd3dModelCamera;
+
+                    [Bindable]
+                    public var model:Dd3dModelCamera;
+                    ]]></fx:Script>
+
+            </utils:PopupSlider>
+        </fx:Component>
+        <fx:Component className="V3dAutoRotate">
+            <utils:PopupSlider minWidth="16"
+                               minimum="-2" maximum="2" height="202"
+
+                               stepSize="0.01" snapInterval="0.01"
+
+                               value="@{model.autoRotate}">
+                <fx:Script><![CDATA[
+                    import edu.umich.med.mbni.pubanatomy.datadriven3dwindow.Dd3dModelCamera;
+
+                    [Bindable]
+                    public var model:Dd3dModelCamera;
+                    ]]></fx:Script>
+
+            </utils:PopupSlider>
+        </fx:Component>
+    </fx:Declarations>
+</s:Group>

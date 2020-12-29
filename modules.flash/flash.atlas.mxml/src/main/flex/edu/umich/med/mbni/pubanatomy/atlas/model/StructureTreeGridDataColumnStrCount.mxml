@@ -1,0 +1,63 @@
+<?xml version="1.0"?>
+<v:TreeGridDataColumn xmlns:fx="http://ns.adobe.com/mxml/2009"
+                      xmlns:v="edu.umich.med.mbni.treedatagrid.*">
+    <fx:Script><![CDATA[
+        import edu.umich.med.mbni.pubanatomy.flash.v02tmp.TermToCount;
+        import edu.umich.med.mbni.treedatagrid.TreeGridDataRow;
+
+        [Bindable(event="treeGridDataChanged")]
+        public function get structureTreeGridData():StructureTreeGridData{
+            return treeGridData as StructureTreeGridData;
+        }
+
+
+        private var _structureSymbol2CountDic:Dictionary;
+
+        [Bindable(event="structureSymbol2CountChanged")]
+        public function get structureSymbol2CountDic():Dictionary{
+            return _structureSymbol2CountDic;
+        }
+
+        private var _structureSymbol2Count:Vector.<TermToCount>;
+        [Bindable(event="structureSymbol2CountChanged")]
+        public function get structureSymbol2Count():Vector.<TermToCount>{
+            return _structureSymbol2Count;
+        }
+
+        public function set structureSymbol2Count( value:Vector.<TermToCount> ):void{
+            if( value != _structureSymbol2Count ){
+                _structureSymbol2Count = value;
+                _structureSymbol2CountDic = new Dictionary();
+                if( _structureSymbol2Count != null ){
+                    _structureSymbol2Count.forEach( function ( tc:TermToCount, idx:int, v:Vector.<TermToCount> ):void{
+                        _structureSymbol2CountDic[ tc.term.toLowerCase() ] = tc.count;
+                    } );
+                }
+                dispatchEvent( new Event( "structureSymbol2CountChanged" ) );
+            }
+        }
+
+        override public function compare2RowData( a:TreeGridDataRow, b:TreeGridDataRow ):int{
+            var la:uint = _structureSymbol2CountDic[ ( a as StructureTreeGridDataRow ).structure.dtoStructure.acronym.toLowerCase() ];
+            var lb:uint = _structureSymbol2CountDic[ ( b as StructureTreeGridDataRow ).structure.dtoStructure.acronym.toLowerCase() ];
+
+            if( la > lb ){
+                return sortDesc ? -1 : 1;
+            }
+            else if( la < lb ){
+                return sortDesc ? 1 : -1;
+            }
+            return nextOr0( a, b );
+        }
+        ]]></fx:Script>
+
+    <fx:Script><![CDATA[
+        import edu.umich.med.mbni.utils.ModelOperationMenuChildren;
+
+        public function dialogDataSetSelection():void{
+            structureTreeGridData.rootModel.rootApp.setMenuOperations(
+                    new ModelOperationMenuChildren( [ new OperationColumnBrainStrClose( structureTreeGridData.str2countCol ) ] )
+            );
+        }
+        ]]></fx:Script>
+</v:TreeGridDataColumn>

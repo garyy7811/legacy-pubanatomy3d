@@ -1,0 +1,62 @@
+<?xml version="1.0"?>
+<win:WebWindowStatus xmlns:fx="http://ns.adobe.com/mxml/2009" xmlns:s="library://ns.adobe.com/flex/spark"
+                     mouseDown="onMousedown();"
+                     dragEnter="moveToTop();"
+                     xmlns:win="edu.umich.med.mbni.webdesktop.*">
+    <fx:Metadata>
+        [Event(name="close", type="mx.events.CloseEvent")]
+    </fx:Metadata>
+    <fx:Script><![CDATA[
+        import mx.events.CloseEvent;
+
+        [Bindable]
+        public var showCloseButton:Boolean = true;
+
+        public function onMenu():void{
+        }
+
+        public function onCloseButtonClicked():void{
+            dispatchEvent( new CloseEvent( CloseEvent.CLOSE ) );
+        }
+
+        public function close():void{
+            _scaleFrom = new Point( 1, 1 );
+            _scaleTo = new Point( barButton.width / width, barButton.height / height );
+
+            _moveFrom = new Point( x, y );
+            _moveTo = new Point( x + barButton.width / 2, y + barButton.height / 2 );
+            _fadeFrom = 1;
+            _fadeTo = 0;
+            effect.play();
+        }
+
+
+        private function onMousedown():void{
+            if( parentGroup != null ){
+                parentGroup.moveToFront( this )
+            }
+        }
+
+        public function moveToTop():void{
+            parentGroup.moveToFront( this );
+        }
+        ]]></fx:Script>
+    <win:titleGroupContent>
+        <s:Label maxDisplayedLines="1" textAlign="start" fontWeight="bold" width="100%"
+                 id="overrideLabel" text="{title}"/>
+        <s:Button width="15" height="15" id="miniButton" click="onMini();"
+                  skinClass="edu.umich.med.mbni.webdesktop.WebWindowMinimizeButtonSkin"
+                  toolTip="minimize this window"/>
+        <s:ToggleButton width="15" height="15" id="maxButton" click="onMax();"
+                        toolTip="Maximize"
+                        selected="{status == WebWindowStatus.MAXED}"
+                        enabled="{status == WebWindowStatus.RESIZED}"
+                />
+        <s:Spacer width="2"/>
+        <s:Button width="15" height="15" id="closeButton" click="onCloseButtonClicked();"
+                  skinClass="spark.skins.spark.TitleWindowCloseButtonSkin" toolTip="close this window"/>
+    </win:titleGroupContent>
+    <win:titleGroupLayout>
+        <s:HorizontalLayout verticalAlign="middle" paddingLeft="3" paddingRight="3" gap="2"/>
+    </win:titleGroupLayout>
+</win:WebWindowStatus>

@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<v:StructureTreeGridColumnItemRenderer xmlns:fx="http://ns.adobe.com/mxml/2009"
+                                       xmlns:v="edu.umich.med.mbni.pubanatomy.atlas.view.*"
+                                       xmlns:view="edu.umich.med.mbni.pubanatomy.voxel3d.view.*"
+                                       xmlns:s="library://ns.adobe.com/flex/spark"
+                                       xmlns:aview="edu.umich.med.mbni.pubanatomy.atlas.view.*"
+
+                                       rightClick="trace( this );"
+        >
+    <fx:Script><![CDATA[
+        [Bindable(event="cellDataChanged")]
+        public function get cellDataGene3d():V3dStructureTreeGridDataCellGene{
+            return cellData as V3dStructureTreeGridDataCellGene;
+        }
+        ]]></fx:Script>
+    <v:layout>
+        <s:HorizontalLayout verticalAlign="middle" gap="2" paddingLeft="3" paddingRight="1" paddingTop="1"/>
+    </v:layout>
+    <view:V3dStructureTreeGridColumnGeneRendererVoxels id="c" data="{cellDataGene3d}"/>
+    <aview:StructureTreeGridColumnGeneItemRendererBar data="{cellDataGene3d}" width="100%" height="100%"/>
+</v:StructureTreeGridColumnItemRenderer>

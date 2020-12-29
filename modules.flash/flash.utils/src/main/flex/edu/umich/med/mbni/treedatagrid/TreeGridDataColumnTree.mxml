@@ -1,0 +1,49 @@
+<?xml version="1.0"?>
+<v:TreeGridDataColumn xmlns:fx="http://ns.adobe.com/mxml/2009"
+                      xmlns:v="edu.umich.med.mbni.treedatagrid.*"
+        >
+    <fx:Script><![CDATA[
+        override public function compare2RowData( a:TreeGridDataRow, b:TreeGridDataRow ):int{
+
+            CONFIG::debugging{
+                if( a == b ){
+                    throw new Error( this + ".compare2RowData " );
+                }
+            }
+            if( a.parent == b.parent ){
+                return next == null ? 0 : next.compare2RowData( a, b );
+            }
+
+            if( a.parent == b ){
+                return sortDesc ? - 1 : 1;
+            }
+            else if( b.parent == a ){
+                return sortDesc ? 1 : - 1;
+            }
+
+            if( a.depth > b.depth ){
+                if( a.parent == null ){
+                    return next == null ? 0 : next.compare2RowData( a, b );
+                }
+                return compare2RowData( a.parent as TreeGridDataRow, b );
+            }
+            else if( a.depth < b.depth ){
+                if( b.parent == null ){
+                    return next == null ? 0 : next.compare2RowData( a, b );
+                }
+                return compare2RowData( a, b.parent as TreeGridDataRow );
+            }
+            else{
+                if( a.parent == null && b.parent == null ){
+                    return next == null ? 0 : next.compare2RowData( a, b );
+                }
+                else if( a.parent != null && b.parent != null ){
+                    return compare2RowData( a.parent as TreeGridDataRow, b.parent as TreeGridDataRow );
+                }
+                else{
+                    return a.parent == null ? -1 : 1;
+                }
+            }
+        }
+        ]]></fx:Script>
+</v:TreeGridDataColumn>

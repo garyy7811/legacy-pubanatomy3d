@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Skin xmlns:fx="http://ns.adobe.com/mxml/2009"
+        xmlns:s="library://ns.adobe.com/flex/spark"
+        xmlns:as3lib="com.flashflexpro.as3lib.*"
+        xmlns:utils="edu.umich.med.mbni.utils.*"
+        xmlns:model2="edu.umich.med.mbni.pubanatomy.integrate_gene_img_sec.model.*"
+        xmlns:sec2d="edu.umich.med.mbni.pubanatomy.sectioninteract.view.*"
+        enterFrame="callInNext.onEnterFrame();">
+    <fx:Metadata>[HostComponent("spark.components.Application")]</fx:Metadata>
+    <s:states>
+        <s:State name="normal"/>
+        <s:State name="disabled" stateGroups="disabledGroup"/>
+        <s:State name="normalAndInactive" stateGroups="inactiveGroup"/>
+        <s:State name="disabledAndInactive" stateGroups="disabledGroup, inactiveGroup"/>
+
+        <s:State name="normalWithControlBar"/>
+        <s:State name="disabledWithControlBar"/>
+    </s:states>
+    <fx:Script><![CDATA[
+        import edu.umich.med.mbni.pubanatomy.sectioninteract.model.ModelSectionPlane;
+
+        import mx.controls.Alert;
+        import mx.events.CollectionEvent;
+
+        public function onPreInit( amfUrl:String, stage:Stage ):void{
+            geneImgSecRootModel.restUrl = amfUrl;
+            geneImgSecRootModel.stage = stage;
+
+
+            var tmp:Number = Number( stage.loaderInfo.parameters.secImgId );
+            if( isNaN( tmp ) ){
+                Alert.show( "Illegal URL param, param name should be 'secImgId'," +
+                                    "try http://~~~~index.jsp?secImgId=73418709" );
+                return;
+            }
+            geneImgSecRootModel.sectionImageId = tmp;
+            geneImgSecRootModel.appInit();
+        }
+
+
+        [Bindable]
+        private var _sec2dpls:ArrayList;
+
+
+        private function set rfrPlanes( ignoreVar:* ):void{
+            geneImgSecRootModel.callInNext.putIn( refreshPlanes );
+        }
+
+        private function refreshPlanes():void{
+            if( _sec2dpls != null && _sec2dpls.length > 0 ){
+                _modelSectionPlane = _sec2dpls.getItemAt( 0 ) as ModelSectionPlane;
+            }
+        }
+
+        [Bindable]
+        private var _modelSectionPlane:ModelSectionPlane;
+
+        private function onRpcLstChange( event:CollectionEvent ):void{
+            try{
+                _title = " section image id:" + geneImgSecRootModel.sectionImageId
+                        + "section data set id:" + geneImgSecRootModel.sectionDSId
+                        + "gene id:" + geneImgSecRootModel.geneDto.geneId;
+                if( geneImgSecRootModel.rpcOnAir.length > 0
+                        || geneImgSecRootModel.rpcWaitQue.length > 0 ){
+                    _title = " loading ";
+                }
+            }
+            catch( e:Error ){
+            }
+        }
+        ]]></fx:Script>
+    <fx:Binding source="geneImgSecRootModel.rootModelSection2d.onSection2dPlanes" destination="_sec2dpls"/>
+    <fx:Binding source="_sec2dpls.length" destination="rfrPlanes"/>
+    <fx:Declarations>
+        <model2:GeneImgSectionRootModel id="geneImgSecRootModel">
+            <model2:callInNext>
+                <as3lib:CallOnceInNextFrame id="callInNext"/>
+            </model2:callInNext>
+            <model2:pressedKeys>
+                <s:ArrayList />
+            </model2:pressedKeys>
+            <model2:rpcOnAir>
+                <s:ArrayList collectionChange="onRpcLstChange( event );"/>
+            </model2:rpcOnAir>
+            <model2:rpcWaitQue>
+                <s:ArrayList collectionChange="onRpcLstChange( event );"/>
+            </model2:rpcWaitQue>
+            <model2:numberFormatter>
+                <s:NumberFormatter
+                        fractionalDigits="9"
+                        decimalSeparator="."
+                        groupingSeparator=","
+                        useGrouping="true"
+                        negativeNumberFormat="0"/>
+            </model2:numberFormatter>
+        </model2:GeneImgSectionRootModel>
+
+        <utils:ViewMenuHandler rootApp="{geneImgSecRootModel}"/>
+    </fx:Declarations>
+    <s:Panel title="{_title}"  width="100%" height="100%">
+        <sec2d:ViewSectionPlane sectionPlane="{_modelSectionPlane}" width="100%" height="100%"/>
+    </s:Panel>
+    <fx:Script><![CDATA[
+        import mx.collections.IList;
+
+
+        [Bindable]
+        private var _imgSecs:IList;
+
+
+        private function set rfrImgSecLen( ignoreVar:* ):void{
+            if( _imgSecs != null && _imgSecs.length == 0 ){
+                Alert.show( "sorry! this img's section is not computed yet! please try some other one!" )
+            }
+        }
+
+        [Bindable]
+        private var _title = "loading .. ";
+        ]]></fx:Script>
+    <fx:Binding source="_modelSectionPlane.v3dPlane.image.sections" destination="_imgSecs"/>
+    <fx:Binding source="_imgSecs.length" destination="rfrImgSecLen"/>
+</s:Skin>

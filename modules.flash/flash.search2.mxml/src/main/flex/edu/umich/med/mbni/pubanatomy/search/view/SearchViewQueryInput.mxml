@@ -1,0 +1,26 @@
+<?xml version="1.0"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009"
+         xmlns:s="library://ns.adobe.com/flex/spark"
+         xmlns:view="edu.umich.med.mbni.pubanatomy.search.view.*"
+         enterFrame="refreshMouseOverDragging();"
+         rollOut="queryResult.mouseOverTerm = null;"
+        >
+    <fx:Script><![CDATA[
+        import edu.umich.med.mbni.pubanatomy.search.model.QueryResult;
+
+        [Bindable]
+        public var queryResult:QueryResult;
+
+        [Bindable]
+        public var termSuggestGroup:ViewTermSuggestGroup;
+
+        private function refreshMouseOverDragging():void{
+            if( !getBounds( this ).contains( mouseX, mouseY ) ){
+                return;
+            }
+            queryResult.mouseOverTerm = rootDrDr.findMouseOverLeaf();
+        }
+        ]]></fx:Script>
+    <view:SearchViewQueryInputDrDr model="{queryResult.queryModel.rootTerm}" termSuggestGroup="{termSuggestGroup}"
+                                   id="rootDrDr" minWidth="120"/>
+</s:Group>

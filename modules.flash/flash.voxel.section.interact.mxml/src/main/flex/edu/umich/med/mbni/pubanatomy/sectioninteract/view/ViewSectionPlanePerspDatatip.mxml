@@ -1,0 +1,67 @@
+<?xml version="1.0"?>
+<s:DataRenderer xmlns:fx="http://ns.adobe.com/mxml/2009" xmlns:s="library://ns.adobe.com/flex/spark">
+    <fx:Script><![CDATA[
+        import edu.umich.med.mbni.pubanatomy.atlas.model.RootModelAtlas;
+
+        [Bindable]
+        public var rootAtlas:RootModelAtlas;
+
+        [Bindable]
+        public var dir:int = -1;
+
+        [Bindable]
+        public var value:uint;
+
+        [Bindable]
+        public var text:String;
+
+        private function set rfr( ignoreVar:* ):void{
+            _minScope = rootAtlas.config.dataExtent[ dir * 2 ];
+            _maxScope = rootAtlas.config.dataExtent[ dir * 2 + 1 ];
+            if( dir == 0 ){
+                currentState = "c";
+            }
+            else if( dir == 1 ){
+                currentState = "t";
+            }
+            else if( dir == 2 ){
+                currentState = "s";
+            }
+        }
+
+        [Bindable]
+        protected var _minScope:int = int.MIN_VALUE;
+
+        [Bindable]
+        protected var _maxScope:int = int.MAX_VALUE;
+
+        [Bindable]
+        protected var _atlasPositionPercent:Number;
+        ]]></fx:Script>
+    <s:states>
+        <s:State name="c" stateGroups="v"/>
+        <s:State name="s" stateGroups="v"/>
+        <s:State name="t"/>
+    </s:states>
+    <fx:Binding source="rootAtlas.config.dataExtent" destination="rfr"/>
+    <fx:Binding source="dir" destination="rfr"/>
+    <fx:Binding source="value" destination="rfr"/>
+
+    <fx:Binding source="( value - _minScope )/( _maxScope - _minScope )" destination="_atlasPositionPercent"/>
+
+    <s:Image source="@Embed(source='/../resources/corronal.png')" includeIn="s,t" id="imgC"/>
+    <s:Image source="@Embed(source='/../resources/sagittal.png')" includeIn="c" id="imgS"/>
+    <s:Line height.v="100%" top.v="0"
+            width.t="100%" left.t="0"
+            left.c="{ 4 + 172*_atlasPositionPercent}"
+            left.s="{ 4 + 125*_atlasPositionPercent}"
+            top.t="{ 4 + 100*_atlasPositionPercent}"
+            >
+        <s:stroke>
+            <s:SolidColorStroke color="0xff0000" weight="3"/>
+        </s:stroke>
+    </s:Line>
+    <s:HGroup width="100%" height="100%" visible="{text !=null}" verticalAlign="middle" horizontalAlign="center">
+        <s:Label text="{text}" color="0xffffff" textAlign="center" fontWeight="bold" fontSize="18"/>
+    </s:HGroup>
+</s:DataRenderer>

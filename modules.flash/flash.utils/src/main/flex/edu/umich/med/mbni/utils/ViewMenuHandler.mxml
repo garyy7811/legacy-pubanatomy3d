@@ -1,0 +1,74 @@
+<?xml version="1.0"?>
+<mx:Menu xmlns:fx="http://ns.adobe.com/mxml/2009" xmlns:mx="library://ns.adobe.com/flex/mx"
+         addedToStage="callLater( onCreated )" removedFromStage="onRemoveFromStage();"
+         itemClick="onClick( event );" visible="false"
+         itemRenderer="edu.umich.med.mbni.utils.ViewMenuHandlerMenuItemRenderer">
+    <fx:Script><![CDATA[
+        import mx.core.FlexGlobals;
+        import mx.events.MenuEvent;
+
+        import spark.components.Application;
+
+        [Bindable]
+        public var rootApp:RootModelApp;
+
+        private function onRemoveFromStage():void{
+            rootApp.setMenuOperations( null );
+
+            for( var j:int = dataProvider.length - 1; j >= 0; j-- ){
+                var omi:ModelOperationMenuType = dataProvider.getItemAt( j ) as ModelOperationMenuType;
+                omi.destroy();
+            }
+        }
+
+        private function onCreated():void{
+            CONFIG::debugging{
+                if( rootApp == null || rootApp.parent != null ){
+                    throw new Error( this + ".onCreated " );
+                }
+            }
+            if( x + width > topApp.width ){
+                x = topApp.width - width - 12;
+            }
+            if( y + height > topApp.height ){
+                y = topApp.height - height - 12;
+            }
+            visible = true;
+        }
+
+        private function set rfrTopMouse( v:* ):void{
+            if( parent != null ){
+                move( rootApp.topMouse.x, rootApp.topMouse.y );
+                onCreated();
+            }
+        }
+
+        private function onClick( event:MenuEvent ):void{
+            var rt:ModelOperationMenuItem = ( event.item as ModelOperationMenuItem );
+            if( rt.rootModel == null ){
+                rt.rootModel = rootApp;
+            }
+            rootApp.log( "ViewMenuHandler.execute.menu" + getQualifiedClassName( rt ) );
+            rt.execute();
+        }
+
+        private function set rfrMenu( ignoreVar:* ):void{
+            rootApp.callInNext.putIn( showMenu );
+        }
+
+        private function showMenu():void{
+            rootApp.topMouse = new Point( rootApp.stage.mouseX, rootApp.stage.mouseY );
+            if( rootApp.menuOperations != null ){
+                owner = rootApp.stage;
+                Menu.popUpMenu( this, topApp, rootApp.menuOperations.children );
+                rootApp.callInNext.putIn( show, this, [ rootApp.stage.mouseX, rootApp.stage.mouseY ] );
+            }
+        }
+
+        private function get topApp():Application{
+            return FlexGlobals.topLevelApplication as Application;
+        }
+        ]]></fx:Script>
+    <fx:Binding source="rootApp.menuOperations" destination="rfrMenu"/>
+    <fx:Binding source="rootApp.topMouse" destination="rfrTopMouse"/>
+</mx:Menu>

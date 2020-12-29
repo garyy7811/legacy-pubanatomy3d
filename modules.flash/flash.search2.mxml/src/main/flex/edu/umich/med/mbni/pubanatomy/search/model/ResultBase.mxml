@@ -1,0 +1,68 @@
+<?xml version="1.0"?>
+<as3lib:MxmlEventDispatcher xmlns:fx="http://ns.adobe.com/mxml/2009" xmlns:as3lib="com.flashflexpro.as3lib.*">
+    <fx:Script><![CDATA[
+        import edu.umich.med.mbni.pubanatomy.flash.dto.DtoFacetResultMedline;
+
+        import mx.collections.ArrayList;
+
+        [Bindable]
+        public var queryResult:QueryResult;
+
+        public function getMoreResults():void{
+            rpc.model = queryResult.searchModel;
+            rpc.caller = this;
+            rpc.callRemote();
+            _lastFault = null;
+            dispatchEvent( new Event( "lastFaultChanged" ) );
+        }
+
+        [Bindable]
+        public var resultList:ArrayList = new ArrayList();
+
+        [Bindable]
+        public var resultMap:Object = {};
+
+        private var _rpc:SearchWithFacet;
+        [Bindable(event="rpcChanged")]
+        public function get rpc():SearchWithFacet{
+            return _rpc;
+        }
+
+        protected function setRpc( value:SearchWithFacet ):void{
+            if( value != _rpc ){
+                _rpc = value;
+                dispatchEvent( new Event( "rpcChanged" ) );
+            }
+        }
+
+        public function onResult( result:DtoFacetResultMedline ):void{
+            setRpc( null );
+        }
+
+        protected function onResultRecord( key:String, o:Object ):void{
+            resultList.addItem( o );
+            resultMap[ key ] = o;
+        }
+
+        public function discardResults():void{
+            resultMap = {};
+            resultList = new ArrayList();
+        }
+
+
+        protected var _lastFault:ErrorEvent;
+        [Bindable(event="lastFaultChanged")]
+        public function get lastFault():ErrorEvent{
+            return _lastFault;
+        }
+
+        public function onFault( event:ErrorEvent ):void{
+            _lastFault = event;
+            dispatchEvent( new Event( "lastFaultChanged" ) );
+            setRpc( null );
+        }
+        ]]></fx:Script>
+    <fx:Declarations>
+        <fx:uint id="pageRows">40</fx:uint>
+    </fx:Declarations>
+</as3lib:MxmlEventDispatcher>

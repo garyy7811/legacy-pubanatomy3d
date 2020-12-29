@@ -1,0 +1,99 @@
+<?xml version="1.0"?>
+<as3lib:MxmlEventDispatcher xmlns:fx="http://ns.adobe.com/mxml/2009" xmlns:as3lib="com.flashflexpro.as3lib.*">
+    <fx:Script><![CDATA[
+        import edu.umich.med.mbni.utils.RootModelModule;
+
+
+        [Bindable]
+        public var inputLevelArray:Vector.<Vector.<Number>>;
+
+        [Bindable]
+        public var outputBarSetArray:Vector.<ModelLevelBarSet>;
+
+        protected var _levelMinimum:Number;
+        [Bindable(event="levelMinimumChanged")]
+        public function get levelMinimum():Number{
+            return _levelMinimum;
+        }
+
+        protected var _levelMaximum:Number;
+        [Bindable(event="levelMaximumChanged")]
+        public function get levelMaximum():Number{
+            return _levelMaximum;
+        }
+
+        protected var _barLevelNumMinimum:uint;
+        [Bindable(event="barLevelNumMinimumChanged")]
+        public function get barLevelNumMinimum():uint{
+            return _barLevelNumMinimum;
+        }
+
+        protected var _barLevelNumMaximum:uint;
+        [Bindable(event="barLevelNumMaximumChanged")]
+        public function get barLevelNumMaximum():uint{
+            return _barLevelNumMaximum;
+        }
+
+
+        private var _selectedLevelSet:Vector.<Vector.<Number>>;
+        [Bindable(event="selectedLevelSetChanged")]
+        public function get selectedLevelSet():Vector.<Vector.<Number>>{
+            return _selectedLevelSet;
+        }
+
+        protected function setSelectedLevelSet( value:Vector.<Vector.<Number>> ):void{
+            if( value != _selectedLevelSet ){
+                _selectedLevelSet = value;
+                dispatchEvent( new Event( "selectedLevelSetChanged" ) );
+            }
+        }
+
+
+        protected var _maxLevelDivided:uint = 0;
+        [Bindable(event="maxLevelDividedChanged")]
+        public function get maxLevelDivided():uint{
+            return _maxLevelDivided;
+        }
+
+        [Bindable]
+        public var selectedLevelMinimum:Number;
+
+        [Bindable]
+        public var selectedLevelMaximum:Number;
+
+        [Bindable]
+        public var levelDividedInto:uint = 50;
+
+        public function getDivideLevelInto():uint{
+            return Math.min( levelDividedInto, _maxLevelDivided );
+        }
+
+
+        private var _step:Number;
+
+        [Bindable(event="stepChanged")]
+        public function get step():Number{
+            return _step;
+        }
+
+        protected function setStep( value:Number ):void{
+            if( value != _step ){
+                _step = value;
+                dispatchEvent( new Event( "stepChanged" ) );
+            }
+        }
+
+        private var _rootModel:RootModelModule;
+        [Bindable(event="rootModelChanged")]
+        public function get rootModel():RootModelModule{
+            return _rootModel;
+        }
+
+        public function set rootModel( value:RootModelModule ):void{
+            if( value != _rootModel ){
+                _rootModel = value;
+                dispatchEvent( new Event( "rootModelChanged" ) );
+            }
+        }
+        ]]></fx:Script>
+</as3lib:MxmlEventDispatcher>

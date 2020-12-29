@@ -1,0 +1,132 @@
+<?xml version="1.0"?>
+<s:SkinnableContainer xmlns:fx="http://ns.adobe.com/mxml/2009"
+                      xmlns:s="library://ns.adobe.com/flex/spark"
+                      left="10" right="10" top="10" bottom="10"
+                      backgroundColor="0xFFFFFF"
+                      skinClass="edu.umich.med.mbni.utils.SkinnableContainerBusySkin"
+                      addedToStage="rfrDataProvider=null;">
+    <fx:Script><![CDATA[
+        import spark.skins.spark.HSliderSkin;
+
+        [Bindable]
+        public var barBackground:uint = 0x555555;
+
+        public var _model:ModelLevelHistogram;
+
+        public static const model_CHANGED:String = "modelChanged";
+
+        [Bindable(event="modelChanged")]
+        public function get model():ModelLevelHistogram{
+            return _model;
+        }
+
+        public function set model( value:ModelLevelHistogram ):void{
+            if( value != _model ){
+                _model = value;
+                dispatchEvent( new Event( model_CHANGED ) );
+            }
+        }
+
+        [Bindable]
+        public var colorFrom:uint = 0x888888;
+
+        [Bindable]
+        public var colorTo:uint = 0x888888;
+
+        [Bindable]
+        public var alphaFrom:Number = 1;
+
+        [Bindable]
+        public var alphaTo:Number = 1;
+
+        [Bindable]
+        public var topMargin:uint = 1;
+
+        [Bindable]
+        public var bottomMin:uint = 1;
+
+        [Bindable]
+        public var barRenderer:IFactory;
+
+        [Bindable]
+        public var barRendererData:IFactory;
+
+        [Bindable]
+        public var barRendererLevelRenderer:IFactory;
+
+        private function set rfrDataProvider( ignoreVar:* ):void{
+            model.rootModel.callInNext.putIn( refreshDataProvider );
+        }
+        protected function refreshDataProvider():void{
+            if( model.outputBarSetArray == null || model.outputBarSetArray.length == 0 ){
+                return;
+            }
+            if( levelsDataProvider != null ){
+                levelsDataProvider.removeAll();
+            }
+            if( barRenderer == null ){
+                barRenderer = new ClassFactory( ViewLevelHistogramBarRenderer );
+            }
+            if( barRendererLevelRenderer == null ){
+                barRendererLevelRenderer = new ClassFactory( ViewLevelHistogramBarLevelRenderer );
+            }
+
+            var barNum:uint = ( model.outputBarSetArray[0] as ModelLevelBarSet ).levelBars.length;
+            for( var j:int = 0; j < barNum; j++ ){
+                var vb:Vector.<Vector.<Number>> = new <Vector.<Number>>[];
+                var bsArrLen:uint = model.outputBarSetArray.length;
+                for( var ei:int = 0; ei < bsArrLen; ei++ ){
+                    var barSet:ModelLevelBarSet = model.outputBarSetArray[ei] as ModelLevelBarSet;
+                    vb.push( barSet.levelBars[ j ] );
+                }
+                if( barRendererData == null ){
+                    barRendererData = new ClassFactory( ViewLevelHistogramBarData );
+                }
+
+                var rendererData:ViewLevelHistogramBarData = barRendererData.newInstance();
+                rendererData.inputBars = vb;
+                rendererData.model = model;
+                rendererData.index = j;
+                levelsDataProvider.addItem( rendererData );
+            }
+            enabled = true;
+        }
+        ]]></fx:Script>
+    <fx:Binding source="model.outputBarSetArray" destination="rfrDataProvider"/>
+    <fx:Binding source="!model.busy" destination="enabled"/>
+    <s:layout>
+        <s:VerticalLayout gap="1" useVirtualLayout="false"/>
+    </s:layout>
+    <s:DataGroup itemRenderer="{barRenderer}" width="100%" height="100%" maxHeight="{height-selector.height}">
+        <s:layout>
+            <s:HorizontalLayout useVirtualLayout="false" gap="1"/>
+        </s:layout>
+        <s:dataProvider>
+            <s:ArrayList id="levelsDataProvider"/>
+        </s:dataProvider>
+    </s:DataGroup>
+    <s:Group id="selector" width="100%">
+        <s:Rect top="0" bottom="0"
+                left="{width * ( model.selectedLevelMinimum - model.levelMinimum) / (model.levelMaximum - model.levelMinimum)}"
+                right="{width * ( model.levelMaximum - model.selectedLevelMaximum) / (model.levelMaximum - model.levelMinimum)}">
+            <s:fill>
+                <s:LinearGradient id="lg">
+                    <s:GradientEntry color="{colorFrom}" alpha="{alphaFrom}" ratio="0"/>
+                    <s:GradientEntry color="{colorTo}" alpha="{alphaTo}" ratio="1"/>
+                </s:LinearGradient>
+            </s:fill>
+        </s:Rect>
+        <s:HSlider id="selectFrom" width="100%" dataTipPrecision="9" value="@{model.selectedLevelMinimum}"
+                   snapInterval="{model.step}" minimum="{model.levelMinimum}" maximum="{model.levelMaximum}"
+                   focusEnabled="false"/>
+
+        <s:HSlider id="selectTo" width="100%" dataTipPrecision="9" value="@{model.selectedLevelMaximum}"
+                   snapInterval="{model.step}" minimum="{model.levelMinimum}" maximum="{model.levelMaximum}"
+                   focusEnabled="false"
+
+                   creationComplete="
+                   ( selectTo.skin as HSliderSkin ).track.visible = false;
+                   ( selectFrom.skin as HSliderSkin ).track.mouseEnabled = false;
+                   "/>
+    </s:Group>
+</s:SkinnableContainer>

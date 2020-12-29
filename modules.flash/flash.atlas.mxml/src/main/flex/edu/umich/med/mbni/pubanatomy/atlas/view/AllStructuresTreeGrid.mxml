@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<view:StructureTreeGrid xmlns:fx="http://ns.adobe.com/mxml/2009"
+                        xmlns:view="edu.umich.med.mbni.pubanatomy.atlas.view.*">
+    <fx:Script><![CDATA[
+        import edu.umich.med.mbni.pubanatomy.atlas.model.AllStructuresTreeGridData;
+
+        [Bindable(event="treeGridDataChanged")]
+        public function get allStructureTreeGridDataModel():AllStructuresTreeGridData{
+            return structureTreeGridDataModel as AllStructuresTreeGridData;
+        }
+
+        ]]></fx:Script>
+</view:StructureTreeGrid>

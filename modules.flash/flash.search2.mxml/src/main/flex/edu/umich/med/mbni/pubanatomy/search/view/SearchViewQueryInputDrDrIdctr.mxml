@@ -1,0 +1,92 @@
+<?xml version="1.0"?>
+<s:BorderContainer xmlns:fx="http://ns.adobe.com/mxml/2009"
+                   xmlns:s="library://ns.adobe.com/flex/spark"
+
+                   dragEnter="onDragEnterOverDropExit( event )"
+                   dragOver="onDragEnterOverDropExit( event )"
+                   dragDrop="onDragEnterOverDropExit( event )"
+                   dragExit="onDragEnterOverDropExit( event );"
+
+                   backgroundColor="0xffffff"
+                   backgroundAlpha.n="0.4" backgroundAlpha.o="0.9"
+                   borderVisible.n="false" borderVisible.o="true"
+                   minHeight="1" height="100%"
+                   maxWidth="{SearchViewQueryInputDrDr.DROPPING_IN_WIDTH*2}"
+        >
+    <fx:Script><![CDATA[
+        import edu.umich.med.mbni.pubanatomy.search.model.QueryRelate2Terms;
+        import edu.umich.med.mbni.pubanatomy.search.model.SearchModel;
+
+        import mx.core.UIComponent;
+
+        import mx.events.DragEvent;
+        import mx.managers.DragManager;
+
+        [Bindable]
+        private var _draggingOver:Boolean;
+
+        private function onDragEnterOverDropExit( event:DragEvent ):void{
+            var searchModel:SearchModel = model.query.queryResult.searchModel;
+            var copy:Boolean = ( searchModel.pressedKeys.getItemIndex( Keyboard.CONTROL ) >= 0 );
+
+            if( event.type == DragEvent.DRAG_ENTER ){
+                if( searchModel.draggingTerm != null ){
+                    _draggingOver = true;
+                    DragManager.acceptDragDrop( event.target as UIComponent );
+                }
+            }
+            else if( event.type == DragEvent.DRAG_OVER ){
+                if( model.tryDropInTerm( searchModel.draggingTerm, false, copy, relation, before ) ){
+                    DragManager.showFeedback( copy ? DragManager.COPY : DragManager.MOVE );
+                }
+                else{
+                    DragManager.showFeedback( DragManager.NONE );
+                }
+            }
+            else if( event.type == DragEvent.DRAG_DROP ){
+                var tmp:Boolean = model.tryDropInTerm( searchModel.draggingTerm, true, copy, relation, before );
+                CONFIG::debugging{
+                    if( !tmp ){
+                        throw new Error( this + ".onDragEnterOverDropExit " );
+                    }
+                }
+            }
+            else{
+                _draggingOver = false;
+            }
+        }
+
+        [Bindable]
+        public var model:QueryRelate2Terms;
+
+        [Bindable]
+        public var relation:String;
+
+        [Bindable]
+        public var before:Boolean;
+
+        private function set rfrState( ignoreVar:* ):void{
+            currentState = ( before ? "l" : "r" ) + ( _draggingOver ? "o" : "n" );
+        }
+        ]]></fx:Script>
+    <fx:Binding source="_draggingOver" destination="rfrState"/>
+    <fx:Binding source="before" destination="rfrState"/>
+
+    <s:Rect id="dropIndicatorRect"
+            width="{SearchViewQueryInputDrDr.DROPPING_IN_WIDTH - 2 }"
+            left.l="0" right.r="0" top="1" bottom="1">
+        <s:fill>
+            <s:SolidColor color="0xdddddd" color.o="0xbbbbbb"/>
+        </s:fill>
+    </s:Rect>
+    <s:Label textAlign="center" verticalAlign="middle" height="100%"
+             text="{relation==QueryRelate2Terms.OPERATOR_AND?'AND'
+             :( relation==QueryRelate2Terms.OPERATOR_OR?'OR':'NOT')}"
+             fontWeight.o="bold" left.r="0" right.l="0"/>
+    <s:states>
+        <s:State name="ln" stateGroups="n,l"/>
+        <s:State name="rn" stateGroups="n,r"/>
+        <s:State name="lo" stateGroups="o,l"/>
+        <s:State name="ro" stateGroups="o,r"/>
+    </s:states>
+</s:BorderContainer>

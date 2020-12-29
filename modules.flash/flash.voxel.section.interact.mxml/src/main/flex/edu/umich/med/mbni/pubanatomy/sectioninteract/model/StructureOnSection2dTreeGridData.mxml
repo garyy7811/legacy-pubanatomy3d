@@ -1,0 +1,56 @@
+<?xml version="1.0"?>
+<atm:StructureTreeGridData xmlns:fx="http://ns.adobe.com/mxml/2009"
+                           xmlns:as3lib="com.flashflexpro.as3lib.*"
+                           xmlns:atm="edu.umich.med.mbni.pubanatomy.atlas.model.*"
+        >
+    <fx:Script><![CDATA[
+        import edu.umich.med.mbni.pubanatomy.atlas.model.StructureItem;
+
+        import mx.events.CollectionEvent;
+        import mx.events.CollectionEventKind;
+
+        [Bindable]
+        public var sectionPlane:ModelSectionPlane;
+
+        private function rfrStructures( ev:CollectionEvent = null ):void{
+            if( rootModel == null ){
+                return;
+            }
+            if( ev != null && ( ev.kind == CollectionEventKind.MOVE || ev.kind == CollectionEventKind.UPDATE  ) ){
+                return;
+            }
+            rootModel.callInNext.putIn( refreshStructures );
+        }
+
+        private function refreshStructures():void{
+            try{
+                var rt:Vector.<StructureItem> = new <StructureItem>[];
+                if( sectionPlane.structureSectionEdgeList != null ){
+                    for( var j:int = sectionPlane.structureSectionEdgeList.length - 1; j >= 0; j-- ){
+                        var structure:StructureItem = ( sectionPlane.structureSectionEdgeList.getItemAt( j ) as ModelSection2dPlaneStructureEdge ).structure2d.structure3d.atlasStructure;
+
+                        CONFIG::debugging{
+                            if( rt.indexOf( structure ) >= 0 ){
+                                throw new Error( this + ".refreshStructures check how many edges returned from server!!" );
+                            }
+                        }
+
+                        rt.push( structure );
+                    }
+                }
+                setInputStructureItems( rt );
+            }
+            catch( bindingError:Error ){
+                CONFIG::debugging{
+                    trace( this + ":" + bindingError.getStackTrace() );
+                }
+            }
+        }
+        ]]></fx:Script>
+    <fx:Binding source="sectionPlane.rootModelAtlas" destination="rootModel"/>
+    <fx:Declarations>
+        <as3lib:ChainEndWatcher eventDispatcher="{sectionPlane.structureSectionEdgeList}"
+                                eventType="{CollectionEvent.COLLECTION_CHANGE}"
+                                eventHandler="rfrStructures"/>
+    </fx:Declarations>
+</atm:StructureTreeGridData>

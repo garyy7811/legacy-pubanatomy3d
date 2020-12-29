@@ -1,0 +1,72 @@
+<?xml version="1.0"?>
+<mx:UIComponent xmlns:fx="http://ns.adobe.com/mxml/2009" implements="mx.core.IDataRenderer"
+                width="100%" height="100%"
+                rollOver="onRollOver( event );" rollOut="onRollOut();"
+                addedToStage="rfrEdges = null;"
+                toolTip="{sectionCanvasItem.structure2d.structure3d.atlasStructure.dtoStructure.name
+                }{sectionCanvasItem.sectionPlane.v3dPlane.imageSectionMode==Voxel3dPlane.IMG_SECTION_MODE_XYZ?
+                ( '\nRight click to show menu'):''}"
+                xmlns:mx="library://ns.adobe.com/flex/mx" filters="{[new GlowFilter( 0xff0000,1,1,1 )]}"
+        >
+    <fx:Script><![CDATA[
+        import edu.umich.med.mbni.pubanatomy.atlas.model.StructureItem;
+        import edu.umich.med.mbni.pubanatomy.sectioninteract.model.ModelSection2dPlaneStructureEdge;
+        import edu.umich.med.mbni.pubanatomy.voxel3d.model.Voxel3dPlane;
+
+        import spark.filters.GlowFilter;
+
+        private function onRollOver( event:MouseEvent ):void{
+            var atlasStructure:StructureItem = sectionCanvasItem.structure2d.structure3d.atlasStructure;
+            atlasStructure.model.mouseOverStructure = atlasStructure;
+        }
+
+        private function onRollOut():void{
+            try{
+                var atlasStructure:StructureItem = sectionCanvasItem.structure2d.structure3d.atlasStructure;
+                if( atlasStructure.model.mouseOverStructure == atlasStructure ){
+                    atlasStructure.model.mouseOverStructure = null;
+                }
+            }
+            catch( e:Error ){
+            }
+        }
+
+        {
+            [Bindable("dataChange")]
+            public function get sectionCanvasItem():ModelSection2dPlaneStructureEdge{
+                return _data as ModelSection2dPlaneStructureEdge;
+            }
+
+            private var _data:Object;
+            public function set data( value:Object ):void{
+                if( _data != value ){
+                    _data = value;
+                    dispatchEvent( new Event( "dataChange" ) );
+                }
+            }
+
+            [Bindable("dataChange")]
+            public function get data():Object{
+                return _data;
+            }
+        }
+        ]]></fx:Script>
+
+    <fx:Script><![CDATA[
+        private function set rfrEdges( v:* ):void{
+            if( stage != null
+                    && sectionCanvasItem != null
+                    && sectionCanvasItem.edgesShape != null
+                    ){
+                if( numChildren > 0 ){
+                    if( sectionCanvasItem.edgesShape == getChildAt( 0 ) ){
+                        return;
+                    }
+                    removeChildAt( 0 );
+                }
+                addChild( sectionCanvasItem.edgesShape );
+            }
+        }
+        ]]></fx:Script>
+    <fx:Binding source="sectionCanvasItem.edgesShape" destination="rfrEdges"/>
+</mx:UIComponent>

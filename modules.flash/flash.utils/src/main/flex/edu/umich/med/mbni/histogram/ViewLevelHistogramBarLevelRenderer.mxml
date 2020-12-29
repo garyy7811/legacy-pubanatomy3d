@@ -1,0 +1,101 @@
+<?xml version="1.0"?>
+<s:DataRenderer xmlns:fx="http://ns.adobe.com/mxml/2009"
+                xmlns:s="library://ns.adobe.com/flex/spark"
+                mouseEnabledWhereTransparent="true"
+                width="100%" height="100%"
+                rollOver="frontBar.filters=[new GlowFilter( 0xffffff )];"
+                rollOut="frontBar.filters=[];"
+                maxHeight="{bar.histogram.height}"
+                currentState="fill"
+        >
+    <fx:Script><![CDATA[
+        import flash.filters.GlowFilter;
+
+        [Bindable("initialize")]
+        public function get bar():ViewLevelHistogramBarRenderer{
+            return parentDocument as ViewLevelHistogramBarRenderer;
+        }
+
+        [Bindable("dataChange")]
+        public function get levels():Vector.<Number>{
+            return data as Vector.<Number>;
+        }
+
+        override public function set data( value:Object ):void{
+            if( value != data ){
+                super.data = value;
+            }
+        }
+
+        private function set rfr( ignoreVar:* ):void{
+            visible = false;
+            bar.levelBar.model.rootModel.callInNext.putIn( refresh );
+        }
+
+        protected function refresh():void{
+            if( bar != null && stage != null ){
+                var min:uint = bar.levelBar.model.barLevelNumMinimum;
+                var max:uint = bar.levelBar.model.barLevelNumMaximum;
+
+                var r:Number = ( levels.length - min ) / ( max - min );
+                var fh:Number = height - bar.histogram.bottomMin - bar.histogram.topMargin;
+                levelHeight = fh * r + bar.histogram.bottomMin;
+                visible = true;
+            }
+        }
+
+        [Bindable]
+        public var levelColor:uint = 0xffFFFF;
+
+        [Bindable]
+        private var levelHeight:Number;
+
+        ]]></fx:Script>
+    <fx:Binding source="levels" destination="rfr"/>
+    <fx:Binding source="height" destination="rfr"/>
+    <fx:Binding source="bar.levelBar.model.barLevelNumMaximum" destination="rfr"/>
+    <fx:Binding source="bar.levelBar.model.barLevelNumMinimum" destination="rfr"/>
+    <fx:Binding source="bar.levelFrom" destination="rfr"/>
+    <fx:Binding source="bar.levelTo" destination="rfr"/>
+
+    <!--to make this tooltip on full height-->
+    <s:Rect width="100%" height="100%" id="background">
+        <s:fill>
+            <s:SolidColor color="{bar.histogram.barBackground}"/>
+        </s:fill>
+    </s:Rect>
+    <s:Rect width="100%" height="{levelHeight}" bottom="0" id="frontBar">
+        <s:fill>
+            <s:SolidColor color="{levelColor}" alpha.fill="1" alpha.empty="0"/>
+        </s:fill>
+        <s:stroke>
+            <s:SolidColorStroke color="{levelColor}" alpha.fill="0" alpha.empty="1" weight="1"/>
+        </s:stroke>
+    </s:Rect>
+    <fx:Script><![CDATA[
+        private function set rfrSelection( v:* ):void{
+            bar.histogram.model.rootModel.callInNext.putIn( refreshSection );
+        }
+
+        private function refreshSection():void{
+            if( bar.histogram == null ){
+                return;
+            }
+            var middle:Number = ( bar.levelFrom + bar.levelTo ) / 2;
+            if( middle >= bar.histogram.model.selectedLevelMinimum
+                    && middle <= bar.histogram.model.selectedLevelMaximum ){
+                currentState = "fill";
+            }
+            else{
+                currentState = "empty";
+            }
+        }
+        ]]></fx:Script>
+    <fx:Binding source="bar.levelTo" destination="rfrSelection"/>
+    <fx:Binding source="bar.histogram.model.selectedLevelMinimum" destination="rfrSelection"/>
+    <fx:Binding source="bar.histogram.model.selectedLevelMaximum" destination="rfrSelection"/>
+    <s:states>
+        <s:State name="fill"/>
+        <s:State name="empty"/>
+    </s:states>
+</s:DataRenderer>

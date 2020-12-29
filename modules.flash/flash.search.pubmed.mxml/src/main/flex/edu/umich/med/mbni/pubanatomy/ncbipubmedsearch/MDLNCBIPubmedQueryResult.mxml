@@ -1,0 +1,146 @@
+<?xml version="1.0"?>
+<model:QueryResult xmlns:fx="http://ns.adobe.com/mxml/2009" xmlns:model="edu.umich.med.mbni.pubanatomy.search.model.*">
+    <fx:Script><![CDATA[
+        override public function sendQuery():void{
+            resultModel.sendQuery( queryModel );
+        }
+
+        override protected function refreshEnableBtn():void{
+        }
+        ]]></fx:Script>
+    <fx:Script><![CDATA[
+        [Bindable]
+        public var usrInptTxt = "";
+
+        private function set rfrCount( ignoreVar:* ):void{
+            searchModel.callInNext.putIn( refreshCount, this, null, 7 );
+            _listError = null;
+            dispatchEvent( new Event( "listErrorChanged" ) );
+        }
+
+        private var _rpcCount:URLLoader;
+
+        [Bindable]
+        public var rpcCountRequest:URLRequest;
+
+        [Bindable]
+        public var ncbiPubmedProxyUrl:String;
+
+        [Bindable]
+        public var lastCountQuery:String;
+
+        private function refreshCount():void{
+            if( rpcCountRequest != null || lastCountQuery == usrInptTxt ){
+                return;
+            }
+            if( usrInptTxt != null && usrInptTxt.length > 2 ){
+                if( _rpcCount == null ){
+                    _rpcCount = new URLLoader();
+                    _rpcCount.dataFormat = URLLoaderDataFormat.BINARY;
+                    _rpcCount.addEventListener( Event.COMPLETE, onCountComplete );
+                    _rpcCount.addEventListener( IOErrorEvent.IO_ERROR, onCountError );
+                }
+                else{
+                    _rpcCount.close();
+                }
+                rpcCountRequest = new URLRequest( ncbiPubmedProxyUrl + "/pubmedproxy/count.amf" );
+                rpcCountRequest.contentType = "application/x-amf";
+                rpcCountRequest.method = URLRequestMethod.POST;
+                lastCountQuery = usrInptTxt;
+                var ba:ByteArray = new ByteArray();
+                ba.writeObject( usrInptTxt );
+                rpcCountRequest.data = ba;
+                _rpcCount.load( rpcCountRequest );
+            }
+        }
+
+        private function onCountError( event:IOErrorEvent ):void{
+            rpcCountRequest = null;
+            throw new Error( event.toString() );
+        }
+
+        [Bindable]
+        public var lastCountResC:int;
+
+        [Bindable]
+        public var lastListQuery:String;
+
+        private var _lastCountResWebEnv:String;
+        private var _lastCountResKey:String;
+
+        private var _lastCountResQ:String;
+
+        private function onCountComplete( event:Event ):void{
+            trace( "count complete-->" + lastCountQuery );
+            var rt:Array = ( _rpcCount.data as ByteArray ).readObject() as Array;
+
+            _lastCountResQ = rt[ 0 ];
+            lastCountResC = rt[ 1 ];
+            _lastCountResWebEnv = rt[ 2 ];
+            _lastCountResKey = rt[ 3 ];
+            rpcCountRequest = null;
+        }
+        ]]></fx:Script>
+    <fx:Binding source="usrInptTxt" destination="rfrCount"/>
+    <fx:Binding source="rpcCountRequest" destination="rfrCount"/>
+    <fx:Script><![CDATA[
+        private var _rpcList:URLLoader;
+
+        [Bindable]
+        public var rpcListingPmidRequest:URLRequest;
+
+        public function queryForPmidList():void{
+            if( _rpcList == null ){
+                _rpcList = new URLLoader();
+                _rpcList.dataFormat = URLLoaderDataFormat.BINARY;
+                _rpcList.addEventListener( Event.COMPLETE, onListComplete )
+                _rpcList.addEventListener( IOErrorEvent.IO_ERROR, onListError )
+            }
+            else{
+                _rpcList.close();
+            }
+            rpcListingPmidRequest = new URLRequest( ncbiPubmedProxyUrl + "/pubmedproxy/list.amf" );
+            rpcListingPmidRequest.contentType = "application/x-amf";
+            rpcListingPmidRequest.method = URLRequestMethod.POST;
+            var ba:ByteArray = new ByteArray();
+            ba.writeObject( [ _lastCountResWebEnv, _lastCountResKey, lastCountResC ] );
+            rpcListingPmidRequest.data = ba;
+            _rpcList.load( rpcListingPmidRequest );
+            lastListQuery = _lastCountResQ;
+        }
+
+        private var _listError:ErrorEvent;
+
+        [Bindable(event="listErrorChanged")]
+        public function get listError():ErrorEvent{
+            return _listError;
+        }
+
+        private function onListError( event:ErrorEvent = null ):void{
+            _listError = event;
+            dispatchEvent( new Event( "listErrorChanged" ) );
+            rpcListingPmidRequest = null;
+            resultModel.discardResults();
+        }
+
+        private function onListComplete( event:Event ):void{
+
+            var pmids:String = ( _rpcList.data as ByteArray ).readObject() as String;
+
+            CONFIG::debugging{
+                if( pmids == null || pmids.length < 3 ){
+                    throw new Error( this + ".onListComplete " );
+                }//debug
+            }
+
+            if( pmids.indexOf( "pmid:(" ) < 0 ){
+                onListError( new ErrorEvent( ErrorEvent.ERROR, false, false, pmids ) );
+                return;
+            }
+
+            queryModel.rootQueryStr = pmids;
+            sendQuery();
+            rpcListingPmidRequest = null;
+        }
+        ]]></fx:Script>
+</model:QueryResult>

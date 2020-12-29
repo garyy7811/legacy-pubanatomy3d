@@ -1,0 +1,87 @@
+<?xml version="1.0"?>
+<tm:TreeBranchItem xmlns:fx="http://ns.adobe.com/mxml/2009"
+                   xmlns:as3lib="com.flashflexpro.as3lib.*" xmlns:s="library://ns.adobe.com/flex/spark"
+                   xmlns:tm="edu.umich.med.mbni.treemodel.*">
+    <fx:Script><![CDATA[
+        import edu.umich.med.mbni.pubanatomy.flash.dto.DtoStructure;
+
+
+        [Bindable]
+        public var model:RootModelAtlas;
+
+        [Bindable]
+        public var dtoStructure:DtoStructure;
+
+        [Bindable]
+        public var atlasImgIdArr:Array;
+
+        [Bindable(event="propertyChange")]
+        public function get parentStructure():StructureItem{
+            return parent as StructureItem;
+        }
+
+        [Bindable]
+        public var color:uint;
+
+        [Bindable]
+        public var alpha:Number = 1;
+
+        private function set rfrStructureAtlas( v:* ):void{
+            if( dtoStructure != null ){
+                color = uint( "0x" + dtoStructure.color );
+            }
+        }
+        ]]></fx:Script>
+    <fx:Binding source="dtoStructure.color" destination="rfrStructureAtlas"/>
+    <fx:Script><![CDATA[
+
+        private function getStructureGeneExpr( g:MDLGene ):StructureGeneExpr{
+            var rt:StructureGeneExpr = new StructureGeneExpr();
+            rt.structure = this;
+            rt.gene = g;
+            return rt;
+        }
+
+        private function destroyStructureGeneExpr( rt:StructureGeneExpr ):void{
+            rt.destroy();
+        }
+
+        public function getGeneTypeDs( ds:MDLDataSet, type:String ):StructureGeneExprTypeDs{
+            for( var j:int = genes.length - 1; j >= 0; j-- ){
+                var sg:StructureGeneExpr = genes.getItemAt( j ) as StructureGeneExpr;
+                if( sg.gene == ds.modelGene ){
+                    return sg.getTypeDs( ds, type );
+                }
+            }
+            throw new Error();
+        }
+        ]]></fx:Script>
+    <fx:Declarations>
+        <as3lib:Sync2Lists source="{model.geneModelList}"
+                           id="syncGeneToExpr"
+                           getDestInst="getStructureGeneExpr" destroyInst="destroyStructureGeneExpr">
+            <as3lib:destination>
+                <s:ArrayList id="genes"/>
+            </as3lib:destination>
+        </as3lib:Sync2Lists>
+    </fx:Declarations>
+    <fx:Script><![CDATA[
+        [Bindable]
+        public var selected:Boolean;
+
+        private var _mouseOver:Boolean = false;
+        [Bindable(event="mouseOverChanged")]
+        public function get mouseOver():Boolean{
+            return _mouseOver;
+        }
+
+        protected function set rfrMouseOver( v:* ):void{
+            var tmp:Boolean = ( this == model.mouseOverStructure );
+            if( tmp != _mouseOver ){
+                _mouseOver = tmp;
+                dispatchEvent( new Event( "mouseOverChanged" ) );
+            }
+        }
+        ]]></fx:Script>
+    <fx:Binding source="model.mouseOverStructure" destination="rfrMouseOver"/>
+</tm:TreeBranchItem>

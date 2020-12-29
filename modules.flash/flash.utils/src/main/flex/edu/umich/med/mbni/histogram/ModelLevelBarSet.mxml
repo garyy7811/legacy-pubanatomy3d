@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<as3lib:MxmlEventDispatcher xmlns:fx="http://ns.adobe.com/mxml/2009" xmlns:as3lib="com.flashflexpro.as3lib.*">
+    <fx:Script><![CDATA[
+        [Bindable]
+        public var histogram:ModelLevelHistogram;
+
+        [Bindable]
+        public var levelBars:Vector.<Vector.<Number>> = new <Vector.<Number>>[];
+
+        [Bindable]
+        public var maxBarLevelNum:uint;
+
+        [Bindable]
+        public var minBarLevelNum:uint;
+
+        [Bindable]
+        public var maxLevel:uint;
+
+        [Bindable]
+        public var minLevel:uint;
+
+        ]]></fx:Script>
+</as3lib:MxmlEventDispatcher>

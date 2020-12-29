@@ -1,0 +1,32 @@
+<?xml version="1.0"?>
+<dd3d:Dd3dViewScene3d xmlns:fx="http://ns.adobe.com/mxml/2009"
+                      xmlns:dd3d="edu.umich.med.mbni.pubanatomy.datadriven3dwindow.*">
+    <fx:Script><![CDATA[
+        import edu.umich.med.mbni.pubanatomy.datadriven3dwindow.Dd3dViewMeshPlane;
+        import edu.umich.med.mbni.pubanatomy.datadriven3dwindow.Dd3dViewMeshStructure;
+        import edu.umich.med.mbni.pubanatomy.voxel3d.model.Voxel3dSceneModel;
+        import edu.umich.med.mbni.pubanatomy.voxel3d.model.Voxel3dStructureModel;
+
+        [Bindable(event="modelChanged")]
+        public function get v3dModel():Voxel3dSceneModel{
+            return model as Voxel3dSceneModel;
+        }
+
+        override protected function getNewViewStructure():Dd3dViewMeshStructure{
+            return new V3dStructure();
+        }
+
+        override protected function getNewViewPlane():Dd3dViewMeshPlane{
+            return new V3dPlane();
+        }
+
+        private function set rfrLoadMesh( ignoreVar:* ):void{
+            if( v3dModel != null && v3dModel.rootModel3d != null && v3dModel.rootModel3d.on3dStageStructureModels != null ){
+                for( var j:int = v3dModel.rootModel3d.on3dStageStructureModels.length - 1; j >= 0; j-- ){
+                    ( v3dModel.rootModel3d.on3dStageStructureModels.getItemAt( j ) as Voxel3dStructureModel ).loadMesh();
+                }
+            }
+        }
+        ]]></fx:Script>
+    <fx:Binding source="v3dModel.rootModel3d.on3dStageStructureModels.length" destination="rfrLoadMesh"/>
+</dd3d:Dd3dViewScene3d>

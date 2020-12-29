@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:SkinnableContainer xmlns:fx="http://ns.adobe.com/mxml/2009"
+                      xmlns:s="library://ns.adobe.com/flex/spark"
+                      xmlns:v="edu.umich.med.mbni.pubanatomy.sectioninteract.view.*"
+                      rightClick="onDoubleClick( event );"
+                      mouseMove="onMouse( event );"
+                      rollOver="onMouse( event );"
+                      rollOut="onMouse( event );"
+
+                      click="onClick( event );"
+
+                      mouseDown="onMouse( event )"
+                      width="{section2dModel.viewWidth}"
+                      height="{section2dModel.viewHeight}"
+        >
+    <fx:Script>
+		<![CDATA[
+        import edu.umich.med.mbni.pubanatomy.sectioninteract.model.ModelSection2dStructure;
+        import edu.umich.med.mbni.pubanatomy.sectioninteract.model.ModelSectionPlane;
+        import edu.umich.med.mbni.utils.ModelOperationMenuChildren;
+
+        [Bindable]
+        public var section2dModel:ModelSectionPlane;
+
+        private function onMouse( event:MouseEvent ):void{
+            if( section2dModel == null ){
+                return;
+            }
+            if( event.type == MouseEvent.ROLL_OUT ){
+                section2dModel.onMouseOut();
+                return;
+            }
+
+            if( event.type == MouseEvent.MOUSE_MOVE || event.type == MouseEvent.ROLL_OVER || event.type == MouseEvent.MOUSE_DOWN ){
+                section2dModel.onMouseOnPlane( event.localX, event.localY );
+            }
+
+            if( event.type == MouseEvent.MOUSE_DOWN ){
+                stage.addEventListener( MouseEvent.MOUSE_UP, onMouse );
+                section2dModel.onMouseDown();
+            }
+            else if( event.type == MouseEvent.MOUSE_UP ){
+                stage.removeEventListener( MouseEvent.MOUSE_UP, onMouse );
+                section2dModel.onMouseUp();
+            }
+        }
+
+
+        private function onDoubleClick( event:MouseEvent ):void{
+            _isDoubleClick = true;
+            var mp:Point = section2dModel.view2model( new Point( event.localX, event.localY ) );
+            var edg:ViewSectionPlaneStructureEdge = event.target as ViewSectionPlaneStructureEdge;
+            var strMns:ModelOperationMenuChildren;
+            if( edg != null ){
+                strMns = section2dModel.treeGridData.getRowByStructure( edg.sectionCanvasItem.structure2d.structure3d.atlasStructure ).getMenuItems();
+            }
+
+            section2dModel.onMenu( mp, strMns );
+        }
+
+        private function onClick( event:MouseEvent ):void{
+            var se:ViewSectionPlaneStructureEdge = event.target as ViewSectionPlaneStructureEdge;
+            if( se != null ){
+                _isDoubleClick = false;
+                section2dModel.rootModelSection2d.callInNext.putIn( isClickOrDouble, this, [ se.sectionCanvasItem.structure2d ], stage.frameRate / 4 );
+            }
+        }
+
+        private var _isDoubleClick:Boolean = false;
+
+        private function isClickOrDouble( se:ModelSection2dStructure ):void{
+            if( _isDoubleClick ){
+                return;
+            }
+            se.selected = !se.selected;
+        }
+        ]]>
+	</fx:Script>
+    <s:states>
+        <s:State name="xyz"/>
+        <s:State name="bitmapFull"/>
+        <s:State name="bitmapDetail"/>
+    </s:states>
+    <fx:Script><![CDATA[
+        import edu.umich.med.mbni.pubanatomy.voxel3d.model.Voxel3dPlane;
+
+        private function set rfrState( ignoreVar:* ):void{
+            if( section2dModel.v3dPlane.imageSectionMode == Voxel3dPlane.IMG_SECTION_MODE_XYZ ){
+                currentState = "xyz";
+                return;
+            }
+            currentState = ( section2dModel.imgDetail == null || !section2dModel.imgDetail.loaded ) ? "bitmapFull" : "bitmapDetail";
+        }
+        ]]></fx:Script>
+    <fx:Binding source="section2dModel.v3dPlane.imageSectionMode" destination="rfrState"/>
+    <fx:Binding source="section2dModel.imgDetail" destination="rfrState"/>
+
+    <s:Rect width="100%" height="100%">
+        <s:fill>
+            <s:SolidColor alpha="0"/>
+        </s:fill>
+    </s:Rect>
+
+    <s:BitmapImage width="100%" height="100%" source="{section2dModel.imgFull.url}" includeIn="bitmapFull"/>
+
+    <s:DataGroup id="sections" dataProvider="{section2dModel.structureSectionEdgeList}" width="100%" height="100%"
+                 mouseEnabled="false"
+                 itemRenderer="edu.umich.med.mbni.pubanatomy.sectioninteract.view.ViewSectionPlaneStructureEdge"/>
+
+    <!--only the edges of selected and mouse over, the fills are still in layers-->
+    <v:ViewSectionTopEdges model="{section2dModel}" mouseEnabled="false" width="100%" height="100%"/>
+
+    <s:DataGroup id="lines" dataProvider="{section2dModel.on2dStageMates}" mouseEnabled="false" width="100%"
+                 height="100%" includeIn="xyz"
+                 itemRenderer="edu.umich.med.mbni.pubanatomy.sectioninteract.view.ViewSectionPlaneMateLine"/>
+</s:SkinnableContainer>

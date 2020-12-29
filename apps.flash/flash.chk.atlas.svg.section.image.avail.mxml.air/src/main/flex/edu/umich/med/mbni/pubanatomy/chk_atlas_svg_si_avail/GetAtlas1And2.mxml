@@ -1,0 +1,92 @@
+<?xml version="1.0"?>
+<as3lib:MxmlEventDispatcher xmlns:fx="http://ns.adobe.com/mxml/2009"
+                            xmlns:s="library://ns.adobe.com/flex/spark"
+                            xmlns:as3lib="com.flashflexpro.as3lib.*">
+    <fx:Script><![CDATA[
+        import edu.umich.med.mbni.pubanatomy.atlas.model.MDLDataSet;
+        import edu.umich.med.mbni.pubanatomy.atlas.model.MDLISHImage;
+
+        import mx.collections.XMLListCollection;
+
+        private var _rootApp:ChkAtlasSVGSectionSvgAvailable;
+
+        /**
+         * this url is good too but returned xml is in a different format which should be easier to parse
+         * http://api.brain-map.org/api/v2/data/query.xml?criteria=model::AtlasImage[annotated$eq'true'],rma::criteria,atlas_data_set(atlases[id$in1,2])
+         * @param callBack
+         */
+        public function start( callBack:ChkAtlasSVGSectionSvgAvailable ):void{
+            var url:String = "http://api.brain-map.org/api/v2/data/query.xml" +
+                    "?criteria=model::AtlasDataSet" +
+                    ",rma::include,atlases[id$in1,2],section_images[annotated$eqtrue](alignment2d),alignment3d";
+
+            _rootApp = callBack;
+
+            _urlLoader = new URLLoader();
+            _urlLoader.addEventListener( Event.COMPLETE, onLoaded );
+            _urlLoader.addEventListener( IOErrorEvent.IO_ERROR, onLoaded );
+            _urlLoader.dataFormat = URLLoaderDataFormat.TEXT;
+            _urlLoader.load( new URLRequest( url ) );
+        }
+
+        protected var _urlLoader:URLLoader;
+
+        protected function onLoaded( event:Event ):void{
+            if( event.type == Event.COMPLETE ){
+                var tmp:XML = new XML( _urlLoader.data );
+                sync2Lists.source = new XMLListCollection( tmp.children()[0].children() );
+
+                for( var j:int = fAtlasDataSets.length - 1; j >= 0; j-- ){
+                    var ds:MDLDataSet = fAtlasDataSets.getItemAt( j ) as MDLDataSet;
+
+                    for( var p:int = ds.sectionImageList.length - 1; p >= 0; p-- ){
+                        var img:MDLISHImage = ds.sectionImageList.getItemAt( p ) as MDLISHImage;
+
+
+                        onImageCorners( img.sectionImageId,
+                                        img.point2vector3d( new Point( 0, 0 ) ), img.point2vector3d( new Point( img.width, 0 ) ),
+                                        img.point2vector3d( new Point( img.width, img.height ) ), img.point2vector3d( new Point( 0, img.height ) ) );
+                    }
+                }
+                _result.close();
+                _rootApp.onAtlasReady();
+            }
+            else{
+                throw new Error();
+            }
+        }
+
+        private var _result:FileStream;
+
+        private var _dic:Dictionary = new Dictionary();
+
+        private function onImageCorners( sectionImageId:Number, lr:Vector3D, rt:Vector3D, rb:Vector3D, lb:Vector3D ):void{
+
+            if( _result == null ){
+                _result = new FileStream();
+                _result.openAsync( File.desktopDirectory.resolvePath( "section.img.3d.4corners/atlas.txt" ), FileMode.WRITE );
+            }
+            _result.writeUTFBytes( sectionImageId + "|" + lr + "|" + rt + "|" + rb + "|" + lb + "\r\n" );
+
+            if( _dic[ sectionImageId ] is Array ){
+                trace( "wow!!!" );
+            }
+
+            _dic[ sectionImageId ] = [ lr, rt, rb, lb ];
+        }
+
+        private function atlasXml2obj( x:XML ):MDLDataSet{
+            var rt:MDLDataSet = new MDLDataSet();
+            rt.dataSetXml = x;
+            return rt;
+        }
+        ]]></fx:Script>
+    <fx:Declarations>
+        <as3lib:Sync2Lists getDestInst="atlasXml2obj" id="sync2Lists">
+            <as3lib:destination>
+                <s:ArrayList id="fAtlasDataSets"/>
+            </as3lib:destination>
+        </as3lib:Sync2Lists>
+    </fx:Declarations>
+
+</as3lib:MxmlEventDispatcher>

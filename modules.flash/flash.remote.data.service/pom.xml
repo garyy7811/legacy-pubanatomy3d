@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <artifactId>pubanatomy.parent.flash</artifactId>
+        <groupId>edu.umich.med.mbni</groupId>
+        <version>0.1-SNAPSHOT</version>
+        <relativePath>../../mvn.parent.flash/pom.xml</relativePath>
+    </parent>
+
+    <artifactId>pubanatomy.module.flash.remote.data.service</artifactId>
+    <version>0.1-SNAPSHOT</version>
+    <packaging>swc</packaging>
+
+    <!-- no need to run every time.
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>net.flexmojos.oss</groupId>
+                <artifactId>flexmojos-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+                        <configuration>
+                            <templates>
+                                <base-bean-template>${basedir}/src/main/gsptemplates/beanBase.gsp</base-bean-template>
+                            </templates>
+                            <includeJavaClasses>
+                                <includeJavaClass>edu.umich.med.mbni.pubanatomy.flash.dto.*</includeJavaClass>
+                            </includeJavaClasses>
+                            <baseOutputDirectory>src/main/flex</baseOutputDirectory>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>-->
+
+    <dependencies>
+        <!--
+        <dependency>
+            <groupId>edu.umich.med.mbni</groupId>
+            <artifactId>pubanatomy.module.java.dto</artifactId>
+            <version>0.1-SNAPSHOT</version>
+            <type>jar</type>
+        </dependency>
+-->
+        <dependency>
+            <groupId>edu.umich.med.mbni</groupId>
+            <artifactId>pubanatomy.module.flash.utils</artifactId>
+            <version>0.1-SNAPSHOT</version>
+            <type>swc</type>
+        </dependency>
+
+    </dependencies>
+
+</project>

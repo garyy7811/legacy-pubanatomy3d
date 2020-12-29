@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<datadriven3dwindow:Dd3dModelMeshBase xmlns:fx="http://ns.adobe.com/mxml/2009"
+                                      xmlns:datadriven3dwindow="edu.umich.med.mbni.pubanatomy.datadriven3dwindow.*">
+    <fx:Script><![CDATA[
+        import edu.umich.med.mbni.pubanatomy.flash.dto.DtoModelMeshArray;
+
+        import mx.events.PropertyChangeEvent;
+
+        protected var _dtoModelMeshArr:DtoModelMeshArray;
+
+        [Bindable(event="propertyChange")]
+        public function get dtoModelMeshArr():DtoModelMeshArray{
+            return _dtoModelMeshArr;
+        }
+
+        protected function setDtoModelMeshArr( value:DtoModelMeshArray ):void{
+            if( value != _dtoModelMeshArr ){
+                var old:DtoModelMeshArray = _dtoModelMeshArr;
+                _dtoModelMeshArr = value;
+                dispatchEvent( PropertyChangeEvent.createUpdateEvent( this, "dtoModelMeshArr", old, _dtoModelMeshArr ) );
+            }
+        }
+        ]]></fx:Script>
+</datadriven3dwindow:Dd3dModelMeshBase>

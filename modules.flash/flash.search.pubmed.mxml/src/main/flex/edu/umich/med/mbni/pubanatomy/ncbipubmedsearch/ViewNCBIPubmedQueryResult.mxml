@@ -1,0 +1,114 @@
+<?xml version="1.0"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" xmlns:s="library://ns.adobe.com/flex/spark"
+         xmlns:searchView="edu.umich.med.mbni.pubanatomy.search.view.*"
+         enabled="{model.rpcListingPmidRequest==null}" currentState="tooShort"
+        >
+    <fx:Script><![CDATA[
+        [Bindable]
+        public var model:MDLNCBIPubmedQueryResult;
+
+        private function onThroughNcbi():void{
+            navigateToURL( new URLRequest( "http://www.ncbi.nlm.nih.gov/pubmed/?term=" + model.usrInptTxt ) );
+        }
+
+        private function set rfrState( ignoreVar:* ):void{
+            if( model.usrInptTxt.length < 3 ){
+                currentState = "tooShort";
+            }
+            else if( model.rpcCountRequest != null ){
+                currentState = "counting";
+            }
+            else if( model.rpcListingPmidRequest != null ){
+                currentState = "listingPmid";
+            }
+            else if( model.resultModel.rpc != null ){
+                currentState = "listingResult";
+            }
+            else if( model.lastListQuery == model.usrInptTxt
+                    && currentState.indexOf( "listing" ) == 0 ){
+                if( model.listError != null ){
+                    currentState = "listingPmidError";
+                }
+                else if( model.resultModel.lastFault != null ){
+                    currentState = "listingResultError";
+                }
+                else{
+                    currentState = "resultReady";
+                }
+            }
+            else if( model.rpcCountRequest == null && model.lastCountQuery == model.usrInptTxt ){
+                if( model.lastCountResC >= 3000 ){
+                    currentState = "countedTooMany";
+                }
+                else if( model.lastCountResC <= 0 ){
+                    currentState = "countedTooLittle";
+                }
+                else{
+                    currentState = "countedReady";
+                }
+            }
+
+        }
+        ]]></fx:Script>
+    <fx:Binding source="model.usrInptTxt" destination="rfrState"/>
+    <fx:Binding source="model.lastCountQuery" destination="rfrState"/>
+    <fx:Binding source="model.lastListQuery" destination="rfrState"/>
+    <fx:Binding source="model.rpcCountRequest" destination="rfrState"/>
+    <fx:Binding source="model.rpcListingPmidRequest" destination="rfrState"/>
+    <fx:Binding source="model.listError" destination="rfrState"/>
+    <fx:Binding source="model.resultModel.rpc" destination="rfrState"/>
+    <fx:Binding source="model.resultModel.lastFault" destination="rfrState"/>
+    <s:states>
+        <s:State name="tooShort" stateGroups="error"/>
+
+        <s:State name="counting" stateGroups="listing"/>
+        <s:State name="countedTooLittle" stateGroups="error"/>
+        <s:State name="countedTooMany" stateGroups="error"/>
+
+        <s:State name="countedReady"/>
+
+        <s:State name="listingPmid" stateGroups="listing"/>
+        <s:State name="listingPmidError" stateGroups="error"/>
+
+        <s:State name="listingResult" stateGroups="listing"/>
+        <s:State name="listingResultError" stateGroups="error"/>
+
+        <s:State name="resultReady"/>
+
+    </s:states>
+    <s:VGroup width="100%" height="100%">
+        <s:HGroup width="100%" verticalAlign="middle" paddingLeft="3" paddingRight="3">
+            <s:TextInput width="100%" text="@{model.usrInptTxt}" enter.countedReady="model.queryForPmidList();"/>
+            <s:Button click="model.queryForPmidList();"
+                      label="Search"
+                      enabled="false"
+                      enabled.countedReady="true"
+                      toolTip="Click to import NCBI PubMed Search result into PubAnatomy Search"/>
+            <s:Button skinClass="edu.umich.med.mbni.utils.UpLabelOverBtnSkin"
+                      label="NCBI web" click="onThroughNcbi();"
+                      enabled="{model.usrInptTxt.length>0}"
+                      toolTip="Click to search this term on a popup NCBI PubMed Search Web page."
+                    />
+        </s:HGroup>
+        <s:Label
+                text.tooShort="Input must be at least 3 chars."
+                text.counting="counting ..."
+                text.countedTooLittle="No result found, please change input"
+                text.countedTooMany="Too many results( {model.lastCountResC } ) found, please change to make it less then 3000"
+                toolTip.countedTooMany="NCBI Pubmed search API is very slow, 3000 limit to make sure searching finish in 30 seconds"
+                text.countedReady="{model.lastCountResC } results found, ready to search"
+                text.listingPmid="busy fetching results from NCBI, can take up to 30 secs."
+                text.listingResult="Pubanatomy is summarizing ..."
+                text.resultReady="Results listed:"
+                text.listingPmidError="NCBI Pubmed API error, mouse over to see more ..."
+                toolTip.listingPmidError="{model.listError.text}"
+                />
+        <searchView:SearchViewResult width="100%" height="100%" model="{model}" visible.error="false"/>
+    </s:VGroup>
+    <s:Group id="busyGroup" includeIn="listingPmid" width="100%" height="100%">
+        <s:SWFLoader scaleContent="true"
+                     source="{styleManager.getStyleDeclaration( 'mx.managers.CursorManager' ).getStyle( 'busyCursor' )}"
+                     x="{busyGroup.width/2}" y="{busyGroup.height/2}"
+                     width="{busyGroup.width/2}" height="{busyGroup.height/2}"/>
+    </s:Group>
+</s:Group>

@@ -1,0 +1,35 @@
+<?xml version="1.0"?>
+<rs:GetXmlFromAba xmlns:fx="http://ns.adobe.com/mxml/2009" xmlns:rs="edu.umich.med.mbni.pubanatomy.flash.rs.*">
+
+    <fx:Script><![CDATA[
+        import mx.collections.XMLListCollection;
+
+        [Bindable]
+        public var gene:MDLGene;
+
+        override public function callRemote():Boolean{
+            paramStrAfterQ = "criteria=model::SectionDataSet," +
+                    "rma::criteira[failed$eqfalse],reference_space[id$in9,10],genes[id$eq" + gene.dtoGene.geneId + "]," +
+                    "rma::include,section_images(alignment2d),alignment3d,plane_of_section";
+            return super.callRemote();
+        }
+
+        override protected function onXMLResult( x:XML ):void{
+            super.onXMLResult( x );
+            var xLst:XMLListCollection = new XMLListCollection( _result.children()[0].children() );
+            gene.dataSetLength = xLst.length;
+            gene.xmlDataSets = new XMLListCollection();
+
+            for( var j:int = xLst.length - 1; j >= 0; j-- ){
+                gene.model.callInNext.putIn(
+                        function ( xlc:XMLListCollection, o:Object ):void{
+                            xlc.addItem( o );
+                        },
+                        this,
+                        [ gene.xmlDataSets, xLst.getItemAt( j )], j * 3 + 1
+                );
+            }
+        }
+        ]]></fx:Script>
+    <fx:Binding source="gene.model" destination="model"/>
+</rs:GetXmlFromAba>

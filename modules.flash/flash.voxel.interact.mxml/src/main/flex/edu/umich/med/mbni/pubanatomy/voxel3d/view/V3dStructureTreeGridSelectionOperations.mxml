@@ -1,0 +1,140 @@
+<?xml version="1.0"?>
+<s:BorderContainer xmlns:fx="http://ns.adobe.com/mxml/2009"
+         xmlns:s="library://ns.adobe.com/flex/spark" cornerRadius="3"
+         visible.show="true" visible="false" currentState="hide"
+         includeInLayout.show="true" includeInLayout="false"
+         minWidth="1" minHeight="1"
+        >
+    <s:layout>
+        <s:HorizontalLayout verticalAlign="middle" paddingLeft="2" paddingTop="2" paddingBottom="2"/>
+    </s:layout>
+    <fx:Script><![CDATA[
+        import edu.umich.med.mbni.pubanatomy.voxel3d.model.Voxel3dStructureOn3dTreeGridData;
+
+        [Bindable]
+        public var v3dTreeGridData:Voxel3dStructureOn3dTreeGridData;
+        ]]></fx:Script>
+    <s:states>
+        <s:State name="show"/>
+        <s:State name="hide"/>
+    </s:states>
+    <s:VGroup horizontalAlign="center">
+        <s:Label text="{selectedV3dStructureRows.length} structures selected:" fontWeight="bold"/>
+        <s:Button label="reverse selection" click="v3dTreeGridData.reverseSelection();"
+                  toolTip="#t(v3doprtnRvsSlct)p#"/>
+    </s:VGroup>
+    <fx:Script><![CDATA[
+        import edu.umich.med.mbni.treedatagrid.TreeGridDataColumn;
+
+        private function set rfrNames( ignoreVar:* ):void{
+            v3dTreeGridData.rootModelVoxel3d.callInNext.putIn( refreshNames );
+        }
+
+        private function refreshNames():void{
+            selectedV3dStructureRows.removeAll();
+            if( v3dTreeGridData.selectedItems != null && v3dTreeGridData.selectedItems.length > 0 ){
+                v3dTreeGridData.selectedItems.sort( ( v3dTreeGridData.colOrderList.getItemAt( 0 ) as TreeGridDataColumn ).compare2RowData );
+                v3dTreeGridData.selectedItems.reverse();
+                for( var j:int = v3dTreeGridData.selectedItems.length - 1; j >= 0; j-- ){
+                    selectedV3dStructureRows.addItem( v3dTreeGridData.selectedItems[j] );
+                }
+                currentState = "show";
+            }
+            else{
+                currentState = "hide";
+            }
+        }
+        ]]></fx:Script>
+
+    <fx:Binding source="{v3dTreeGridData.selectedItems}" destination="rfrNames"/>
+    <fx:Binding source="{v3dTreeGridData.colOrderList.length}" destination="rfrNames"/>
+    <fx:Declarations>
+        <s:ArrayList id="selectedV3dStructureRows"/>
+    </fx:Declarations>
+    <s:Scroller height="100%" id="scroller">
+        <s:DataGroup dataProvider="{selectedV3dStructureRows}"
+                     minHeight="1" maxWidth="450">
+            <s:layout>
+                <s:TileLayout/>
+            </s:layout>
+            <s:itemRenderer>
+                <fx:Component>
+                    <s:ItemRenderer rollOver="row.v3dTreeGridData.atlasModel.mouseOverStructure=row.structure;"
+                                    rollOut="onRollOut();" width="100%">
+                        <s:states>
+                            <s:State name="normal"/>
+                            <s:State name="hovered"/>
+                        </s:states>
+                        <fx:Script><![CDATA[
+                            import edu.umich.med.mbni.pubanatomy.voxel3d.model.Voxel3dStructureTreeGridDataRow;
+
+                            [Bindable("dataChange")]
+                            public function get row():Voxel3dStructureTreeGridDataRow{
+                                return data as Voxel3dStructureTreeGridDataRow;
+                            }
+
+                            override public function set data( value:Object ):void{
+                                if( data != value ){
+                                    super.data = value;
+                                }
+                            }
+
+                            private function onRollOut():void{
+                                if( row.v3dTreeGridData.atlasModel.mouseOverStructure == row.structure ){
+                                    row.v3dTreeGridData.atlasModel.mouseOverStructure = null;
+                                }
+                            }
+
+                            private function set rfrState( ignoreVar:* ):void{
+                                row.v3dTreeGridData.rootModelVoxel3d.callInNext.putIn( refreshState );
+                            }
+
+                            private function refreshState():void{
+                                if( row.v3dTreeGridData.atlasModel.mouseOverStructure == row.structure ){
+                                    currentState = "hovered";
+                                }
+                                else{
+                                    currentState = "normal";
+                                }
+                            }
+                            ]]></fx:Script>
+                        <fx:Binding source="row.v3dTreeGridData.atlasModel.mouseOverStructure" destination="rfrState"/>
+                        <s:Label text="{row.structure.dtoStructure.acronym}"
+                                 toolTip="structure name |^|{row.structure.dtoStructure.name+ '\r\n'}#t(strslc)p#"
+                                 color.hovered="0x0000ff" fontWeight.hovered="bold"/>
+                    </s:ItemRenderer>
+                </fx:Component>
+            </s:itemRenderer>
+        </s:DataGroup>
+    </s:Scroller>
+    <s:Label text=" Operations:" fontWeight="bold" toolTip="#t(tree3dmultiOperationLabel)p#"/>
+    <s:DataGroup dataProvider="{v3dTreeGridData.availMultiOperations}"
+                 id="operationList" minHeight="1" height="{operationList.contentHeight+2}"
+                 width="100%" minWidth="210">
+        <s:layout>
+            <s:TileLayout/>
+        </s:layout>
+        <s:itemRenderer>
+            <fx:Component>
+                <s:DataRenderer>
+                    <fx:Script><![CDATA[
+                        import edu.umich.med.mbni.utils.ModelOperationMenuItem;
+
+                        [Bindable("dataChange")]
+                        public function get op():ModelOperationMenuItem{
+                            return data as ModelOperationMenuItem;
+                        }
+
+                        override public function set data( value:Object ):void{
+                            if( data != value ){
+                                super.data = value;
+                            }
+                        }
+                        ]]></fx:Script>
+                    <s:Button label="{op.label}" toolTip="{op.toolTip}" maxWidth="200"
+                              click="op.execute(); outerDocument.v3dTreeGridData.rfrMultiSelectionOperation = null;"/>
+                </s:DataRenderer>
+            </fx:Component>
+        </s:itemRenderer>
+    </s:DataGroup>
+</s:BorderContainer>

@@ -1,0 +1,66 @@
+<?xml version="1.0"?>
+<m:ModelSectionPlaneRfrMates xmlns:fx="http://ns.adobe.com/mxml/2009"
+                               xmlns:m="edu.umich.med.mbni.pubanatomy.sectioninteract.model.*">
+    <fx:Script><![CDATA[
+        import edu.umich.med.mbni.pubanatomy.flash.dto.DtoSection;
+        import edu.umich.med.mbni.pubanatomy.sectioninteract.rs.GetSectionsByPlane;
+        import edu.umich.med.mbni.pubanatomy.voxel3d.model.Voxel3dPlane;
+
+        import mx.collections.IList;
+
+        protected var _currentModelEdgeDTOs:IList;
+        [Bindable(event="currentModelEdgeDTOsChanged")]
+        public function get currentModelEdgeDTOs():IList{
+            return _currentModelEdgeDTOs;
+        }
+
+        private function setCurrentModelEdgeDtos( value:IList ):void{
+            if( value != _currentModelEdgeDTOs ){
+                _currentModelEdgeDTOs = value;
+                dispatchEvent( new Event( "currentModelEdgeDTOsChanged" ) );
+            }
+        }
+
+        private function set rfrModelEdgeDTOs( ignoreVar:* ):void{
+            rootModelSection2d.callInNext.putIn( refreshModelEdgeDTOs, this, null, rootModelSection2d.stage.frameRate / 2 );
+        }
+
+        private var _loadingXyzSection:GetSectionsByPlane;
+
+        [Bindable(event="loadingXyzSectionChanged")]
+        public function get loadingXyzSection():GetSectionsByPlane{
+            return _loadingXyzSection;
+        }
+
+        private function refreshModelEdgeDTOs():void{
+            if( _currentModelEdgeDTOs != null && v3dPlane.imageSectionMode == Voxel3dPlane.IMG_SECTION_MODE_XYZ ){
+                if( _currentModelEdgeDTOs.length == 0 || !( _currentModelEdgeDTOs.getItemAt( 0 ) as DtoSection ).plane.equals( v3dPlane.getDtoPlane() ) ){
+                    setCurrentModelEdgeDtos( null );
+                }
+            }
+
+            if( _currentModelEdgeDTOs == null && _loadingXyzSection == null ){
+                _loadingXyzSection = new GetSectionsByPlane();
+                dispatchEvent( new Event( "loadingXyzSectionChanged" ) );
+                _loadingXyzSection.sectionPlane = this as ModelSectionPlane;
+                _loadingXyzSection.callRemote();
+            }
+        }
+
+        public function onEdges( edges:IList ):void{
+            setCurrentModelEdgeDtos( edges );
+            _loadingXyzSection = null;
+            dispatchEvent( new Event( "loadingXyzSectionChanged" ) );
+        }
+
+
+        override public function destroy():void{
+            super.destroy();
+            _currentModelEdgeDTOs = null;
+            _loadingXyzSection = null;
+        }
+        ]]></fx:Script>
+    <fx:Binding source="v3dPlane.imageSectionMode" destination="rfrModelEdgeDTOs"/>
+    <fx:Binding source="v3dPlane.projectionDirection" destination="rfrModelEdgeDTOs"/>
+    <fx:Binding source="v3dPlane.projectionPosition" destination="rfrModelEdgeDTOs"/>
+</m:ModelSectionPlaneRfrMates>

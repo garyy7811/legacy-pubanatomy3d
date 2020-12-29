@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<model:QueryField xmlns:fx="http://ns.adobe.com/mxml/2009" xmlns:model="edu.umich.med.mbni.pubanatomy.search.model.*">
+    <fx:Script><![CDATA[
+
+        override public function instanciateResultFacet():ResultFacet{
+            var rt:ResultFacet = searchModel.instantiate( ResultFacet ) as ResultFacet;
+            rt.field = this;
+            return  rt;
+        }
+
+        override public function instanciateTermClass():QueryTerm{
+            var t:QueryTermT = searchModel.instantiate( QueryTermT ) as QueryTermT;
+            t.field = this;
+            return  t;
+        }
+
+        [Bindable]
+        public var minimalChar:uint = 1;
+
+        ]]></fx:Script>
+</model:QueryField>

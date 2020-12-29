@@ -1,0 +1,140 @@
+<?xml version="1.0"?>
+<as3lib:MxmlEventDispatcher xmlns:fx="http://ns.adobe.com/mxml/2009"
+                            xmlns:as3lib="com.flashflexpro.as3lib.*">
+    <fx:Script><![CDATA[
+        import com.flashflexpro.as3lib.CallOnceInNextFrame;
+
+        import mx.collections.ArrayList;
+        import mx.core.DragSource;
+        import mx.core.IFlexDisplayObject;
+        import mx.core.IUIComponent;
+
+        import spark.formatters.NumberFormatter;
+
+
+        [Bindable]
+        public var callInNext:CallOnceInNextFrame;
+
+        [Bindable]
+        public var restUrl:String;
+
+        [Bindable]
+        public var stage:Stage;
+
+        [Bindable]
+        public var numberFormatter:NumberFormatter;
+
+        [Bindable]
+        public var pressedKeys:ArrayList;
+
+        [Bindable]
+        public var rpcOnAir:ArrayList;
+
+        [Bindable]
+        public var rpcWaitQue:ArrayList;
+
+        [Bindable]
+        public var executingOperations:ArrayList;
+
+        private var _parent:RootModelModule;
+        public static const parent_CHANGED:String = "parentChanged";
+
+        [Bindable(event="parentChanged")]
+        public function get parent():RootModelModule{
+            return _parent;
+        }
+
+        public function set parent( value:RootModelModule ):void{
+            if( value != _parent ){
+                _parent = value;
+                dispatchEvent( new Event( parent_CHANGED ) );
+            }
+        }
+
+        private var _rootApp:RootModelApp;
+        public static const rootApp_CHANGED:String = "rootAppChanged";
+
+        [Bindable(event="rootAppChanged")]
+        public function get rootApp():RootModelApp{
+            return _rootApp;
+        }
+
+        public function set rootApp( value:RootModelApp ):void{
+            if( value != _rootApp ){
+                _rootApp = value;
+                dispatchEvent( new Event( rootApp_CHANGED ) );
+            }
+        }
+
+        protected function classNewInst( type:Class ):Object{
+            if( _parent != null ){
+                return _parent.instantiate( type );
+            }
+            return null;
+        }
+
+        public function instantiate( type:Class ):Object{
+            var rt:Object = classNewInst( type );
+            if( rt == null ){
+                return new type();
+            }
+            return rt;
+        }
+
+        private var _dragging:DragSource;
+        [Bindable(event="draggingChanged")]
+        public function get dragging():DragSource{
+            return _dragging;
+        }
+
+        protected function setDragging( value:DragSource ):void{
+            if( value != _dragging ){
+                _dragging = value;
+                dispatchEvent( new Event( "draggingChanged" ) );
+            }
+        }
+
+        public static const DRAGGING_FORMAT:String = "yanggang.dragging";
+
+        public function doDrag( dragInitiator:IUIComponent, dragSource:DragSource, mouseEvent:MouseEvent, dragImage:IFlexDisplayObject = null, // instance of dragged item(s)
+                                xOffset:Number = 0, yOffset:Number = 0, imageAlpha:Number = 0.5, allowMove:Boolean = true ):void{
+            CONFIG::debugging{
+                if( _dragging != null ){
+                    throw new Error( this + ".doDrag " );
+                }
+            }
+
+            setDragging( dragSource );
+            stage.addEventListener( MouseEvent.MOUSE_UP, onDragMouseUp );
+            if( _parent != null ){
+                _parent.doDrag( dragInitiator, dragSource, mouseEvent, dragImage,
+                                xOffset, yOffset, imageAlpha, allowMove );
+            }
+        }
+
+        private function onDragMouseUp( ev:MouseEvent ):void{
+            setDragging( null );
+            stage.removeEventListener( MouseEvent.MOUSE_UP, onDragMouseUp );
+        }
+
+        public function log( s:String ):void{
+            _rootApp.log( s );
+        }
+        ]]></fx:Script>
+    <fx:Binding source="parent.rootApp" destination="rootApp"/>
+    <fx:Binding source="rootApp.callInNext" destination="callInNext"/>
+    <fx:Binding source="rootApp.stage" destination="stage"/>
+    <fx:Binding source="rootApp.restUrl" destination="restUrl"/>
+
+    <fx:Binding source="rootApp.pressedKeys" destination="pressedKeys"/>
+    <fx:Binding source="rootApp.rpcOnAir" destination="rpcOnAir"/>
+    <fx:Binding source="rootApp.rpcWaitQue" destination="rpcWaitQue"/>
+    <fx:Binding source="rootApp.numberFormatter" destination="numberFormatter"/>
+
+    <fx:Script><![CDATA[
+
+        public function setMenuOperations( value:ModelOperationMenuChildren ):void{
+            _parent.setMenuOperations( value );
+        }
+        ]]></fx:Script>
+</as3lib:MxmlEventDispatcher>

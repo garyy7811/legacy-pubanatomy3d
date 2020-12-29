@@ -1,0 +1,60 @@
+<?xml version="1.0"?>
+<as3lib:MxmlEventDispatcher xmlns:fx="http://ns.adobe.com/mxml/2009" xmlns:as3lib="com.flashflexpro.as3lib.*"
+                            xmlns:model="edu.umich.med.mbni.pubanatomy.voxel3d.model.*"
+                            xmlns:s="library://ns.adobe.com/flex/spark">
+    <fx:Script><![CDATA[
+        import edu.umich.med.mbni.pubanatomy.atlas.model.MDLDataSet;
+        import edu.umich.med.mbni.pubanatomy.atlas.model.StructureGeneExpr;
+        import edu.umich.med.mbni.pubanatomy.atlas.model.StructureItem;
+
+        [Bindable]
+        public var model:RootModelVoxel3d;
+
+        [Bindable]
+        public var atlasStructure:StructureItem;
+
+        [Bindable]
+        public var on3dStage:Boolean = false;
+
+        [Bindable]
+        public var selected:Boolean;
+
+        private function addV3dGene( g:StructureGeneExpr ):Voxel3dStructureGeneExpr{
+            var rt:Voxel3dStructureGeneExpr = new Voxel3dStructureGeneExpr();
+            rt.v3dStructure = this;
+            rt.structureGene = g;
+            return rt;
+        }
+
+        private function removeV3dGene( v:Voxel3dStructureGeneExpr ):void{
+            v.destroy();
+        }
+
+        public function getV3dGeneStructureExprByGeneAndType( geneDs:MDLDataSet, selectedGeneExprType:String ):Voxel3dStructureGeneExprType{
+            var tmp:StructureGeneExpr = atlasStructure.syncGeneToExpr.getDestBySource( geneDs.modelGene ) as StructureGeneExpr;
+            var tmp2:Voxel3dStructureGeneExpr = syncStructureGenExprToV3d.getDestBySource( tmp ) as Voxel3dStructureGeneExpr;
+
+
+            for( var j:int = tmp2.v3dTypeGeneList.length - 1; j >= 0; j-- ){
+                var object:Voxel3dStructureGeneExprType = tmp2.v3dTypeGeneList.getItemAt( j ) as Voxel3dStructureGeneExprType;
+                if( object.atlasGeneTypeDs.sectionDataSet == geneDs && object.atlasGeneTypeDs.exprType == selectedGeneExprType ){
+                    return object;
+                }
+            }
+            throw new Error( "GEt this get this!!!" );
+        }
+        ]]></fx:Script>
+    <fx:Binding source="atlasStructure.selected" destination="selected" twoWay="true"/>
+    <fx:Declarations>
+        <model:Voxel3dStructureModel id="structure3dModel" structureItem="{this}"/>
+        <as3lib:Sync2Lists source="{atlasStructure.genes}"
+                getDestInst="addV3dGene"
+                destroyInst="removeV3dGene"
+                id="syncStructureGenExprToV3d"
+                >
+            <as3lib:destination>
+                <s:ArrayList id="geneList"/>
+            </as3lib:destination>
+        </as3lib:Sync2Lists>
+    </fx:Declarations>
+</as3lib:MxmlEventDispatcher>

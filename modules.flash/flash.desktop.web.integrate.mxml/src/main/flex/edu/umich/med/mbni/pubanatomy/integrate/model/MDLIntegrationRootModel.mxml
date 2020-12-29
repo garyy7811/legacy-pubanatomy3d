@@ -1,0 +1,338 @@
+<?xml version="1.0"?>
+<utils:RootModelApp xmlns:fx="http://ns.adobe.com/mxml/2009"
+                    xmlns:utils="edu.umich.med.mbni.utils.*"
+                    xmlns:search="edu.umich.med.mbni.pubanatomy.search.model.*"
+                    xmlns:v3dModel="edu.umich.med.mbni.pubanatomy.voxel3d.model.*"
+                    xmlns:atlasModel="edu.umich.med.mbni.pubanatomy.atlas.model.*"
+                    xmlns:section2dModel="edu.umich.med.mbni.pubanatomy.sectioninteract.model.*"
+                    xmlns:s="library://ns.adobe.com/flex/spark"
+                    xmlns:as3lib="com.flashflexpro.as3lib.*"
+                    xmlns:m="edu.umich.med.mbni.pubanatomy.integrate.model.*"
+                    xmlns:dd3d="edu.umich.med.mbni.pubanatomy.datadriven3dwindow.*"
+                    xmlns:ncbisearch="edu.umich.med.mbni.pubanatomy.ncbipubmedsearch.*">
+    <fx:Metadata>
+        [Event(name="popUpHelpNow", type="flash.events.Event")]
+    </fx:Metadata>
+    <fx:Declarations>
+        <section2dModel:RootModelSection2d id="rootModelSection2d" parent="{this}">
+            <section2dModel:rootModelVoxel3d>
+                <v3dModel:RootModelVoxel3d id="rootModelVoxel3d" parent="{this}">
+                    <v3dModel:rootModelAtlas>
+                        <atlasModel:RootModelAtlas id="rootModelAtlas" parent="{this}"/>
+                    </v3dModel:rootModelAtlas>
+                </v3dModel:RootModelVoxel3d>
+            </section2dModel:rootModelVoxel3d>
+        </section2dModel:RootModelSection2d>
+        <search:SearchModel id="searchModel" parent="{this}"/>
+        <search:QueryResult id="staticQueryResult" searchModel="{searchModel}">
+            <search:queryModel>
+                <search:Query queryResult="{staticQueryResult}"/>
+            </search:queryModel>
+        </search:QueryResult>
+        <ncbisearch:MDLNCBIPubmedQueryResult id="ncbiQueryResult" searchModel="{searchModel}">
+            <ncbisearch:ncbiPubmedProxyUrl>{ncbiUrl}</ncbisearch:ncbiPubmedProxyUrl>
+            <ncbisearch:queryModel>
+                <ncbisearch:MDLNCBIPubmedQuery queryResult="{ncbiQueryResult}"/>
+            </ncbisearch:queryModel>
+            <ncbisearch:resultModel>
+                <ncbisearch:MDLNCBIPubmedResult queryResult="{ncbiQueryResult}"/>
+            </ncbisearch:resultModel>
+        </ncbisearch:MDLNCBIPubmedQueryResult>
+        <s:ArrayList id="dynamicQueryResults"/>
+    </fx:Declarations>
+
+    <fx:Script><![CDATA[
+        import edu.umich.med.mbni.pubanatomy.flash.rs.RpcBase;
+        import edu.umich.med.mbni.pubanatomy.search.model.QueryResult;
+        import edu.umich.med.mbni.pubanatomy.sectioninteract.model.ModelSectionPlane;
+        import edu.umich.med.mbni.pubanatomy.voxel3d.model.Voxel3dOperationAddPlaneFromImage;
+        import edu.umich.med.mbni.utils.ModelOperationMenuChildren;
+
+        [Bindable]
+        public var ncbiUrl:String;
+        public var searchUrl:String;
+        public var abaUrl:String;
+
+        [Bindable(event="singletonAllStructuresChanged")]
+        public function get singletonAllStructures():Boolean{
+            return webWinModels.getItemIndex( rootModelAtlas.allStructuresTreeGridData ) >= 0;
+        }
+
+        public function set singletonAllStructures( value:Boolean ):void{
+            if( value != singletonAllStructures ){
+                if( value ){
+                    webWinModels.addItem( rootModelAtlas.allStructuresTreeGridData );
+                }
+                else{
+                    webWinModels.removeItem( rootModelAtlas.allStructuresTreeGridData );
+                }
+                dispatchEvent( new Event( "singletonAllStructuresChanged" ) );
+            }
+        }
+
+
+        private function addSearchQRModel2Win( qrm:QueryResult ):QueryResult{
+            if( webWinModels.getItemIndex( qrm ) < 0 ){
+                webWinModels.addItem( qrm );
+            }
+            return qrm;
+        }
+
+        private function removeSearchQRModelWin( qrm:QueryResult ):void{
+            webWinModels.removeItem( qrm );
+        }
+
+        private function addSection2dModel2Win( msp:ModelSectionPlane ):ModelSectionPlane{
+            var fromImg:Boolean = false;
+            for( var j:int = executingOperations.length - 1; j >= 0; j-- ){
+                if( executingOperations.getItemAt( j ) is CMDAddPlaneFromImageIntoWidget ){
+                    fromImg = true;
+                    break;
+                }
+            }
+
+            if( !fromImg ){
+                webWinModels.addItem( msp );
+            }
+            return msp;
+        }
+
+        private function removeSection2dModel2Win( msp:ModelSectionPlane ):void{
+            webWinModels.removeItem( msp );
+        }
+
+        public function onAppLoaded():void{
+        }
+
+        [Bindable]
+        public var showMainMedlineSearch:Boolean = true;
+
+        [Bindable]
+        public var showAllBrainStructures:Boolean = false;
+
+        [Bindable]
+        public var show3dSceneTreeStructures:Boolean = false;
+
+        public function addNewSearchWin():void{
+            var queryResult:QueryResult = new QueryResult();
+            queryResult.searchModel = searchModel;
+            dynamicQueryResults.addItem( queryResult );
+        }
+
+        public function removeSearchWin( qr:QueryResult ):void{
+            dynamicQueryResults.removeItem( qr );
+        }
+
+        public function addNewAllenGeneSearchWin():void{
+            setMenuOperations( new ModelOperationMenuChildren( [
+                                                                   new CMDTempAddAbaSearch( new MDLTempAbaDatasetSearchRpcGene(), "By Gene Name/Symbol" ),
+                                                                   new CMDTempAddAbaSearch( new MDLTempAbaDatasetSearchRpcDiff(), "By Structure Differential" ),
+                                                                   new CMDTempAddAbaSearch( new MDLTempAbaDatasetSearchRpcCorr(), "By NeuroBlast" )
+                                                               ] ) );
+        }
+
+        public function onEnterFrame():void{
+            callInNext.onEnterFrame();
+
+            for( var j:int = rpcLstOnAir.length - 1; j >= 0; j-- ){
+                ( rpcLstOnAir.getItemAt( j ) as RpcBase ).checkIfTimeOut();
+            }
+        }
+        ]]></fx:Script>
+    <fx:Declarations>
+        <s:ArrayList id="webWinModels"/>
+        <as3lib:Sync2Lists source="{dynamicQueryResults}"
+                           getDestInst="addSearchQRModel2Win"
+                           destroyInst="removeSearchQRModelWin">
+            <as3lib:destination>
+                <s:ArrayList id="__queryResultWindowDummy"/>
+            </as3lib:destination>
+        </as3lib:Sync2Lists>
+        <as3lib:Sync2Lists source="{rootModelSection2d.onSection2dPlanes}"
+                           getDestInst="addSection2dModel2Win"
+                           destroyInst="removeSection2dModel2Win"
+                >
+            <as3lib:destination>
+                <s:ArrayList id="__section2dWindowDummy"/>
+            </as3lib:destination>
+        </as3lib:Sync2Lists>
+
+
+        <m:MDLDividableWidgetRoot id="cameraDiv" rootApp="{this}">
+            <m:modelCamera>
+                <dd3d:Dd3dModelCamera id="rootModelCamera" scene="{rootModelVoxel3d.scene3d}"/>
+            </m:modelCamera>
+        </m:MDLDividableWidgetRoot>
+    </fx:Declarations>
+    <utils:pressedKeys>
+        <s:ArrayList/>
+    </utils:pressedKeys>
+    <utils:rpcOnAir>
+        <s:ArrayList id="rpcLstOnAir"/>
+    </utils:rpcOnAir>
+    <utils:rpcWaitQue>
+        <s:ArrayList/>
+    </utils:rpcWaitQue>
+    <utils:executingOperations>
+        <s:ArrayList/>
+    </utils:executingOperations>
+    <utils:numberFormatter>
+        <s:NumberFormatter
+                fractionalDigits="4"
+                decimalSeparator="."
+                groupingSeparator=","
+                useGrouping="true"
+                negativeNumberFormat="0"/>
+    </utils:numberFormatter>
+    <fx:Script><![CDATA[
+        //target uid mapping to MDLTooltipExPub;
+        private static const _dicTargetUid2Help:Dictionary = new Dictionary();
+        public function get dicTargetUid2Help():Dictionary{
+            return _dicTargetUid2Help;
+        }
+        ]]></fx:Script>
+
+
+    <fx:Script><![CDATA[
+        import edu.umich.med.mbni.pubanatomy.atlas.model.MDLISHImage;
+        import edu.umich.med.mbni.pubanatomy.atlas.model.StructureItem;
+        import edu.umich.med.mbni.pubanatomy.atlas.model.StructureTreeGridDataRow;
+        import edu.umich.med.mbni.pubanatomy.integrate.view.DraggingDesc;
+        import edu.umich.med.mbni.pubanatomy.integrate.view.TmpStructureListH;
+        import edu.umich.med.mbni.utils.ModelOperationMenuItem;
+        import edu.umich.med.mbni.utils.ModelOperationMenuType;
+
+        import mx.core.DragSource;
+        import mx.core.IFlexDisplayObject;
+        import mx.core.IUIComponent;
+
+        override public function setMenuOperations( value:ModelOperationMenuChildren ):void{
+            if( value != null && value.target is MDLISHImage ){
+                var aimg:Voxel3dOperationAddPlaneFromImage = new Voxel3dOperationAddPlaneFromImage();
+                aimg.image = value.target as MDLISHImage;
+                aimg.rootModel = rootModelVoxel3d;
+                aimg.label = "Pop up section view panel";
+                value.children.addItem( aimg );
+            }
+            else if( value != null ){
+                var f:ModelOperationMenuChildren = findTargetIsStructureRow( value );
+                if( f != null ){
+                    var t:StructureTreeGridDataRow = f.target as StructureTreeGridDataRow;
+                    var s:ModelOperationMenuItem = new ModelOperationMenuItem( "Add structure" + t.name + " to Main Search" );
+                    s.toExe = function ():void{
+                        showMainMedlineSearch = true;
+                        staticQueryResult.queryModel.appendTermStr( staticQueryResult.searchModel.brainStructureNames, t.name );
+                        staticQueryResult.sendQuery();
+                    };
+
+                    s.toolTip = "AddStructureToMainSearch|^|" + t.name + "\r\n" + "#t(AddStructureToMainSearch)p#";
+
+                    f.children.addItemAt( new ModelOperationMenuType(), 0 );
+                    f.children.addItemAt( s, 0 );
+                }
+            }
+            super.setMenuOperations( value );
+        }
+
+        private function findTargetIsStructureRow( m:ModelOperationMenuChildren ):ModelOperationMenuChildren{
+            if( m.target is StructureTreeGridDataRow ){
+                return m;
+            }
+            if( m.children != null ){
+
+                for( var j:int = m.children.length - 1; j >= 0; j-- ){
+                    var c:ModelOperationMenuChildren = m.children.getItemAt( j ) as ModelOperationMenuChildren;
+                    if( c == null ){
+                        continue;
+                    }
+                    var r:ModelOperationMenuChildren = findTargetIsStructureRow( c );
+                    if( r != null ){
+                        return r;
+                    }
+                }
+            }
+            return null;
+        }
+
+
+        override public function doDrag( dragInitiator:IUIComponent, dragSource:DragSource, mouseEvent:MouseEvent, dragImage:IFlexDisplayObject = null, xOffset:Number = 0, yOffset:Number = 0, imageAlpha:Number = 0.5, allowMove:Boolean = true ):void{
+            if( dragInitiator is TmpStructureListH ){
+                var originalDragging:Vector.<Object> = dragSource.dataForFormat( RootModelModule.DRAGGING_FORMAT ) as Vector.<Object>;
+                if( originalDragging != null ){
+                    originalDragging.forEach( function ( row:Object, idx:int, v:Vector.<Object> ):void{
+                        originalDragging[ idx ] = ( row as StructureItem ).dtoStructure;
+                    } )
+                }
+            }
+
+            if( dragImage == null ){
+                var tmp:DraggingDesc = new DraggingDesc();
+                tmp.rootApp = this;
+                super.doDrag( dragInitiator, dragSource, mouseEvent,
+                              tmp, -9 - dragInitiator.mouseX, -9 - dragInitiator.mouseY, 1, false );
+            }
+            else{
+                super.doDrag( dragInitiator, dragSource, mouseEvent, dragImage, xOffset, yOffset, imageAlpha, allowMove );
+            }
+        }
+        ]]></fx:Script>
+    <fx:Script><![CDATA[
+        [Bindable]
+        public var moreHelpClickable:Boolean = true;
+
+        private var _shiftDownTime:uint;
+
+        override protected function onKeyUp( event:KeyboardEvent ):void{
+            super.onKeyUp( event );
+            if( event.keyCode == Keyboard.SHIFT ){
+                var tmp:int = getTimer();
+                if( tmp - _shiftDownTime < 200 ){
+                    popUpHelpNow();
+                    tmp = 0;
+                }
+                _shiftDownTime = tmp;
+            }
+        }
+
+        public function popUpHelpNow():void{
+            dispatchEvent( new Event( "popUpHelpNow" ) );
+        }
+
+
+        public function onGlobalConfig():void{
+            var globalConfig:ModelOperationMenuItem = new ModelOperationMenuItem();
+            globalConfig.label = "More help tip box clickable";
+            globalConfig.toolTip = "this check controls whether a tip box is clickable when have more help available";
+            globalConfig.type = ModelOperationMenuType.TYPE_CHECK;
+            globalConfig.toggled = moreHelpClickable;
+            globalConfig.toExe = function ():void{
+                moreHelpClickable = !moreHelpClickable;
+            };
+
+            setMenuOperations( new ModelOperationMenuChildren( [ globalConfig ] ) );
+        }
+        ]]></fx:Script>
+
+    <fx:Script><![CDATA[
+        import edu.umich.med.mbni.pubanatomy.voxel3d.model.Voxel3dStructureOn3dTreeGridData;
+
+        public var userClosed3dView:Boolean = false;
+
+        private function set rfrShow3dViewTreeGridFor1stTime( v:* ):void{
+            var tmp:Voxel3dStructureOn3dTreeGridData = rootModelVoxel3d.on3dStageStructureTreeGridData;
+            if( !userClosed3dView && (
+                    tmp.geneColumns.length > 0
+                            || tmp.str2countCol != null
+                            || ( tmp.selectedItems != null && tmp.selectedItems.length > 0 )
+                    ) ){
+                show3dSceneTreeStructures = true;
+            }
+        }
+        ]]></fx:Script>
+    <fx:Binding source="rootModelVoxel3d.on3dStageStructureTreeGridData.geneColumns.length"
+                destination="rfrShow3dViewTreeGridFor1stTime"/>
+    <fx:Binding source="rootModelVoxel3d.on3dStageStructureTreeGridData.selectedItems"
+                destination="rfrShow3dViewTreeGridFor1stTime"/>
+    <fx:Binding source="rootModelVoxel3d.on3dStageStructureTreeGridData.str2countCol"
+                destination="rfrShow3dViewTreeGridFor1stTime"/>
+</utils:RootModelApp>

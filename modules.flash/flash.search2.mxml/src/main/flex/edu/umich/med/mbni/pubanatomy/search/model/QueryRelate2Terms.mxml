@@ -1,0 +1,419 @@
+<?xml version="1.0"?>
+<model:QueryTerm xmlns:fx="http://ns.adobe.com/mxml/2009"
+                 xmlns:model="edu.umich.med.mbni.pubanatomy.search.model.*">
+    <fx:Metadata>
+        [RemoteClass]
+    </fx:Metadata>
+    <fx:Binding source="parent.query" destination="query"/>
+    <fx:Binding source="( term !=null &amp;&amp; query != null  ) ? query : null" destination="term.query"/>
+    <fx:Script><![CDATA[
+        import mx.collections.ArrayList;
+
+        public static const IS_VERTICAL_DEFAULT:Boolean = false;
+
+        [Bindable]
+        public var isVertical:Boolean = IS_VERTICAL_DEFAULT;
+
+        [Bindable]
+        public var term:QueryTerm;
+
+        [Bindable]
+        public var parent:QueryRelate2Terms;
+
+        [Bindable]
+        public var child1:QueryRelate2Terms;
+
+        [Bindable]
+        public var child2:QueryRelate2Terms;
+
+        [Bindable]
+        public var operator:String = null;
+
+        public static const OPERATOR_AND:String = "AND";
+        public static const OPERATOR_OR:String = "OR";
+        public static const OPERATOR_NOT:String = "NOT";
+        public static const OPERATORS:ArrayList = new ArrayList( [ OPERATOR_AND, OPERATOR_OR, OPERATOR_NOT ] );
+
+
+        public function addTerm( newSibling:QueryRelate2Terms, relation:String = OPERATOR_AND, before:Boolean = false ):void{
+            var p:QueryRelate2Terms = query.queryResult.searchModel.instantiate( QueryRelate2Terms ) as QueryRelate2Terms;
+            p.child1 = before ? newSibling : this;
+            p.child2 = before ? this : newSibling;
+            p.operator = relation;
+            p.isVertical = isVertical;
+            isVertical = IS_VERTICAL_DEFAULT;
+
+            if( parent == null ){
+                p.query = query;
+                query.rootTerm = p;
+            }
+            else{
+                if( parent.child1 == this ){
+                    parent.child1 = p;
+                }
+                else{
+                    parent.child2 = p;
+                }
+                p.parent = parent;
+            }
+
+            newSibling.parent = p;
+            parent = p;
+        }
+
+        public function removeChild( removing:QueryRelate2Terms, destroyRemoved:Boolean ):void{
+            CONFIG::debugging{
+                if( removing == null ){
+                    throw new Error();
+                }
+            }
+            var left:QueryRelate2Terms = ( child1 == removing ? child2 : child1 );
+            if( parent != null ){
+                if( parent.child1 == this ){
+                    parent.child1 = left;
+                }
+                else{
+                    parent.child2 = left;
+                }
+                left.parent = parent;
+            }
+            else{
+                left.parent = null;
+                left.query = query;
+                query.rootTerm = left;
+            }
+            if( destroyRemoved ){
+                removing.destroy();
+            }
+            super.destroy();
+            parent = null;
+            term = null;
+            child1 = null;
+            child2 = null;
+            System.gc();
+        }
+
+        override public function clone( newQuery:Query = null, newInst:QueryTerm = null ):QueryTerm{
+            var niR:QueryRelate2Terms = new QueryRelate2Terms();
+            niR.parent = parent;
+            niR.operator = operator;
+            if( term != null ){
+                niR.term = term.clone( newQuery );
+            }
+            else{
+                niR.child1 = child1.clone( newQuery ) as QueryRelate2Terms;
+                niR.child1.parent = niR;
+                niR.child2 = child2.clone( newQuery ) as QueryRelate2Terms;
+                niR.child2.parent = niR;
+            }
+            return super.clone( newQuery, niR );
+        }
+
+
+        public function tryDropInTerm( dragging:QueryRelate2Terms, drop:Boolean, ctrlDown:Boolean, relation:String, before:Boolean ):Boolean{
+            if( dragging.queryStrAsChild == null && dragging.query != null ){
+                CONFIG::debugging{
+                    trace( this + ".tryDropInTerm: dragging has null term!" );
+                }//debug
+                return false;
+            }
+            if( dragging.query != null && !ctrlDown ){
+                if( dragging.parent == this || dragging.parent == null ){
+                    return false;
+                }
+                var tmp:QueryRelate2Terms = this;
+                while( tmp != null ){
+                    if( tmp == dragging ){
+                        return false;
+                    }
+                    tmp = tmp.parent;
+                }
+            }
+
+            if( drop ){
+                if( dragging.query == null || !ctrlDown ){
+                    if( dragging.parent != null ){
+                        dragging.parent.removeChild( dragging, false );
+                    }
+                    else{
+                        CONFIG::debugging{
+                            if( dragging.term == null ){
+                                throw new Error( this + ".tryDropInTerm " );
+                            }//debug
+                        }
+                        query.setFocusedOnTerm( dragging.term );
+                    }
+
+                    addTerm( dragging, relation, before );
+                }
+                else{
+                    addTerm( dragging.clone( query ) as QueryRelate2Terms, relation, before );
+                }
+            }
+            return true;
+        }
+
+        override public function destroy():void{
+            super.destroy();
+            parent = null;
+            if( child1 != null ){
+                child1.destroy();
+                child1 = null;
+            }
+            if( child2 != null ){
+                child2.destroy();
+                child2 = null;
+            }
+            term = null;
+        }
+        ]]></fx:Script>
+
+
+    <fx:Script><![CDATA[
+        private function set rfrQueryStr( ignoreVar:* ):void{
+            if( query == null ){
+                return;
+            }
+            var qStrWithNoField:String;
+            if( term != null ){
+                CONFIG::debugging{
+                    if( child1 != null || child2 != null ){
+                        throw new Error( this + ".rfrQueryStr " );
+                    }
+                }//debug
+                qStrWithNoField = term.queryStrAsChild;
+            }
+            else if( child1 != null && child2 != null ){
+                CONFIG::debugging{
+                    if( term != null ){
+                        throw new Error( this + ".rfrQueryStr " );
+                    }
+                }//debug: child 1 and 2 has to be null
+                if( child1.queryStrAsChild != null && child2.queryStrAsChild != null ){
+                    if( operator != OPERATOR_NOT && child2.queryStrAsChild > child1.queryStrAsChild ){
+                        qStrWithNoField = child2.queryStrAsChild + " " + operator + " " + child1.queryStrAsChild;
+                    }
+                    else{
+                        qStrWithNoField = child1.queryStrAsChild + " " + operator + " " + child2.queryStrAsChild;
+                    }
+                }
+                else if( child1.queryStrAsChild != null ){
+                    qStrWithNoField = child1.queryStrAsChild;
+                }
+                else if( child2.queryStrAsChild != null ){
+                    qStrWithNoField = child2.queryStrAsChild;
+                }
+                else{
+                    throw new Error( "both query str as child is null" );
+                }
+            }
+            if( qStrWithNoField == null ){
+                setQueryStr( null, null );
+                return;
+            }
+
+            qStrWithNoField = "(" + qStrWithNoField + ")";
+
+            var qStrAsSelf:String = field != null ? ( field.queryField + ":" + qStrWithNoField ) : qStrWithNoField;
+            if( field != null && ( parent == null || parent.field == null ) ){
+                setQueryStr( qStrAsSelf, qStrAsSelf );
+            }
+            else{
+                setQueryStr( qStrWithNoField, qStrAsSelf );
+            }
+        }
+        ]]></fx:Script>
+    <fx:Binding source="query.queryResult.searchModel.callInNext" destination="rfrQueryStr"/>
+    <fx:Binding source="operator" destination="rfrQueryStr"/>
+    <fx:Binding source="child1.queryStrAsChild" destination="rfrQueryStr"/>
+    <fx:Binding source="child2.queryStrAsChild" destination="rfrQueryStr"/>
+    <fx:Binding source="term.queryStrAsChild" destination="rfrQueryStr"/>
+    <fx:Binding source="field" destination="rfrQueryStr"/>
+    <fx:Binding source="parent.field" destination="rfrQueryStr"/>
+
+    <fx:Script><![CDATA[
+        private function set rfrField( ignoreVar:* ):void{
+            CONFIG::debugging{
+                if( term != null && operator != null ){
+                    throw new Error( this + ".rfrField " );
+                }
+            }
+            if( term != null ){
+                field = term.field;
+            }
+            else if( child1.field == child2.field ){
+                field = child1.field;
+            }
+            else{
+                field = null;
+            }
+        }
+        ]]></fx:Script>
+    <fx:Binding source="child1.field" destination="rfrField"/>
+    <fx:Binding source="child2.field" destination="rfrField"/>
+    <fx:Binding source="term.field" destination="rfrField"/>
+
+
+    <fx:Script><![CDATA[
+        private var _allChildrenSameOperator:Boolean = false;
+
+        [Bindable(event="allChildrenSameOperatorChanged")]
+        public function get allChildrenSameOperator():Boolean{
+            return _allChildrenSameOperator;
+        }
+
+        private function setAllChildrenSameOperator( value:Boolean ):void{
+            if( value != _allChildrenSameOperator ){
+                _allChildrenSameOperator = value;
+                dispatchEvent( new Event( "allChildrenSameOperatorChanged" ) );
+            }
+        }
+
+        private function set rfrAllSameOperator( ignoreVar:* ):void{
+            setAllChildrenSameOperator( term != null || ( child1.allChildrenSameOperator && child2.allChildrenSameOperator
+                    && child1.operator == child2.operator ) );
+        }
+        ]]></fx:Script>
+    <fx:Binding source="child1.operator" destination="rfrAllSameOperator"/>
+    <fx:Binding source="child2.operator" destination="rfrAllSameOperator"/>
+    <fx:Binding source="child1.allChildrenSameOperator" destination="rfrAllSameOperator"/>
+    <fx:Binding source="child2.allChildrenSameOperator" destination="rfrAllSameOperator"/>
+    <fx:Binding source="term" destination="rfrAllSameOperator"/>
+
+    <fx:Script><![CDATA[
+        private function set rfrFocusNullQueryStr( ignoreVar:* ):void{
+            query.queryResult.searchModel.callInNext.putIn( refreshFocusNullQueryStr );
+        }
+
+        private function refreshFocusNullQueryStr():void{
+            if( term != null && term.queryStrAsChild == null && query.focusedOnTerm != term ){
+                if( parent != null ){
+                    //                    parent.removeChild( this, true );
+                }
+            }
+        }
+        ]]></fx:Script>
+    <fx:Binding source="query.focusedOnTerm" destination="rfrFocusNullQueryStr"/>
+    <fx:Binding source="query.queryResult.searchModel" destination="rfrFocusNullQueryStr"/>
+    <fx:Binding source="queryStrAsChild" destination="rfrFocusNullQueryStr"/>
+
+    <fx:Script><![CDATA[
+        import edu.umich.med.mbni.pubanatomy.search.view.ViewTermCountRpc;
+
+        private var _count:int;
+        [Bindable(event="countChanged")]
+        public function get count():int{
+            return _count;
+        }
+
+        private function set rfrCount( ignoreVar:* ):void{
+            query.queryResult.searchModel.callInNext.putIn( refreshCount );
+        }
+
+        private function refreshCount():void{
+            if( queryStrAsChild != null ){
+                var countRpc:ViewTermCountRpc = new ViewTermCountRpc();
+                countRpc.queryTerm = this;
+                countRpc.callRemote();
+            }
+        }
+
+        public function onCountResult( value:uint ):void{
+            if( value != _count ){
+                _count = value;
+                dispatchEvent( new Event( "countChanged" ) );
+            }
+        }
+        ]]></fx:Script>
+    <fx:Binding source="queryStrAsChild" destination="rfrCount"/>
+    <fx:Script><![CDATA[
+        public function findEqualTerms( facetTerm:QueryTerm, rt:ArrayList = null ):ArrayList{
+            if( rt == null ){
+                rt = new ArrayList();
+            }
+            if( term != null && term.queryStr == facetTerm.queryStr ){
+                rt.addItem( this );
+                return rt;
+            }
+
+            if( child1 != null ){
+                child1.findEqualTerms( facetTerm, rt );
+                child2.findEqualTerms( facetTerm, rt );
+            }
+            return rt;
+        }
+        ]]></fx:Script>
+
+    <fx:Script><![CDATA[
+        import edu.umich.med.mbni.utils.ModelOperationMenuChildren;
+        import edu.umich.med.mbni.utils.ModelOperationMenuItem;
+        import edu.umich.med.mbni.utils.ModelOperationMenuType;
+
+        import mx.collections.ArrayCollection;
+
+        public function showMenu():void{
+            var addingFields:ArrayCollection = new ArrayCollection();
+
+            for( var j:int = query.queryResult.searchModel.queryFields.length - 1; j >= 0; j-- ){
+                var adding:OperationQueryAddTerm = new OperationQueryAddTerm();
+                adding.field = query.queryResult.searchModel.queryFields.getItemAt( j ) as QueryField;
+                adding.addTo = this;
+                adding.label = adding.field.label;
+                adding.toolTip = "#t(searchField_" + adding.field.toolTip + ")p#";
+                addingFields.addItem( adding );
+            }
+            var addingEntry:ModelOperationMenuChildren = new ModelOperationMenuChildren( addingFields.toArray() );
+            addingEntry.label = "Add new Term";
+            addingEntry.toolTip = "#t(searchAddNewTerm)p#";
+            addingEntry.enabled = ( queryStr != null && queryStr != "" );
+            var menu:ModelOperationMenuChildren = new ModelOperationMenuChildren( [ addingEntry ] );
+
+            if( child1 == null && child2 == null ){
+                var candlst:ArrayList = query.queryResult.searchModel.findSameTypeQueryFields( field.type );
+
+                var rt:Array = [];
+                for( var j:int = candlst.length - 1; j >= 0; j-- ){
+                    var f:QueryField = candlst.getItemAt( j ) as QueryField;
+                    if( f == field ){
+                        continue;
+                    }
+                    var tmp:OperationQueryChangeTerm = new OperationQueryChangeTerm();
+                    tmp.field = f;
+                    tmp.target = this;
+                    tmp.toolTip = "#t(searchField_" + adding.field.toolTip + ")p#";
+                    rt.push( tmp );
+                }
+
+                menu.children.addItem( new ModelOperationMenuChildren( rt, null, "Change term to" ) );
+            }
+
+            var closeTerm:OperationQueryCloseTerm = new OperationQueryCloseTerm();
+            closeTerm.target = this;
+            closeTerm.enabled = (parent != null);
+            closeTerm.label = "Close this term";
+            menu.children.addItem( new ModelOperationMenuType() );
+            menu.children.addItem( closeTerm );
+
+            query.queryResult.searchModel.setMenuOperations( menu );
+        }
+
+
+        private function onTryChangeField():void{
+        }
+        ]]></fx:Script>
+    <fx:Script><![CDATA[
+        override public function writeExternal( output:IDataOutput ):void{
+            output.writeObject( term );
+            output.writeObject( child1 );
+            output.writeObject( operator );
+            output.writeObject( child2 );
+        }
+
+        override public function readExternal( input:IDataInput ):void{
+            term = input.readObject();
+            child1 = input.readObject();
+            operator = input.readObject();
+            child2 = input.readObject();
+        }
+        ]]></fx:Script>
+</model:QueryTerm>

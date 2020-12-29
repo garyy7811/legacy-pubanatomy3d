@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:WindowedApplication xmlns:fx="http://ns.adobe.com/mxml/2009"
+                       xmlns:s="library://ns.adobe.com/flex/spark"
+                       xmlns:as3lib="com.flashflexpro.as3lib.*"
+                       xmlns:chk_atlas_svg_si_avail="edu.umich.med.mbni.pubanatomy.chk_atlas_svg_si_avail.*"
+                       enterFrame="callOnceInNextFrame.onEnterFrame();"
+                       creationComplete="onCreated();">
+    <fx:Script><![CDATA[
+        private function onCreated():void{
+            rootModel.thisAppInit( systemManager.stage );
+        }
+        ]]></fx:Script>
+    <fx:Declarations>
+        <chk_atlas_svg_si_avail:ChkAtlasSVGSectionSvgAvailable id="rootModel">
+            <chk_atlas_svg_si_avail:callInNext>
+                <as3lib:CallOnceInNextFrame id="callOnceInNextFrame"/>
+            </chk_atlas_svg_si_avail:callInNext>
+        </chk_atlas_svg_si_avail:ChkAtlasSVGSectionSvgAvailable>
+    </fx:Declarations>
+    <s:layout>
+        <s:VerticalLayout/>
+    </s:layout>
+</s:WindowedApplication>

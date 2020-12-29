@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>edu.umich.med.mbni</groupId>
+    <artifactId>pubanatomy.parent.flash</artifactId>
+    <version>0.1-SNAPSHOT</version>
+    <packaging>pom</packaging>
+
+    <properties>
+        <target.flash.player.version>12.0.0</target.flash.player.version>
+        <flexmojo.version>6.0.1</flexmojo.version>
+        <flex.sdk.version>4.12.0.20140303</flex.sdk.version>
+    </properties>
+
+    <build>
+        <sourceDirectory>src/main/flex</sourceDirectory>
+        <directory>../.mvn.build/${project.build.finalName}</directory>
+        <plugins>
+            <plugin>
+                <groupId>net.flexmojos.oss</groupId>
+                <artifactId>flexmojos-maven-plugin</artifactId>
+                <version>${flexmojo.version}</version>
+                <extensions>true</extensions>
+                <configuration>
+                    <actionscriptFileEncoding>UTF-8</actionscriptFileEncoding>
+                    <!-- this will kill everything
+                    <includeSources>
+                        <includeSource>${project.basedir}/src/main/resources</includeSource>
+                    </includeSources>
+                    -->
+                    <localesCompiled>
+                        <locale>en_US</locale>
+                    </localesCompiled>
+                    <flashPlayerCommand>${test.flashplayercommand}</flashPlayerCommand>
+                    <storepass/>
+                    <targetPlayer>${target.flash.player.version}</targetPlayer>
+                    <debug>${output.debuggable.swf}</debug>
+                    <defines>
+                        <property>
+                            <name>CONFIG::debugging</name>
+                            <value>${conditional.compile.config.debugging}</value>
+                        </property>
+                        <property>
+                            <name>CONFIG::production</name>
+                            <value>${conditional.compile.config.production}</value>
+                        </property>
+                    </defines>
+                </configuration>
+
+                <dependencies>
+                    <dependency>
+                        <groupId>com.adobe.flex</groupId>
+                        <artifactId>compiler</artifactId>
+                        <version>${flex.sdk.version}</version>
+                        <type>pom</type>
+                    </dependency>
+                </dependencies>
+            </plugin>
+        </plugins>
+    </build>
+    <dependencies>
+        <dependency>
+            <groupId>com.adobe.flex.framework</groupId>
+            <artifactId>flex-framework</artifactId>
+            <version>${flex.sdk.version}</version>
+            <type>pom</type>
+        </dependency>
+
+        <dependency>
+            <groupId>com.adobe.flexunit</groupId>
+            <artifactId>flexunit</artifactId>
+            <version>4.0-rc-1</version>
+            <type>swc</type>
+            <scope>test</scope>
+        </dependency>
+
+    </dependencies>
+
+</project>

@@ -1,0 +1,82 @@
+<?xml version="1.0"?>
+<trm:TreeLeaveItem xmlns:fx="http://ns.adobe.com/mxml/2009"
+                   xmlns:trm="edu.umich.med.mbni.treemodel.*" xmlns:s="library://ns.adobe.com/flex/spark"
+                   xmlns:as3lib="com.flashflexpro.as3lib.*">
+    <fx:Script><![CDATA[
+
+        private function addFromDirToAll(c:TreeLeaveItem):TreeLeaveItem {
+            var tmp:TreeBranchItem = this;
+            while (tmp != null) {
+                CONFIG::debugging{
+                    if (tmp.allChildren.getItemIndex(c) >= 0) {
+                        throw new Error(this + ".addFromDirToAll ");
+                    }
+                }//debug
+                tmp.allChildren.addItem(c);
+                var cp:TreeBranchItem = c as TreeBranchItem;
+                if (cp != null) {
+                    var cpLen:uint = cp.allChildren.length;
+                    for (var j:uint = 0; j < cpLen; j++) {
+                        var cpc:TreeLeaveItem = cp.allChildren.getItemAt(j) as TreeLeaveItem;
+                        CONFIG::debugging{
+                            if (tmp.allChildren.getItemIndex(cpc) >= 0) {
+                                throw new Error(this + ".addFromDirToAll ");
+                            }
+                        }//debug
+                        tmp.allChildren.addItem(cpc);
+                    }
+                }
+                tmp = tmp.parent;
+            }
+            return c;
+        }
+
+        private function removeFromDirToAll(c:TreeLeaveItem):void {
+            var tmp:TreeBranchItem = this;
+            while (tmp != null) {
+                CONFIG::debugging{
+                    if (tmp.allChildren.getItemIndex(c) <= 0) {
+                        throw new Error(this + ".removeFromDirToall ");
+                    }
+                }//debug
+                tmp._allChildren.removeItem(c);
+                var cp:TreeBranchItem = c as TreeBranchItem;
+                if (cp != null) {
+                    var cpLen:uint = cp._allChildren.length;
+                    for (var j:uint = 0; j < cpLen; j++) {
+                        var cpc:TreeLeaveItem = cp._allChildren.getItemAt(j) as TreeLeaveItem;
+                        CONFIG::debugging{
+                            if (tmp._allChildren.getItemIndex(cpc) < 0) {
+                                throw new Error(this + ".addFromDirToAll ");
+                            }
+                        }//debug
+                        tmp._allChildren.removeItem(cpc);
+                    }
+                }
+                tmp = tmp.parent;
+            }
+        }
+
+        private var _directChildren:ArrayList = new ArrayList();
+        [Bindable(event="propertyChange")]
+        public function get directChildren():ArrayList {
+            return _directChildren;
+        }
+
+        private var _allChildren:ArrayList = new ArrayList();
+        [Bindable(event="propertyChange")]
+        public function get allChildren():ArrayList {
+            return _allChildren;
+        }
+        ]]></fx:Script>
+    <fx:Declarations>
+        <as3lib:Sync2Lists source="{directChildren}"
+                           getDestInst="addFromDirToAll"
+                           destroyInst="removeFromDirToAll"
+                >
+            <as3lib:destination>
+                <s:ArrayList id="__allChildrenSyncDummy"/>
+            </as3lib:destination>
+        </as3lib:Sync2Lists>
+    </fx:Declarations>
+</trm:TreeLeaveItem>

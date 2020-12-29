@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>edu.umich.med.mbni</groupId>
+    <artifactId>brain.point.app.pubanatomy.integrate.swf.mxml.build</artifactId>
+    <version>0.1-SNAPSHOT</version>
+    <packaging>pom</packaging>
+
+    <modules>
+
+        <module>../../modules/flash.remote.data.service</module>
+        <module>../../modules/flash.utils</module>
+        <module>../../modules/flash.remote.data.service</module>
+        <module>../../modules/flash.webdesktop</module>
+
+        <module>../../3rd-party/away3d-core-fp11-0.3-snapshot</module>
+        <module>../../modules/flash.interface.away3d</module>
+        <module>../../modules/flash.voxel.interact.mxml</module>
+        <module>../../apps/flash.voxel.interact.swf.mxml</module>
+
+        <module>../../modules/flash.search.mxml</module>
+        <module>../../apps/flash.search.swf.mxml</module>
+
+        <module>../../modules/flash.desktop.web.integrate.mxml</module>
+        <module>../../apps/flash.desktop.web.integrate.swf.mxml</module>
+
+    </modules>
+</project>

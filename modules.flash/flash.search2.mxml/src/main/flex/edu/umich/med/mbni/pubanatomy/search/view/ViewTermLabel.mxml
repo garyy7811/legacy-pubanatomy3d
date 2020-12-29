@@ -1,0 +1,41 @@
+<?xml version="1.0"?>
+<s:Label xmlns:fx="http://ns.adobe.com/mxml/2009" xmlns:s="library://ns.adobe.com/flex/spark"
+         maxDisplayedLines="1"
+         toolTip.labelEmpty="#t(labelEmptyClickToEnter)p#"
+         toolTip.labelTerm="#t(termClickToEnter)p#"
+
+         text.labelTerm="{queryTerm.label}"
+         text.labelEmpty="{(queryTerm.label==null||queryTerm.label=='')?'Click Here':'Too short!'}"
+
+         color.labelEmpty="{(queryTerm.label==null||queryTerm.label=='')?0xAAAAAA:0x0000FF}"
+         color.labelTerm="#000000"
+
+         fontStyle.labelTerm="normal" fontStyle.labelEmpty="italic"
+
+         fontSize="18"
+
+         click="queryTerm.query.setFocusedOnTerm(  queryTerm );"
+
+         verticalAlign="middle">
+    <fx:Script><![CDATA[
+        import edu.umich.med.mbni.pubanatomy.search.model.QueryTerm;
+
+        [Bindable]
+        public var queryTerm:QueryTerm;
+
+        private function set rfrStatus( v:* ):void{
+            if( queryTerm != null && queryTerm.label != null && queryTerm.label.length > 0 ){
+                setCurrentState( 'labelTerm' );
+            }
+            else{
+                setCurrentState( 'labelEmpty' );
+            }
+        }
+        ]]></fx:Script>
+    <fx:Binding source="queryTerm.label" destination="rfrStatus"/>
+    <s:states>
+        <s:State name="labelEmpty"/>
+        <s:State name="labelTerm"/>
+    </s:states>
+
+</s:Label>

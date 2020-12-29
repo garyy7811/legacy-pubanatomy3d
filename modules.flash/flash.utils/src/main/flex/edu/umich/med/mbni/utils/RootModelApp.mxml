@@ -1,0 +1,105 @@
+<?xml version="1.0"?>
+<utils:RootModelModule xmlns:fx="http://ns.adobe.com/mxml/2009" xmlns:utils="edu.umich.med.mbni.utils.*">
+    <fx:Script><![CDATA[
+        import mx.core.DragSource;
+        import mx.core.IFlexDisplayObject;
+        import mx.core.IUIComponent;
+        import mx.managers.DragManager;
+
+        CONFIG::debugging{
+            private static var _lastMouseOverTarget:Object;
+            private static var _lastMouseOverCurrentTarget:Object;
+        }
+
+        [Bindable]
+        public var maxConcurrentRpcNum:uint = 20;
+
+        public function appInit():void{
+            CONFIG::debugging{
+                if( parent != null || stage == null || restUrl == null || pressedKeys == null || rpcOnAir == null ||
+                        rpcWaitQue == null ){
+                    throw new Error( this + ".appInit" );
+                }
+            }
+
+            stage.addEventListener( KeyboardEvent.KEY_DOWN, onKeyDown );
+            stage.addEventListener( KeyboardEvent.KEY_UP, onKeyUp );
+            CONFIG::debugging{
+                stage.addEventListener( MouseEvent.MOUSE_OVER, function ( ev:MouseEvent ):void{
+                    _lastMouseOverTarget = ev.target;
+                    _lastMouseOverCurrentTarget = ev.currentTarget;
+                } )
+            }
+            rootApp = this;
+        }
+
+
+        protected function onKeyDown( event:KeyboardEvent ):void{
+            CONFIG::debugging{
+                if( event.altKey && event.ctrlKey && event.keyCode == Keyboard.SHIFT ){
+                    trace( "ctrl&&alt&&D" );
+                }
+            }
+            if( pressedKeys.getItemIndex( event.keyCode ) < 0 ){
+                pressedKeys.addItem( event.keyCode );
+            }
+        }
+
+        protected function onKeyUp( event:KeyboardEvent ):void{
+            var idx:int = pressedKeys.getItemIndex( event.keyCode );
+            if( idx < 0 ){
+                CONFIG::debugging{
+                    trace( this + ".UnKnown onKeyUp: event.keyCode:" + event.keyCode );
+                }
+                return;
+            }
+            pressedKeys.removeItemAt( idx );
+        }
+
+        [Bindable]
+        public var topMouse:Point;
+
+
+        override public function doDrag( dragInitiator:IUIComponent, dragSource:DragSource, mouseEvent:MouseEvent, dragImage:IFlexDisplayObject = null, xOffset:Number = 0, yOffset:Number = 0, imageAlpha:Number = 0.5, allowMove:Boolean = true ):void{
+            super.doDrag( dragInitiator, dragSource, mouseEvent, dragImage, xOffset, yOffset, imageAlpha, allowMove );
+            DragManager.doDrag( dragInitiator, dragSource, mouseEvent, dragImage,
+                                xOffset, yOffset, imageAlpha, allowMove );
+        }
+        ]]></fx:Script>
+    <fx:Script><![CDATA[
+        public static const menuOperations_CHANGED:String = "menuOperationsChanged";
+
+        [ArrayElementType("edu.umich.med.mbni.utils.ModelOperationMenuItem")]
+        private var _menuOperations:ModelOperationMenuChildren;
+        private var _menuOriginEvent:Event;
+
+        [Bindable(event="menuOperationsChanged")]
+        public function get menuOperations():ModelOperationMenuChildren{
+            return _menuOperations;
+        }
+
+        override public function setMenuOperations( value:ModelOperationMenuChildren ):void{
+            if( value != _menuOperations ){
+                _menuOperations = value;
+                dispatchEvent( new Event( menuOperations_CHANGED ) );
+            }
+        }
+        ]]></fx:Script>
+    <fx:Script><![CDATA[
+        public var sessionId:String;
+
+        public static var logUrl:String;
+
+        override public function log( s:String ):void{
+
+            CONFIG::debugging{
+                return;
+            }
+
+            var vars:URLVariables = new URLVariables();
+            vars.sessionId = sessionId;
+            vars.log = s;
+            Security.loadPolicyFile( logUrl + "?" + vars.toString() );
+        }
+        ]]></fx:Script>
+</utils:RootModelModule>

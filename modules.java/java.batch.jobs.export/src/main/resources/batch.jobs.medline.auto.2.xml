@@ -1,0 +1,142 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:batch="http://www.springframework.org/schema/batch"
+       xmlns:task="http://www.springframework.org/schema/task" xmlns:util="http://www.springframework.org/schema/util"
+
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://www.springframework.org/schema/batch
+       http://www.springframework.org/schema/batch/spring-batch.xsd
+       http://www.springframework.org/schema/task
+       http://www.springframework.org/schema/task/spring-task.xsd http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
+
+    <import resource="Batch.jobs.medline.auto.shared.xml"/>
+
+    <task:scheduled-tasks>
+        <task:scheduled ref="medlineAutoUpdateScheduler" method="checkIfLockFileChanged"
+                        fixed-delay="${medline.autoupdate.lock.check.millionsec}"/>
+    </task:scheduled-tasks>
+
+    <bean id="medlineAutoUpdateScheduler"
+          class="edu.umich.med.mbni.pubanatomy.batch.medline.MedlineAutoUpdateScheduler">
+        <property name="lockFile" value="file:${medline.autoupdate.lock.file}"/>
+        <property name="jobLauncher">
+            <bean class="org.springframework.batch.core.launch.support.SimpleJobLauncher">
+                <property name="jobRepository" ref="jobRepository"/>
+            </bean>
+        </property>
+    </bean>
+
+    <!--it's not restartable because of saving state( current concept ) in medlineJobContext-->
+    <batch:job id="autoUpdateSolr" restartable="false">
+        <batch:step id="prepareConceptChemical" next="updateConceptChemical">
+            <batch:tasklet>
+                <bean class="edu.umich.med.mbni.pubanatomy.batch.medline.BatchTaskletPrepareConcept">
+                    <constructor-arg ref="pmid2Chemicals"/>
+                </bean>
+            </batch:tasklet>
+        </batch:step>
+
+        <batch:step id="updateConceptChemical" next="prepareDisease">
+            <batch:flow parent="updateConcept"/>
+        </batch:step>
+
+        <batch:step id="prepareDisease" next="updateConceptDisease">
+            <batch:tasklet>
+                <bean class="edu.umich.med.mbni.pubanatomy.batch.medline.BatchTaskletPrepareConcept">
+                    <constructor-arg ref="pmid2Diseases"/>
+                </bean>
+            </batch:tasklet>
+        </batch:step>
+
+        <batch:step id="updateConceptDisease" next="prepareFunctions">
+            <batch:flow parent="updateConcept"/>
+        </batch:step>
+
+
+        <batch:step id="prepareFunctions" next="updateConceptFunction">
+            <batch:tasklet>
+                <bean class="edu.umich.med.mbni.pubanatomy.batch.medline.BatchTaskletPrepareConcept">
+                    <constructor-arg ref="pmid2Functions"/>
+                </bean>
+            </batch:tasklet>
+        </batch:step>
+
+        <batch:step id="updateConceptFunction" next="prepareBrainStr">
+            <batch:flow parent="updateConcept"/>
+        </batch:step>
+
+        <batch:step id="prepareBrainStr" next="updateConceptBrainStr">
+            <batch:tasklet>
+                <bean class="edu.umich.med.mbni.pubanatomy.batch.medline.BatchTaskletPrepareConcept">
+                    <constructor-arg ref="pmid2BrainStructures"/>
+                </bean>
+            </batch:tasklet>
+        </batch:step>
+
+        <batch:step id="updateConceptBrainStr" next="prepareGene">
+            <batch:flow parent="updateConcept"/>
+        </batch:step>
+
+        <batch:step id="prepareGene" next="updateConceptGene">
+            <batch:tasklet>
+                <bean class="edu.umich.med.mbni.pubanatomy.batch.medline.BatchTaskletPrepareConceptFtpGene">
+                    <constructor-arg ref="pmid2Genes"/>
+                </bean>
+            </batch:tasklet>
+        </batch:step>
+
+        <batch:step id="updateConceptGene" next="chkMdlnMd5">
+            <batch:flow parent="updateConcept"/>
+        </batch:step>
+
+        <batch:step id="chkMdlnMd5" next="processOrSkipGzip">
+            <batch:tasklet>
+                <bean class="edu.umich.med.mbni.pubanatomy.batch.medline.BatchTaskletChkMedlineGzipMd5">
+                    <constructor-arg>
+                        <util:list>
+                            <value type="org.springframework.core.io.Resource">file:${ncbi.medline.ftp.medlease.gzFolder}</value>
+                            <value type="org.springframework.core.io.Resource">file:${ncbi.medline.ftp.medleasebaseline.gzFolder}
+                            </value>
+                        </util:list>
+                    </constructor-arg>
+                </bean>
+            </batch:tasklet>
+        </batch:step>
+
+        <batch:decision id="processOrSkipGzip" decider="batchDeciderProcessOrSkipMedlineGzip">
+            <batch:next on="process" to="parallelProcessChangedGzip"/>
+            <batch:end on="*"/>
+        </batch:decision>
+
+        <batch:step id="parallelProcessChangedGzip" next="optimizeMergeAll">
+            <batch:partition partitioner="batchPartitionerMedlineGzip">
+                <batch:step>
+                    <batch:tasklet>
+                        <batch:chunk commit-interval="1" retry-limit="9">
+                            <batch:reader>
+                                <bean class="edu.umich.med.mbni.pubanatomy.batch.medline.BatchReaderMedlineGzipImport" scope="step"/>
+                            </batch:reader>
+                            <batch:processor>
+                                <bean class="edu.umich.med.mbni.pubanatomy.batch.medline.BatchProcessorMedlineQueryField" scope="step"/>
+                            </batch:processor>
+                            <batch:writer>
+                                <bean class="edu.umich.med.mbni.pubanatomy.batch.medline.BatchWriteMergeAll" scope="step"/>
+                            </batch:writer>
+                            <batch:retryable-exception-classes>
+                                <batch:include class="org.apache.solr.common.SolrException"/>
+                                <batch:include class="org.springframework.dao.DataRetrievalFailureException"/>
+                            </batch:retryable-exception-classes>
+                        </batch:chunk>
+                    </batch:tasklet>
+                </batch:step>
+                <batch:handler grid-size="${batch.exe.thread.num}" task-executor="taskExecutor"/>
+            </batch:partition>
+        </batch:step>
+        <batch:step id="optimizeMergeAll">
+            <batch:tasklet>
+                <ref bean="batchTaskletOptimizeMergeAll"/>
+            </batch:tasklet>
+        </batch:step>
+    </batch:job>
+</beans>

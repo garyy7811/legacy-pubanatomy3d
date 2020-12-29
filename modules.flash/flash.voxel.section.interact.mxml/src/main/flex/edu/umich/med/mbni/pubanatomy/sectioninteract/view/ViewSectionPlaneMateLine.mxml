@@ -1,0 +1,146 @@
+<?xml version="1.0"?>
+<s:SkinnableContainer xmlns:fx="http://ns.adobe.com/mxml/2009"
+                      xmlns:s="library://ns.adobe.com/flex/spark"
+                      implements="mx.core.IDataRenderer"
+                      mouseEnabled="false"
+                      width="100%" height="100%"
+                      resize="rfrLayout=null;"
+        >
+    <fx:Script><![CDATA[
+        import edu.umich.med.mbni.pubanatomy.sectioninteract.model.ModelSectionPlane;
+
+        import spark.components.DataGroup;
+
+        {
+            private var _data:Object;
+            public static const data_CHANGED:String = "dataChanged";
+
+            [Bindable(event="dataChanged")]
+            public function get data():Object{
+                return _data;
+            }
+
+            [Bindable("dataChanged")]
+            public function get planeMate():ModelSectionPlane{
+                return _data as ModelSectionPlane;
+            }
+
+            public function set data( value:Object ):void{
+                if( value != _data ){
+                    _data = value;
+                    dispatchEvent( new Event( data_CHANGED ) );
+                }
+            }
+
+
+            [Bindable]
+            private var _planeOwner:ModelSectionPlane;
+
+            override public function set owner( value:DisplayObjectContainer ):void{
+                super.owner = value;
+                var dg:DataGroup = value as DataGroup;
+                if( dg != null && stage != null ){
+                    _planeOwner = ( dg.owner as ViewSectionPlaneImgEdgeMate ).section2dModel;
+                }
+            }
+        }
+
+        private function set rfrLayout( v:* ):void{
+            if( planeMate != null && _planeOwner != null ){
+                CONFIG::debugging{
+                    if( planeMate.v3dPlane.projectionDirection == _planeOwner.v3dPlane.projectionDirection ){
+                        throw new Error( "if( planeMate.v3dPlane.projectionDirection == _planeOwner.v3dPlane.projectionDirection ){" );
+                    }
+                }
+
+                var mateScaledPosition:Number = planeMate.v3dPlane.projectionPosition * _planeOwner.viewScale;
+
+                if( planeMate.v3dPlane.projectionDirection == _planeOwner.v3dPlane.verticalDirection ){
+                    if( _planeOwner.dirVerBigHor ){
+                        currentState = _planeOwner.dirHor ? "h1" : "h0";
+                    }
+                    else{
+                        currentState = _planeOwner.dirVer ? "v1" : "v0";
+                    }
+                }
+                else if( planeMate.v3dPlane.projectionDirection == _planeOwner.v3dPlane.horizontalDirection ){
+                    if( _planeOwner.dirVerBigHor ){
+                        currentState = _planeOwner.dirHor ? "v1" : "v0";
+                    }
+                    else{
+                        currentState = _planeOwner.dirVer ? "h1" : "h0";
+                    }
+                }
+
+                if( currentState.indexOf( "v" ) == 0 ){
+                    _position = _planeOwner.dirHor ? mateScaledPosition : width - mateScaledPosition;
+                }
+                else{
+                    _position = _planeOwner.dirVer ? mateScaledPosition : height - mateScaledPosition;
+                }
+            }
+        }
+
+        [Bindable]
+        private var _position:Number;
+
+        [Bindable]
+        private var _lineColor:uint = 0x666666;
+
+        private function set rfrMouseOver( ignoreVar:* ):void{
+            _planeOwner.rootModelSection2d.callInNext.putIn( refreshMouseOver );
+        }
+
+        private function refreshMouseOver():void{
+            if( _planeOwner.mouseClosestDraggableMate == planeMate ){
+                _lineColor = 0xaaaaaa;
+            }
+            else if( _planeOwner.draggingMate == planeMate ){
+                _lineColor = 0xffffff;
+            }
+            else{
+                _lineColor = 0x666666;
+            }
+        }
+        ]]></fx:Script>
+    <s:states>
+        <s:State name="h1" stateGroups="h"/>
+        <s:State name="h0" stateGroups="h"/>
+        <s:State name="v1" stateGroups="v"/>
+        <s:State name="v0" stateGroups="v"/>
+    </s:states>
+
+    <fx:Binding source="_planeOwner.mouseClosestDraggableMate" destination="rfrMouseOver"/>
+    <fx:Binding source="_planeOwner.draggingMate" destination="rfrMouseOver"/>
+
+    <fx:Binding source="_planeOwner.v3dPlane.horizontalDirection" destination="rfrLayout"/>
+    <fx:Binding source="_planeOwner.v3dPlane.verticalDirection" destination="rfrLayout"/>
+    <fx:Binding source="_planeOwner.dirVerBigHor" destination="rfrLayout"/>
+    <fx:Binding source="_planeOwner.dirHor" destination="rfrLayout"/>
+    <fx:Binding source="_planeOwner.dirVer" destination="rfrLayout"/>
+    <fx:Binding source="_planeOwner.viewScale" destination="rfrLayout"/>
+
+    <fx:Binding source="planeMate.v3dPlane.horizontalDirection" destination="rfrLayout"/>
+    <fx:Binding source="planeMate.v3dPlane.verticalDirection" destination="rfrLayout"/>
+    <fx:Binding source="planeMate.v3dPlane.projectionPosition" destination="rfrLayout"/>
+
+    <s:Line includeIn="h,v"
+
+            width.v="0" height.v="100%" left.v="{_position}" top.v="0"
+
+            width.h="100%" height.h="0" left.h="0" top.h="{_position}"
+            >
+        <s:stroke>
+            <s:SolidColorStroke
+                    color="{_lineColor}"
+                    weight="{planeMate.v3dPlane.thickness}"/>
+        </s:stroke>
+    </s:Line>
+    <s:Label includeIn="h,v" mouseEnabled="false"
+             text="{planeMate.rootModelAtlas.format( planeMate.v3dPlane.projectionPosition )}" focusEnabled="false"
+
+             top.v1="2" bottom.v0="2" left.v="{_position}"
+
+             top.h="{_position}" left.h1="2" right.h0="2"
+            />
+</s:SkinnableContainer>

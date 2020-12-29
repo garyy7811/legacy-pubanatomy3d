@@ -1,0 +1,35 @@
+<?xml version="1.0"?>
+<ww:TiBoTlePanel xmlns:fx="http://ns.adobe.com/mxml/2009" xmlns:s="library://ns.adobe.com/flex/spark"
+                 xmlns:sec2="edu.umich.med.mbni.pubanatomy.sectioninteract.view.*"
+                 xmlns:utils="edu.umich.med.mbni.utils.*"
+                 backgroundColor="0xffffff" minWidth="1" minHeight="1" cornerRadius="3"
+                 xmlns:ww="edu.umich.med.mbni.webdesktop.*"
+                 borderColor="0x0000ff" borderWeight="1"
+                 borderVisible="{model.sectionPlane.v3dPlane.imageSectionMode != Voxel3dPlane.IMG_SECTION_MODE_XYZ
+               &amp;&amp;model.sectionPlane.rootModelAtlas.mouseOverImg !=null
+               &amp;&amp;model.sectionPlane.rootModelAtlas.mouseOverImg == model.sectionPlane.v3dPlane.image}">
+    <fx:Script><![CDATA[
+        import edu.umich.med.mbni.pubanatomy.integrate.model.MDLDividableWidget;
+        import edu.umich.med.mbni.pubanatomy.voxel3d.model.Voxel3dPlane;
+
+        [Bindable]
+        public var model:MDLDividableWidget;
+        ]]></fx:Script>
+    <ww:titleGroupContent>
+        <s:SkinnableContainer width="100%">
+            <sec2:ViewSectionPlaneTitle sectionPlane="{model.sectionPlane}"/>
+        </s:SkinnableContainer>
+        <utils:MoreOptionsButton click="model.onMenu();"/>
+    </ww:titleGroupContent>
+    <ww:titleGroupLayout>
+        <s:HorizontalLayout verticalAlign="middle"/>
+    </ww:titleGroupLayout>
+    <s:Scroller width="100%" height="100%">
+        <s:Group>
+            <sec2:ViewSectionPlane sectionPlane="{model.sectionPlane}" width="100%" height="100%"/>
+        </s:Group>
+    </s:Scroller>
+    <ww:botleGroupContent>
+        <sec2:ViewSectionPlaneBotile sectionPlane="{model.sectionPlane}" width="100%"/>
+    </ww:botleGroupContent>
+</ww:TiBoTlePanel>

@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<as3lib:MxmlEventDispatcher xmlns:fx="http://ns.adobe.com/mxml/2009" xmlns:as3lib="com.flashflexpro.as3lib.*">
+    <fx:Script><![CDATA[
+        [Bindable]
+        public var geneId:uint;
+        [Bindable]
+        public var geneSymbol:String;
+        [Bindable]
+        public var geneName:String;
+
+        [Bindable]
+        public var geneEntrezId:uint;
+
+        [Bindable]
+        public var dsPlane:String;
+
+        [Bindable]
+        public var dsId:int;
+
+
+        ]]></fx:Script>
+</as3lib:MxmlEventDispatcher>

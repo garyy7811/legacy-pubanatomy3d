@@ -1,0 +1,35 @@
+<?xml version="1.0"?>
+<rs:RpcGET xmlns:fx="http://ns.adobe.com/mxml/2009"
+           xmlns:rs="edu.umich.med.mbni.pubanatomy.flash.rs.*"
+           exemptFromMaxNum="true" timeout="5000"
+        >
+    <fx:Script><![CDATA[
+        protected var _result:XML;
+        public function get result():XML{
+            return _result;
+        }
+
+        public static const _urlBeforeQ:String = "http://api.brain-map.org/api/v2/data/query.xml";
+
+        [Bindable]
+        public var paramStrAfterQ:String;
+
+        override protected function getRequestData():Object{
+            return paramStrAfterQ;
+        }
+
+        override protected function onRawResult( r:Object ):void{
+            onXMLResult( new XML( r ) );
+        }
+
+        protected function onXMLResult( x:XML ):void{
+            _result = x;
+        }
+
+        override public function callRemote():Boolean{
+            _request = new URLRequest( _urlBeforeQ );
+            model.log( "AllenBrainAPI->" + paramStrAfterQ );
+            return super.callRemote();
+        }
+        ]]></fx:Script>
+</rs:RpcGET>

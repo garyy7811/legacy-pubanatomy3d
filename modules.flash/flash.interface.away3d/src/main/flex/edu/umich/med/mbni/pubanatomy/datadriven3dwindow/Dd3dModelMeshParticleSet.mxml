@@ -1,0 +1,118 @@
+<?xml version="1.0"?>
+<datadriven3dwindow:Dd3dModelMeshBase xmlns:fx="http://ns.adobe.com/mxml/2009"
+                                      xmlns:datadriven3dwindow="edu.umich.med.mbni.pubanatomy.datadriven3dwindow.*">
+    <fx:Script><![CDATA[
+        private var _vertices:Vector.<Number>;
+
+        private var _normals:Vector.<Number>;
+
+        private var _indices:Vector.<uint>;
+
+        [Bindable(event="Changed")]
+        public function get vertices():Vector.<Number>{
+            return _vertices;
+        }
+
+        [Bindable(event="Changed")]
+        public function get normals():Vector.<Number>{
+            return _normals;
+        }
+
+        [Bindable(event="Changed")]
+        public function get indices():Vector.<uint>{
+            return _indices;
+        }
+
+        [Bindable]
+        public var levels:Vector.<Vector3D>;
+
+        private function set rfrMesh( v:* ):void{
+            if( levels != null ){
+                var currentVertices:Vector.<Number> = new <Number>[];
+                var currentNormals:Vector.<Number> = new <Number>[];
+                var currentIndices:Vector.<uint> = new <uint>[];
+                for( var j:int = levels.length - 1; j >= 0; j-- ){
+                    var p:Vector3D = levels[ j ] as Vector3D;
+
+                    currentVertices.push( p.x + p.w );
+                    currentVertices.push( p.y );
+                    currentVertices.push( p.z );
+                    currentVertices.push( p.x - p.w );
+                    currentVertices.push( p.y );
+                    currentVertices.push( p.z );
+                    currentVertices.push( p.x );
+                    currentVertices.push( p.y + p.w );
+                    currentVertices.push( p.z );
+                    currentVertices.push( p.x );
+                    currentVertices.push( p.y - p.w );
+                    currentVertices.push( p.z );
+                    currentVertices.push( p.x );
+                    currentVertices.push( p.y );
+                    currentVertices.push( p.z + p.w );
+                    currentVertices.push( p.x );
+                    currentVertices.push( p.y );
+                    currentVertices.push( p.z - p.w );
+
+
+                    currentNormals.push( 1 );
+                    currentNormals.push( 0 );
+                    currentNormals.push( 0 );
+                    currentNormals.push( -1 );
+                    currentNormals.push( 0 );
+                    currentNormals.push( 0 );
+                    currentNormals.push( 0 );
+                    currentNormals.push( 1 );
+                    currentNormals.push( 0 );
+                    currentNormals.push( 0 );
+                    currentNormals.push( -1 );
+                    currentNormals.push( 0 );
+                    currentNormals.push( 0 );
+                    currentNormals.push( 0 );
+                    currentNormals.push( 1 );
+                    currentNormals.push( 0 );
+                    currentNormals.push( 0 );
+                    currentNormals.push( -1 );
+
+
+                    var indexBase:uint = j * 6;
+
+                    currentIndices.push( indexBase );
+                    currentIndices.push( indexBase + 4 );
+                    currentIndices.push( indexBase + 3 );
+                    currentIndices.push( indexBase );
+                    currentIndices.push( indexBase + 3 );
+                    currentIndices.push( indexBase + 5 );
+                    currentIndices.push( indexBase );
+                    currentIndices.push( indexBase + 2 );
+                    currentIndices.push( indexBase + 4 );
+                    currentIndices.push( indexBase );
+                    currentIndices.push( indexBase + 5 );
+                    currentIndices.push( indexBase + 2 );
+                    currentIndices.push( indexBase + 1 );
+                    currentIndices.push( indexBase + 3 );
+                    currentIndices.push( indexBase + 4 );
+                    currentIndices.push( indexBase + 1 );
+                    currentIndices.push( indexBase + 5 );
+                    currentIndices.push( indexBase + 3 );
+                    currentIndices.push( indexBase + 1 );
+                    currentIndices.push( indexBase + 4 );
+                    currentIndices.push( indexBase + 2 );
+                    currentIndices.push( indexBase + 1 );
+                    currentIndices.push( indexBase + 2 );
+                    currentIndices.push( indexBase + 5 );
+                }
+
+                _vertices = currentVertices;
+                _normals = currentNormals;
+                _indices = currentIndices;
+
+                dispatchEvent( new Event( "Changed" ) );
+            }
+        }
+
+        public function getUVs():Vector.<Number>{
+            return new Vector.<Number>( _vertices.length * 2, true );
+        }
+        ]]></fx:Script>
+    <fx:Binding source="levels" destination="rfrMesh"/>
+</datadriven3dwindow:Dd3dModelMeshBase>

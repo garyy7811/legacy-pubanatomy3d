@@ -1,0 +1,67 @@
+<?xml version="1.0"?>
+<s:List xmlns:fx="http://ns.adobe.com/mxml/2009"
+        xmlns:s="library://ns.adobe.com/flex/spark" dragEnabled="true"
+        allowMultipleSelection="false"
+        itemRenderer="edu.umich.med.mbni.pubanatomy.atlas.view.SectionImageListRenderer">
+
+    <s:dataProvider>{_dataSet.sectionImageList}</s:dataProvider>
+    <fx:Binding source="treeGrid.selectedGeneColumn.selectedDataSet" destination="_dataSet"/>
+    <fx:Script><![CDATA[
+        import edu.umich.med.mbni.pubanatomy.atlas.model.MDLDataSet;
+        import edu.umich.med.mbni.pubanatomy.atlas.model.MDLISHImage;
+        import edu.umich.med.mbni.pubanatomy.atlas.model.StructureTreeGridData;
+        import edu.umich.med.mbni.utils.RootModelModule;
+
+        import mx.collections.ArrayList;
+
+        import mx.core.DragSource;
+
+        import mx.events.DragEvent;
+
+        [Bindable]
+        public var treeGrid:StructureTreeGridData;
+
+        [Bindable]
+        private var _dataSet:MDLDataSet;
+
+        override protected function dragStartHandler( event:DragEvent ):void{
+            CONFIG::debugging{
+                if( ( selectedItem as MDLISHImage ).modelSectionDs.projectionDir < 0 ){
+                    throw new Error();
+                }
+            }
+            if( event.isDefaultPrevented() ){
+                return;
+            }
+
+            if( _dataSet.modelGene.model.rootApp.dragging == null ){
+                var dragSource:DragSource = new DragSource();
+                dragSource.addData( selectedItem, RootModelModule.DRAGGING_FORMAT );
+                _dataSet.modelGene.model.doDrag( this, dragSource, event );
+            }
+        }
+
+        private function set rfrMouseOver( ignoreVar:* ):void{
+            treeGrid.rootModel.callInNext.putIn( refreshMouseOver );
+        }
+
+        private function refreshMouseOver():void{
+            if( treeGrid.autoOpenMouseOverImg ){
+                try{
+                    var idx:int = _dataSet.sectionImageList.getItemIndex( _dataSet.modelGene.model.mouseOverImg );
+                    ensureIndexIsVisible( idx );
+                }
+                catch( e:Error ){
+                }
+            }
+        }
+
+        [Bindable]
+        public var maxThumbSize:Point = new Point();
+
+        [Bindable]
+        public var highLightImgs:ArrayList = new ArrayList();
+        ]]></fx:Script>
+    <fx:Binding source="treeGrid.autoOpenMouseOverImg" destination="rfrMouseOver"/>
+    <fx:Binding source="_dataSet.modelGene.model.mouseOverImg" destination="rfrMouseOver"/>
+</s:List>

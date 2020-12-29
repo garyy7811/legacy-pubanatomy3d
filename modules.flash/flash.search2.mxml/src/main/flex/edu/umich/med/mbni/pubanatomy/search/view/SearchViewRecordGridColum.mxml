@@ -1,0 +1,36 @@
+<?xml version="1.0"?>
+<s:GridColumn xmlns:fx="http://ns.adobe.com/mxml/2009" xmlns:s="library://ns.adobe.com/flex/spark"
+              showDataTips="true" minWidth="40"
+              labelFunction="getLabelTxt" dataTipFunction="getLabelTxt">
+    <fx:Script><![CDATA[
+        import edu.umich.med.mbni.pubanatomy.flash.dto.DtoResultRecordMedline;
+        import edu.umich.med.mbni.pubanatomy.search.model.QueryField;
+
+        [Bindable]
+        public var queryField:QueryField;
+
+        private function getLabelTxt( o:DtoResultRecordMedline, col:GridColumn ):String{
+            var rt:String;
+
+            var dt:Object = o[ queryField.id ];
+            if( dt == null ){
+                rt = "";
+            }
+            else if( dt is String || dt is Number ){
+                rt = String( dt );
+            }
+            else if( dt is Array ){
+                rt = ( dt as Array ).join( "; " );
+            }
+
+            rt += "\r\n Click PMID to link to see original on NCBI website.";
+
+            return rt;
+        }
+        ]]></fx:Script>
+    <fx:Binding source="queryField.sortable" destination="sortable"/>
+    <fx:Binding source="queryField.label" destination="headerText"/>
+    <fx:Binding source="queryField.citationColWidth" destination="width"/>
+    <fx:Binding source="queryField.citationItemRenderer" destination="itemRenderer"/>
+    <fx:Binding source="queryField.citationHeaderRenderer" destination="headerRenderer"/>
+</s:GridColumn>

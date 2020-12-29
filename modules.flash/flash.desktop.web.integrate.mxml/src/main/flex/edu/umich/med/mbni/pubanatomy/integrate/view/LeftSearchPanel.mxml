@@ -1,0 +1,53 @@
+<?xml version="1.0"?>
+<webdesktop:TiBoTlePanel xmlns:fx="http://ns.adobe.com/mxml/2009" xmlns:webdesktop="edu.umich.med.mbni.webdesktop.*"
+                         xmlns:search="edu.umich.med.mbni.pubanatomy.search.view.*"
+                         xmlns:ncbi="edu.umich.med.mbni.pubanatomy.ncbipubmedsearch.*"
+                         xmlns:s="library://ns.adobe.com/flex/spark" currentState="p"
+                         cornerRadius="9" borderWeight="2" borderColor="0xffffff" backgroundColor="0xffffff"
+        >
+    <fx:Metadata>
+        [ResourceBundle("TextIntegrate")]
+    </fx:Metadata>
+    <fx:Script><![CDATA[
+        import edu.umich.med.mbni.pubanatomy.integrate.model.MDLIntegrationRootModel;
+
+        import spark.components.Group;
+
+        [Bindable]
+        public var rootAppModel:MDLIntegrationRootModel;
+
+        [Bindable]
+        public var searchAutoCompleteGroup:Group;
+        ]]></fx:Script>
+    <webdesktop:states>
+        <s:State name="p"/>
+        <s:State name="n"/>
+    </webdesktop:states>
+    <webdesktop:layout>
+        <s:VerticalLayout horizontalAlign="center"/>
+    </webdesktop:layout>
+    <s:HGroup>
+        <s:RadioButton click="currentState='p'"
+                       label="{resourceManager.getString( 'TextIntegrate', 'main.search.pub' )}"
+                       toolTip="#t(main.search.pub)p#"
+                       selected.n="false" selected.p="true" fontWeight.p="bold" fontWeight.n="normal"/>
+        <s:RadioButton click="currentState='n'"
+                       label="{resourceManager.getString( 'TextIntegrate', 'main.search.ncbi' )}"
+                       toolTip="#t(main.search.ncbi)p#"
+                       selected.p="false" selected.n="true" fontWeight.n="bold" fontWeight.p="normal"/>
+    </s:HGroup>
+    <search:SearchViewQueryResult model="{rootAppModel.staticQueryResult}"
+                                  suggestGroup="{searchAutoCompleteGroup}"
+                                  width="100%" height="100%" includeIn="p"/>
+    <ncbi:ViewNCBIPubmedQueryResult model="{rootAppModel.ncbiQueryResult}"
+                                    height="100%" includeIn="n"/>
+    <webdesktop:titleGroupContent>
+        <s:Label text="{resourceManager.getString( 'TextIntegrate', 'main.search.title' )}"
+                 maxDisplayedLines="1" width="100%" fontWeight="bold" toolTip="#t(main.search.title)p#"/>
+        <s:Button skinClass="spark.skins.spark.TitleWindowCloseButtonSkin" width="16" height="16"
+                  click="rootAppModel.showMainMedlineSearch = false;"/>
+    </webdesktop:titleGroupContent>
+    <webdesktop:titleGroupLayout>
+        <s:HorizontalLayout verticalAlign="middle"/>
+    </webdesktop:titleGroupLayout>
+</webdesktop:TiBoTlePanel>

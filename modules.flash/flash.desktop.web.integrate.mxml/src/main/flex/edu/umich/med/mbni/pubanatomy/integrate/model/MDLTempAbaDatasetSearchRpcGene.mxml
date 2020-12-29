@@ -1,0 +1,58 @@
+<?xml version="1.0"?>
+<im:MDLTempAbaDatasetSearchRpc xmlns:fx="http://ns.adobe.com/mxml/2009"
+                               xmlns:s="library://ns.adobe.com/flex/spark"
+                               xmlns:im="edu.umich.med.mbni.pubanatomy.integrate.model.*">
+    <fx:Script><![CDATA[
+        [Bindable]
+        public var inputText:String;
+
+        [Bindable]
+        public var symbolOrName:Boolean = true;
+
+        private function set rfrAbaUrl( ignoreVar:* ):void{
+            if( inputText != null && inputText.length > 0 ){
+                paramStrAfterQ = "criteria=model::SectionDataSet,rma::criteria,[failed$eqfalse],[reference_space_id$in9,10],genes["
+                                   + ( symbolOrName ? "acronym" : "name" )
+                                   + "$il'" + inputText + "*']"
+                                   + ",rma::include,genes,section_images,plane_of_section"
+                                   + ",rma::options[start_row$eq0],[num_rows$eq20],[sort_by$eq'gene." + ( symbolOrName ? "acronym" : "name" ) + "']";
+            }
+            else{
+                paramStrAfterQ = null;
+            }
+        }
+
+        override protected function onXMLResult( x:XML ):void{
+            super.onXMLResult( x );
+            var source:XMLList = _result.children()[0].children();
+
+            resultSectionDataSets.removeAll();
+            for( var j:int = source.length() - 1; j >= 0; j-- ){
+                var xg:XML = source[ j ] as XML;
+
+                var vo:MDLTempAllenBrainGeneSearchVO = new MDLTempAllenBrainGeneSearchVO();
+                vo.dsPlane = xg['plane-of-section'].name.toString();
+                vo.dsId = xg.id;
+                vo.geneEntrezId = xg..gene[0][ "entrez-id" ].toString();
+                vo.geneId= xg..gene[0][ "id" ].toString();
+                vo.geneSymbol= xg..gene[0][ "acronym" ].toString();
+                vo.geneName= xg..gene[0][ "name" ].toString();
+                resultSectionDataSets.addItem( vo );
+            }
+        }
+        ]]></fx:Script>
+    <fx:Binding source="inputText" destination="rfrAbaUrl"/>
+    <fx:Binding source="symbolOrName" destination="rfrAbaUrl"/>
+    <fx:Script><![CDATA[
+        private function set rfrCallRemote( ignoreVar:* ):void{
+            model.callInNext.putIn( refreshCallRemote, this, null, 11 );
+        }
+
+        private function refreshCallRemote():void{
+            if( paramStrAfterQ != null ){
+                callRemote();
+            }
+        }
+        ]]></fx:Script>
+    <fx:Binding source="paramStrAfterQ" destination="rfrCallRemote"/>
+</im:MDLTempAbaDatasetSearchRpc>

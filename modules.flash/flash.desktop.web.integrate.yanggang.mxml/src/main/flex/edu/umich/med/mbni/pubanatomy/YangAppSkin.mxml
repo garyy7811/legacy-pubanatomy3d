@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<iv:AppSkin xmlns:fx="http://ns.adobe.com/mxml/2009"
+            xmlns:iv="edu.umich.med.mbni.pubanatomy.*"
+        >
+    <fx:Script><![CDATA[
+        import edu.umich.med.mbni.pubanatomy.atlas.view.StructureTreeGridColumnGeneHeader;
+        import edu.umich.med.mbni.utils.ModelOperationMenuChildren;
+        import edu.umich.med.mbni.utils.ModelOperationMenuType;
+        import edu.umich.med.mbni.utils.ToolTipManagerImplExt;
+
+        override protected function onRightClick( event:MouseEvent ):void{
+            var tmp:InteractiveObject = event.target as InteractiveObject;
+            while( tmp != null ){
+                if( tmp is StructureTreeGridColumnGeneHeader ){
+                    onGeneColHeader( tmp as StructureTreeGridColumnGeneHeader );
+                    return;
+                }
+                tmp = tmp.parent;
+            }
+
+            var adminRightClickMenu:ModelOperationMenuChildren = new ModelOperationMenuChildren(
+                    [
+                        new TstArrayListVSlst2arrayPerform( rootAppModel ),
+                        new AddAnnotateGene( rootAppModel.rootModelVoxel3d, 19122, "RAD23b" ),
+                        new AddAnnotateGene( rootAppModel.rootModelVoxel3d, 11237, "Chrne" ),
+                        new AddAnnotateGene( rootAppModel.rootModelVoxel3d, 18587, "many data sets" ),
+                        new ModelOperationMenuType(),
+                        new AddWindow( winGroup, WinMaterialAjust ),
+                        new AddWindow( winGroup, Win3DModelsSelection ),
+                        new AddWindow( winGroup, WinTestRestApi ),
+                        new AddWindow( winGroup, WinEscUrl ),
+                        new PrintStructureIdNameAcroym( rootAppModel.rootModelAtlas )
+                    ]
+            );
+
+            if( rootAppModel.rootApp.menuOperations != null ){
+                rootAppModel.rootApp.menuOperations.children.addItem( adminRightClickMenu );
+            }
+            else{
+                rootAppModel.setMenuOperations( adminRightClickMenu );
+            }
+        }
+
+        override public function onPreInit( abaUrl:String, ncbiUrl:String, searchUrl:String, stage:Stage, sessionId:String ):void{
+            super.onPreInit( abaUrl, ncbiUrl, searchUrl, stage, sessionId );
+            ToolTipManagerImplExt.getInstance().toolTipClass = TooltipExPubYang;
+            _webWinModelToView[ MDLTooltipExPubYang ] = WinHelpYang;
+        }
+
+        private function onGeneColHeader( gHeader:StructureTreeGridColumnGeneHeader ):void{
+            trace( gHeader );
+        }
+        ]]></fx:Script>
+</iv:AppSkin>

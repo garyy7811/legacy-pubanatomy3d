@@ -1,0 +1,65 @@
+<?xml version="1.0"?>
+<core:MXMLObjectAdapter xmlns:fx="http://ns.adobe.com/mxml/2009" xmlns:core="mx.core.*"
+                        xmlns:as3lib="com.flashflexpro.as3lib.*" xmlns:s="library://ns.adobe.com/flex/spark">
+    <fx:Script><![CDATA[
+        import edu.umich.med.mbni.pubanatomy.atlas.model.MDLDataSet;
+        import edu.umich.med.mbni.pubanatomy.atlas.model.MDLGene;
+        import edu.umich.med.mbni.pubanatomy.flash.dto.DtoGene;
+
+        [Bindable]
+        public var dtoGene:DtoGene;
+
+        [Bindable]
+        public var model:SaveAllSectionImgCornerModel;
+
+
+        private function destroy():void{
+            var sc:Boolean = model.geneDtoList.removeItem( dtoGene );
+            if( !sc ){
+                throw new Error();
+            }
+            syncDs2Wkr.destroy();
+            _geiGene = null;
+
+            if( model.working.getItemIndex( this ) >= 0 ){
+                throw new Error();
+            }
+            model = null;
+        }
+
+        [Bindable]
+        private var _geiGene:MDLGene;
+
+        public function start():void{
+            _geiGene = model.geneModelList.getItemAt( model.addGene( dtoGene ) ) as MDLGene;
+        }
+
+        private function ds2worker( ds:MDLDataSet ):GeneDataSetWorker{
+            var rt:GeneDataSetWorker = new GeneDataSetWorker();
+            rt.owner = this;
+            rt.dataSet = ds;
+            return rt;
+        }
+
+        private function destroyWorker( gds:GeneDataSetWorker ):void{
+            gds.destroy();
+        }
+
+        public function done( gds:GeneDataSetWorker ):void{
+            _geiGene.dataSets.removeItem( gds.dataSet );
+
+            if( _geiGene.dataSets.length == 0 ){
+                model.working.removeItem( this );
+                destroy();
+            }
+        }
+        ]]></fx:Script>
+    <fx:Declarations>
+        <as3lib:Sync2Lists source="{_geiGene.dataSets}" id="syncDs2Wkr"
+                           getDestInst="ds2worker" destroyInst="destroyWorker">
+            <as3lib:destination>
+                <s:ArrayList/>
+            </as3lib:destination>
+        </as3lib:Sync2Lists>
+    </fx:Declarations>
+</core:MXMLObjectAdapter>

@@ -1,0 +1,99 @@
+<?xml version="1.0"?>
+<s:TextInput xmlns:fx="http://ns.adobe.com/mxml/2009"
+             xmlns:s="library://ns.adobe.com/flex/spark"
+             restrict="^\\" text="@{queryTerm.inputTxt}"
+        ><fx:Metadata>
+        [Event(name="commitTxt", type="flash.events.Event")]
+        [Event(name="revertTxt", type="flash.events.Event")]
+    </fx:Metadata><fx:Script><![CDATA[
+    import edu.umich.med.mbni.pubanatomy.search.model.QueryTermT;
+
+    [Bindable]
+    public var queryTerm:QueryTermT;
+
+    private var _splitting:Boolean;
+
+    public function get splitting():Boolean{
+        return _splitting;
+    }
+
+    [Bindable]
+    public var termSuggestGroup:ViewTermSuggestGroup;
+
+    override protected function focusInHandler( event:FocusEvent ):void{
+        super.focusInHandler( event );
+        CONFIG::debugging{
+            if( termSuggestGroup == null || queryTerm == null ){
+                throw new Error( this + ".focusInHandler " );
+            }
+        }
+        if( termSuggestGroup.textInputCtrl != this ){
+            termSuggestGroup.setInput( this, splitting );
+            systemManager.stage.addEventListener( MouseEvent.MOUSE_DOWN, onMouseDownAnyWhere );
+        }
+    }
+
+    override protected function focusOutHandler( event:FocusEvent ):void{
+        super.focusOutHandler( event );
+        var f:InteractiveObject = getFocus();
+        if( f != textDisplay && f != termSuggestGroup.lst ){
+            queryTerm.commit();
+            termSuggestGroup.setInput( null );
+        }
+    }
+
+    override protected function keyDownHandler( event:KeyboardEvent ):void{
+        super.keyDownHandler( event );
+        if( queryTerm != null ){
+            if( event.keyCode == Keyboard.ENTER ){
+                queryTerm.commit();
+                termSuggestGroup.setFocus();
+            }
+            else if( event.keyCode == Keyboard.ESCAPE ){
+                queryTerm.revert();
+                termSuggestGroup.setFocus();
+            }
+        }
+    }
+
+    private function onMouseDownAnyWhere( event:MouseEvent ):void{
+        if( queryTerm == null ){
+            systemManager.stage.removeEventListener( MouseEvent.MOUSE_DOWN, onMouseDownAnyWhere );
+            return;
+        }
+        if( !termSuggestGroup.lst.getRect( termSuggestGroup.lst )
+                .contains( termSuggestGroup.lst.mouseX, termSuggestGroup.lst.mouseY )
+                && !getRect( this ).contains( mouseX, mouseY ) ){
+
+            if( termSuggestGroup != null && termSuggestGroup.textInputCtrl != null ){
+                var p:DisplayObjectContainer = event.target as DisplayObjectContainer;
+                while( true ){
+                    if( p == null ){
+                        break;
+                    }
+                    if( p == termSuggestGroup.textInputCtrl ){
+                        return;
+                    }
+                    p = p.parent;
+                }
+                termSuggestGroup.setFocus();
+            }
+        }
+    }
+
+    ]]></fx:Script><fx:Binding
+            source="queryTerm.query.focusedOnTerm" destination="rfrFocused"
+            /><fx:Binding
+        source="queryTerm.query.queryResult.searchModel.callInNext" destination="rfrFocused"
+        /><fx:Script><![CDATA[
+    private function set rfrFocused( ignoreVar:* ):void{
+        queryTerm.query.queryResult.searchModel.callInNext.putIn( refreshFocused );
+    }
+
+    private function refreshFocused():void{
+        if( queryTerm != null && queryTerm == queryTerm.query.focusedOnTerm ){
+            setFocus();
+        }
+    }
+
+    ]]></fx:Script></s:TextInput>

@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<s:WindowedApplication xmlns:fx="http://ns.adobe.com/mxml/2009"
+               xmlns:s="library://ns.adobe.com/flex/spark"
+               preloader="edu.umich.med.mbni.utils.PreLoadConfig"
+               skinClass="edu.umich.med.mbni.pubanatomy.AppSkin">
+    <fx:Script><![CDATA[
+        import edu.umich.med.mbni.pubanatomy.AppSkin;
+        import edu.umich.med.mbni.utils.RootModelApp;
+
+        private function set rfr( ignoreVar:* ):void{
+            if( skin is AppSkin ){
+                var c:AppCompiledConfig = new AppCompiledConfig();
+                RootModelApp.logUrl = c.pubanatomyLogUrl;
+                ( skin as AppSkin ).onPreInit( c.pubanatomyAbaUrl, c.pubanatomySearchUrl, c.ncbiPubmedSearchUrl, systemManager.stage, parameters.sessionid );
+            }
+        }
+        ]]></fx:Script>
+    <fx:Binding source="skin" destination="rfr"/>
+</s:WindowedApplication>

@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<settings xmlns="http://maven.apache.org/SETTINGS/1.0.0"
+          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.0.0 http://maven.apache.org/xsd/settings-1.0.0.xsd">
+    <mirrors>
+        <mirror>
+            <id>pubanatomy-nexus</id>
+            <name>pubanatomy-nexus</name>
+            <url>http://pubanatomy.org/nexus/content/groups/public</url>
+            <mirrorOf>*</mirrorOf>
+        </mirror>
+    </mirrors>
+    <profiles>
+
+        <profile>
+            <id>pubanatomy-all-in-one</id>
+
+            <properties>
+
+                <deploy.target.tomcat.auth>tomcat.to.deploy</deploy.target.tomcat.auth>
+                <deploy.target.tomcat.url>http://141.214.186.65/manager-uqs239jhd62se/text</deploy.target.tomcat.url>
+                <deploy.target.tomcat.content.path>/</deploy.target.tomcat.content.path>
+
+                <server.cache.ehcache.diskStore.path>/home/yanggang/ehcache_tmp</server.cache.ehcache.diskStore.path>
+
+                <AllenInst.http.response.cache.seconds>604800</AllenInst.http.response.cache.seconds>
+                <help.http.response.cache.seconds>7200</help.http.response.cache.seconds>
+                <search.http.response.cache.seconds>86400</search.http.response.cache.seconds>
+
+                <mongo.host>127.0.0.1</mongo.host>
+                <mongo.port>27017</mongo.port>
+                <mongo.dbname>Production_Pubanatomy_ABA</mongo.dbname>
+
+                <!--*****************-->
+
+                <solr.medline.url>http://127.0.0.1:8099/solr430/search_slave</solr.medline.url>
+
+                <solr.core.folder.build>N/A</solr.core.folder.build>
+
+
+                <!--*****************-->
+
+                <pubanatomy.hostSWF.webapp.secret.admin.dir>v03tstsecretadminfolder
+                </pubanatomy.hostSWF.webapp.secret.admin.dir>
+
+                <pubanatomy.hostSWF.webapp.dir>../../apps.java/web.allinone.tomcat/src/main/webapp
+                </pubanatomy.hostSWF.webapp.dir>
+
+                <output.debuggable.swf>false</output.debuggable.swf>
+                <conditional.compile.config.debugging>false</conditional.compile.config.debugging>
+                <conditional.compile.config.production>true</conditional.compile.config.production>
+                <test.flashplayercommand>not.used.for.now</test.flashplayercommand>
+
+                <swf.pubanatomySearchUrl.url>http://pubanatomy.org/api</swf.pubanatomySearchUrl.url>
+                <swf.pubanatomyAbaUrl.url>http://pubanatomy.org/api</swf.pubanatomyAbaUrl.url>
+                <swf.pubanatomyLogUrl.url>http://pubanatomylog.appspot.com/pubanatomy</swf.pubanatomyLogUrl.url>
+
+                <swf.pubmedsearchproxy.url>http://pubanatomy.org/ncbi/api</swf.pubmedsearchproxy.url>
+
+            </properties>
+
+        </profile>
+    </profiles>
+
+    <activeProfiles>
+        <activeProfile>pubanatomy-all-in-one</activeProfile>
+    </activeProfiles>
+
+
+    <servers>
+        <server>
+            <id>tomcat.to.deploy</id>
+            <username>script-manager</username>
+            <password>itZa1kiwcrbk9kl25</password>
+        </server>
+    </servers>
+
+</settings>

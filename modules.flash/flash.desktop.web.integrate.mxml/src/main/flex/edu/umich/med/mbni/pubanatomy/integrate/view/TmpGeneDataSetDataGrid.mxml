@@ -1,0 +1,102 @@
+<?xml version="1.0"?>
+<s:DataGrid xmlns:fx="http://ns.adobe.com/mxml/2009" xmlns:s="library://ns.adobe.com/flex/spark"
+            enabled="{ ( model.bytesLoaded == model.bytesTotal &amp;&amp; model.bytesLoaded > 0 ) || isNaN( model.bytesLoaded ) }"
+            skinClass="edu.umich.med.mbni.utils.DataGridBusySkin"
+            gridMouseDrag="ongGridDrag( event );" dataProvider="{model.resultSectionDataSets}"
+            width="100%" height="100%" selectionMode="singleRow" rowHeight="30" variableRowHeight="false">
+    <fx:Script><![CDATA[
+        import edu.umich.med.mbni.pubanatomy.flash.dto.DtoGene;
+        import edu.umich.med.mbni.pubanatomy.integrate.model.MDLTempAbaDatasetSearchRpc;
+        import edu.umich.med.mbni.pubanatomy.integrate.model.MDLTempAllenBrainGeneSearchVO;
+        import edu.umich.med.mbni.utils.RootModelModule;
+
+        import mx.core.DragSource;
+
+        import spark.events.GridEvent;
+
+        [Bindable]
+        public var model:MDLTempAbaDatasetSearchRpc;
+
+        private function ongGridDrag( event:GridEvent ):void{
+            if( selectedItem != null
+                    && event.item == selectedItem
+                    && model.model.rootApp.dragging == null ){
+                var dragSource:DragSource = new DragSource();
+                var tmp:MDLTempAllenBrainGeneSearchVO = event.item as MDLTempAllenBrainGeneSearchVO;
+
+                var dtoGene:DtoGene = new DtoGene();
+                dtoGene.geneId = tmp.geneId
+                dtoGene.acronym = tmp.geneSymbol;
+                dtoGene.name = tmp.geneName;
+
+                dragSource.addData( dtoGene, RootModelModule.DRAGGING_FORMAT );
+                model.model.rootApp.doDrag( this, dragSource, event );
+            }
+        }
+        ]]></fx:Script>
+    <s:columns>
+        <s:ArrayList>
+            <s:GridColumn dataField="geneSymbol" dataTipField="geneSymbol" headerText="Gene Symbol Name"
+                          maxWidth="480"/>
+            <s:GridColumn dataField="geneName" dataTipField="geneName" headerText="Gene Name"
+                          maxWidth="480"/>
+            <s:GridColumn headerText="Data Set ID" maxWidth="120">
+                <s:itemRenderer>
+                    <fx:Component>
+                        <s:GridItemRenderer>
+                            <fx:Script><![CDATA[
+                                import edu.umich.med.mbni.pubanatomy.integrate.model.MDLTempAllenBrainGeneSearchVO;
+
+                                [Bindable("dataChange")]
+                                public function get vo():MDLTempAllenBrainGeneSearchVO{
+                                    return super.data as MDLTempAllenBrainGeneSearchVO;
+                                }
+
+                                private function onLinkToAllen():void{
+                                    navigateToURL( new URLRequest( "http://mouse.brain-map.org/experiment/show/" + vo.dsId ), "_blank" )
+                                }
+                                ]]></fx:Script>
+                            <s:layout>
+                                <s:VerticalLayout verticalAlign="middle"/>
+                            </s:layout>
+                            <s:Button textDecoration="underline" skinClass="edu.umich.med.mbni.utils.UpLabelOverBtnSkin"
+                                      click="onLinkToAllen();" label="{vo.dsId}"
+                                      toolTip="Click to link to mouse.brain-map.org/experiment/ page."
+                                    />
+                        </s:GridItemRenderer>
+                    </fx:Component>
+                </s:itemRenderer>
+            </s:GridColumn>
+            <s:GridColumn dataField="dsPlane" headerText="Data Set direction" maxWidth="120"/>
+            <!--<s:GridColumn dataField="dsImgNum" headerText="Data Set Image Number" maxWidth="320"/>-->
+            <s:GridColumn dataField="geneEntrezId" dataTipField="geneEntrezId"
+                          headerText="Gene EntrezId" maxWidth="120">
+                <s:itemRenderer>
+                    <fx:Component>
+                        <s:GridItemRenderer>
+                            <fx:Script><![CDATA[
+                                import edu.umich.med.mbni.pubanatomy.integrate.model.MDLTempAllenBrainGeneSearchVO;
+
+                                [Bindable("dataChange")]
+                                public function get vo():MDLTempAllenBrainGeneSearchVO{
+                                    return super.data as MDLTempAllenBrainGeneSearchVO;
+                                }
+
+                                private function onLinkToAllen():void{
+                                    navigateToURL( new URLRequest( "http://www.ncbi.nlm.nih.gov/gene/?term=" + vo.geneEntrezId ), "_blank" );
+                                }
+                                ]]></fx:Script>
+                            <s:layout>
+                                <s:VerticalLayout verticalAlign="middle"/>
+                            </s:layout>
+                            <s:Button textDecoration="underline" skinClass="edu.umich.med.mbni.utils.UpLabelOverBtnSkin"
+                                      click="onLinkToAllen();" label="{vo.geneEntrezId}"
+                                      toolTip="Click to link to ncbi.nlm.nih.gov/gene page."
+                                    />
+                        </s:GridItemRenderer>
+                    </fx:Component>
+                </s:itemRenderer>
+            </s:GridColumn>
+        </s:ArrayList>
+    </s:columns>
+</s:DataGrid>

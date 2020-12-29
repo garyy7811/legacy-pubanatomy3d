@@ -1,0 +1,26 @@
+<?xml version="1.0"?>
+<m:Voxel3dOperationAddPlane xmlns:fx="http://ns.adobe.com/mxml/2009"
+                            xmlns:m="edu.umich.med.mbni.pubanatomy.voxel3d.model.*">
+    <fx:Script><![CDATA[
+        import edu.umich.med.mbni.pubanatomy.datadriven3dwindow.Dd3dModelMeshPlane;
+
+        [Bindable]
+        public var hitVoxel:Vector3D;
+
+        [Bindable]
+        public var projectDir:uint;
+
+
+        private function set rfrProjectionVal( ignoreVar:* ):void{
+            try{
+                _planeProjectionVal = hitVoxel[ Dd3dModelMeshPlane.axisNames[ projectDir ] ];
+            }
+            catch( e:Error ){
+            }
+        }
+        ]]></fx:Script>
+    <fx:Binding source="projectDir" destination="_planeProjectionDir"/>
+
+    <fx:Binding source="hitVoxel" destination="rfrProjectionVal"/>
+    <fx:Binding source="_planeProjectionDir" destination="rfrProjectionVal"/>
+</m:Voxel3dOperationAddPlane>

@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<v:StructureTreeGridColumnItemRenderer xmlns:fx="http://ns.adobe.com/mxml/2009"
+                                       xmlns:s="library://ns.adobe.com/flex/spark"
+                                       xmlns:v="edu.umich.med.mbni.pubanatomy.atlas.view.*">
+    <fx:Metadata>
+        [ResourceBundle("TextAtlas")]
+    </fx:Metadata>
+    <fx:Script><![CDATA[
+        private function onChange( event:Event ):void{
+            structureRowData.structure.selected = chk.selected;
+        }
+        ]]></fx:Script>
+    <v:layout>
+        <s:HorizontalLayout verticalAlign="middle" horizontalAlign="center"/>
+    </v:layout>
+    <s:CheckBox id="chk" label="" mouseDown="event.stopImmediatePropagation();"
+                selected="{ structureRowData != null &amp;&amp; structureRowData.structure.selected}"
+                change="onChange( event );"
+                toolTip="#t(strslcglbl0)p#"/>
+</v:StructureTreeGridColumnItemRenderer>

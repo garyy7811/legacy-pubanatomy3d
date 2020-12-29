@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<m:Voxel3dOperationAddPlane xmlns:fx="http://ns.adobe.com/mxml/2009"
+                            xmlns:m="edu.umich.med.mbni.pubanatomy.voxel3d.model.*">
+    <fx:Script><![CDATA[
+        import edu.umich.med.mbni.pubanatomy.atlas.model.StructureItem;
+        import edu.umich.med.mbni.pubanatomy.datadriven3dwindow.Dd3dModelMeshPlane;
+
+        [Bindable]
+        public var projectionDir:int;
+
+        public function set rfr( ss:* ):void{
+            var max:Array = structure.dtoStructure.max;
+            var min:Array = structure.dtoStructure.min;
+            var v:Vector3D = new Vector3D( Math.round( max[0 ] + min[ 0 ] ) / 2, Math.round( max[ 1 ] + min[ 1 ] ) / 2, Math.round( max[ 2 ] + min[ 2 ] ) / 2 );
+            _planeProjectionVal = v[Dd3dModelMeshPlane.axisNames[ projectionDir ]];
+            _planeProjectionDir = projectionDir;
+        }
+
+        [Bindable]
+        public var structure:StructureItem;
+        ]]></fx:Script>
+    <fx:Binding source="projectionDir" destination="rfr"/>
+    <fx:Binding source="structure.dtoStructure" destination="rfr"/>
+</m:Voxel3dOperationAddPlane>

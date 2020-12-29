@@ -1,0 +1,35 @@
+<?xml version="1.0"?>
+<v:TreeGridRendererHeader xmlns:fx="http://ns.adobe.com/mxml/2009"
+                          xmlns:s="library://ns.adobe.com/flex/spark"
+                          xmlns:v="edu.umich.med.mbni.treedatagrid.*"
+        >
+    <fx:Metadata>
+        [ResourceBundle("TextAtlas")]
+    </fx:Metadata>
+    <s:Rect width="100%" height="100%">
+        <s:fill>
+            <s:LinearGradient rotation="90">
+                <s:GradientEntry color="0x888888"/>
+                <s:GradientEntry color="0xeeeeee"/>
+            </s:LinearGradient>
+        </s:fill>
+    </s:Rect>
+    <s:HGroup horizontalAlign="center" gap="1" width="100%">
+        <s:ToggleButton selected="@{treeGridColumn.data.sortDesc}"
+                        toolTip="#t(sort{getQualifiedClassName(this)})p#"
+                        skinClass="edu.umich.med.mbni.treedatagrid.TreeGridRendererHeaderSortOrder"/>
+        <s:Label text="{resourceManager.getString('TextAtlas','treegrid.col.header.label.glblslctn')}"
+                 toolTip="#t(treegrid.col.glblslctn)p#"
+                 fontWeight="bold"/>
+    </s:HGroup>
+    <s:Rect height="100%" width="5" visible="false" id="leftDropIndicator" left="0">
+        <s:fill>
+            <s:SolidColor color="0x000000"/>
+        </s:fill>
+    </s:Rect>
+    <s:Rect height="100%" width="5" visible="false" id="rightDropIndicator" right="0">
+        <s:fill>
+            <s:SolidColor color="0x000000"/>
+        </s:fill>
+    </s:Rect>
+</v:TreeGridRendererHeader>

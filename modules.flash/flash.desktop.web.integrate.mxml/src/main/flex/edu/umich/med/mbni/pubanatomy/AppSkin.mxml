@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Skin xmlns:fx="http://ns.adobe.com/mxml/2009"
+        xmlns:s="library://ns.adobe.com/flex/spark"
+        xmlns:ww="edu.umich.med.mbni.webdesktop.*"
+        xmlns:as3lib="com.flashflexpro.as3lib.*"
+        xmlns:searchView="edu.umich.med.mbni.pubanatomy.search.view.*"
+        xmlns:m="edu.umich.med.mbni.pubanatomy.integrate.model.*"
+        xmlns:utils="edu.umich.med.mbni.utils.*"
+        xmlns:v="edu.umich.med.mbni.pubanatomy.integrate.view.*"
+        enterFrame="rootAppModel.onEnterFrame();"
+        mouseEnabled="true"
+        rightClick="onRightClick( event );"
+        creationComplete="rootAppModel.onAppLoaded();">
+    <fx:Metadata>[HostComponent("spark.components.Application")]</fx:Metadata>
+    <s:states>
+        <s:State name="normal"/>
+        <s:State name="disabled" stateGroups="disabledGroup"/>
+        <s:State name="normalAndInactive" stateGroups="inactiveGroup"/>
+        <s:State name="disabledAndInactive" stateGroups="disabledGroup, inactiveGroup"/>
+
+        <s:State name="normalWithControlBar"/>
+        <s:State name="disabledWithControlBar"/>
+    </s:states>
+    <fx:Script><![CDATA[
+        import edu.umich.med.mbni.pubanatomy.atlas.model.AllStructuresTreeGridData;
+        import edu.umich.med.mbni.pubanatomy.integrate.model.MDLTempAbaDatasetSearchRpcCorr;
+        import edu.umich.med.mbni.pubanatomy.integrate.model.MDLTempAbaDatasetSearchRpcDiff;
+        import edu.umich.med.mbni.pubanatomy.integrate.model.MDLTempAbaDatasetSearchRpcGene;
+        import edu.umich.med.mbni.pubanatomy.integrate.view.TooltipExPub;
+        import edu.umich.med.mbni.pubanatomy.integrate.view.WebWinBase;
+        import edu.umich.med.mbni.pubanatomy.integrate.view.WinHelp;
+        import edu.umich.med.mbni.pubanatomy.integrate.view.WinNCBIPubmedSearch;
+        import edu.umich.med.mbni.pubanatomy.integrate.view.WinSearch;
+        import edu.umich.med.mbni.pubanatomy.integrate.view.WinSection2d;
+        import edu.umich.med.mbni.pubanatomy.integrate.view.WinStructureTreeGrid;
+        import edu.umich.med.mbni.pubanatomy.integrate.view.WinTempAllenBrainGeneCorrelaSearch;
+        import edu.umich.med.mbni.pubanatomy.integrate.view.WinTempAllenBrainGeneDiffSearch;
+        import edu.umich.med.mbni.pubanatomy.integrate.view.WinTempAllenBrainGeneSearch;
+        import edu.umich.med.mbni.pubanatomy.ncbipubmedsearch.MDLNCBIPubmedQueryResult;
+        import edu.umich.med.mbni.pubanatomy.search.model.QueryResult;
+        import edu.umich.med.mbni.pubanatomy.sectioninteract.model.ModelSectionPlane;
+        import edu.umich.med.mbni.utils.ToolTipManagerImplExt;
+        protected function onRightClick( event:MouseEvent ):void{
+
+        }
+
+        public function onPreInit( abaUrl:String, searchUrl:String, ncbiUrl:String, stage:Stage, sessionId:String ):void{
+
+            rootAppModel.stage = stage;
+            rootAppModel.sessionId = sessionId;
+
+            rootAppModel.restUrl = abaUrl;
+            rootAppModel.ncbiUrl = ncbiUrl;
+            rootAppModel.searchUrl = searchUrl;
+
+            ToolTipManagerImplExt.getInstance().toolTipClass = TooltipExPub;
+
+            rootAppModel.appInit();
+
+            _webWinModelToView[ AllStructuresTreeGridData ] = WinStructureTreeGrid;
+            _webWinModelToView[ QueryResult ] = WinSearch;
+            _webWinModelToView[ ModelSectionPlane ] = WinSection2d;
+            _webWinModelToView[ MDLTooltipExPub ] = WinHelp;
+            _webWinModelToView[ MDLTempAbaDatasetSearchRpcGene ] = WinTempAllenBrainGeneSearch;
+            _webWinModelToView[ MDLTempAbaDatasetSearchRpcDiff ] = WinTempAllenBrainGeneDiffSearch;
+            _webWinModelToView[ MDLTempAbaDatasetSearchRpcCorr ] = WinTempAllenBrainGeneCorrelaSearch;
+            _webWinModelToView[ MDLNCBIPubmedQueryResult ] = WinNCBIPubmedSearch;
+        }
+        ]]></fx:Script>
+    <fx:Declarations>
+        <m:MDLIntegrationRootModel id="rootAppModel" popUpHelpNow="popUpHelp();">
+            <m:callInNext>
+                <as3lib:CallOnceInNextFrame id="callInNext"/>
+            </m:callInNext>
+        </m:MDLIntegrationRootModel>
+
+        <utils:ViewMenuHandler rootApp="{rootAppModel}"/>
+    </fx:Declarations>
+    <s:layout>
+        <s:VerticalLayout gap="0"/>
+    </s:layout>
+    <s:Group width="100%" height="100%">
+        <v:DesktopLeftCenterRight width="100%" height="100%" rootAppModel="{rootAppModel}" id="dividedLCR"
+                                  searchAutoCompleteGroup="{searchAutoCompleteGroup}"/>
+        <ww:WebWinContainer id="winGroup" windowsBar="{winBar}" width="100%" height="100%"/>
+        <searchView:ViewTermSuggestGroup id="searchAutoCompleteGroup" includeInLayout="false"
+                                         searchModel="{rootAppModel.searchModel}"/>
+    </s:Group>
+    <s:BorderContainer width="100%" backgroundColor="0xFFffff" id="bottomBar">
+        <s:layout>
+            <s:HorizontalLayout paddingLeft="3" verticalAlign="middle"/>
+        </s:layout>
+        <v:TaskBarCtrls rootAppModel="{rootAppModel}"/>
+        <ww:WebWinBar id="winBar" width="100%" height="100%" windowsGroup="{winGroup}"/>
+        <utils:MoreOptionsButton click="rootAppModel.onGlobalConfig();"
+                                 toolTip="Global Configurations"/>
+    </s:BorderContainer>
+    <fx:Script><![CDATA[
+        private function wwModel2View( m:Object ):WebWinBase{
+            var cls:Class = webWinModelToViewInfo( m );
+            var rt:WebWinBase = new cls() as WebWinBase;
+            rt.rootView = this;
+            rt.data = m;
+            winGroup.addElement( rt );
+            return rt;
+        }
+
+        protected var _webWinModelToView:Dictionary = new Dictionary();
+
+        public function webWinModelToViewInfo( obj:Object ):Class{
+            var found:Array = [];
+            for( var ck:* in _webWinModelToView ){
+                if( getQualifiedClassName( obj ) == getQualifiedClassName( ck ) ){
+                    found.push( ck );
+                }
+            }
+            if( found.length == 0 || found.length > 1 ){
+                throw new Error( "" );
+            }
+
+            return _webWinModelToView[ found[ 0 ] ];
+        }
+
+        public function onWinClose( ww:WebWinBase ):void{
+            ww.close();
+        }
+        ]]></fx:Script>
+    <fx:Declarations>
+        <as3lib:Sync2Lists source="{rootAppModel.webWinModels}" id="sync2ListsWebWins"
+                           getDestInst="wwModel2View" destroyInst="onWinClose">
+            <as3lib:destination>
+                <s:ArrayList id="webWinWindows"/>
+            </as3lib:destination>
+        </as3lib:Sync2Lists>
+    </fx:Declarations>
+
+    <fx:Script><![CDATA[
+        import edu.umich.med.mbni.pubanatomy.integrate.model.MDLTooltipExPub;
+        import edu.umich.med.mbni.webdesktop.WebWindowStatus;
+
+        private function popUpHelp():void{
+            var tip:TooltipExPub = ( ToolTipManagerImplExt.getInstance().currentToolTip as TooltipExPub );
+            if( tip == null || !tip.mouseEnabled ){
+                return;
+            }
+            var tooltipModel:MDLTooltipExPub = tip.model;
+            if( tooltipModel == null ){
+                return;
+            }
+
+            var existWin:WebWinBase = sync2ListsWebWins.getDestBySource( tooltipModel ) as WebWinBase;
+            if( existWin == null ){
+                rootAppModel.webWinModels.addItem( tooltipModel );
+                return;
+            }
+            if( existWin.status == WebWindowStatus.MINIMIZED ){
+                existWin.onRestoreFromMini();
+            }
+            else{
+                existWin.moveToTop();
+            }
+        }
+        ]]></fx:Script>
+</s:Skin>

@@ -1,0 +1,104 @@
+<?xml version="1.0"?>
+<model:StructureTreeGridDataRow xmlns:fx="http://ns.adobe.com/mxml/2009"
+                                xmlns:model="edu.umich.med.mbni.pubanatomy.atlas.model.*">
+
+    <fx:Script><![CDATA[
+        [Bindable(event="treeGridDataChanged")]
+        public function get v3dTreeGridData():Voxel3dStructureOn3dTreeGridData{
+            return treeGridData as Voxel3dStructureOn3dTreeGridData;
+        }
+
+        public function getStructureCenterAddPlaneExeArray():Array{
+            return [
+                v3dTreeGridData.rootModelVoxel3d.getOpPlaneInDirFromStrCenter( 0, structure ),
+                v3dTreeGridData.rootModelVoxel3d.getOpPlaneInDirFromStrCenter( 1, structure ),
+                v3dTreeGridData.rootModelVoxel3d.getOpPlaneInDirFromStrCenter( 2, structure )
+            ]
+        }
+
+        private function set rfrV3dStr( ignoreVar:* ):void{
+            treeGridData.rootModel.callInNext.putIn( refreshV3dStr );
+        }
+
+        private function refreshV3dStr():void{
+            _v3dStructure = v3dTreeGridData.rootModelVoxel3d.syncAllStructuresToVoxels.getDestBySource( structure ) as
+                    Voxel3dStructure;
+            dispatchEvent( new Event( "v3dStructureChanged" ) );
+        }
+
+        private var _v3dStructure;
+        [Bindable(event="v3dStructureChanged")]
+        public function get v3dStructure():Voxel3dStructure{
+            return _v3dStructure;
+        }
+        ]]></fx:Script>
+    <fx:Binding source="v3dTreeGridData.rootModelVoxel3d.syncAllStructuresToVoxels.destination.length"
+                destination="rfrV3dStr"/>
+    <fx:Binding source="structure" destination="rfrV3dStr"/>
+
+    <fx:Script><![CDATA[
+        private var _loaded:Boolean = false;
+        [Bindable(event="loadedChanged")]
+        public function get loaded():Boolean{
+            return _loaded;
+        }
+
+        private function set assLoaded( value:Boolean ):void{
+            if( value != _loaded ){
+                _loaded = value;
+                dispatchEvent( new Event( "loadedChanged" ) );
+            }
+        }
+        ]]></fx:Script>
+
+    <fx:Binding source="v3dStructure.structure3dModel.dtoModelMeshArr!=null" destination="assLoaded"/>
+    <fx:Script><![CDATA[
+        import edu.umich.med.mbni.utils.ModelOperationMenuChildren;
+        import edu.umich.med.mbni.utils.ModelOperationMenuType;
+
+        override public function getMenuItems( ev:MouseEvent = null ):ModelOperationMenuChildren{
+            var rt:ModelOperationMenuChildren = super.getMenuItems( ev );
+            rt.children.addItem( new ModelOperationMenuType() );
+            var move3dCenter:Voxel3dOperationMove3dCenter = new Voxel3dOperationMove3dCenter();
+            move3dCenter.newCentralStructure = v3dStructure.structure3dModel;
+            move3dCenter.v3dSceneModel = v3dTreeGridData.rootModelVoxel3d.scene3d;
+
+            rt.children.addItem( move3dCenter );
+            if( structure.directChildren.length > getNextLevelChildrenLength() ){
+                rt.children.addItem( new ModelOperationMenuType() );
+                rt.children.addItem( new Voxel3dOperationAddMoreStructures( ev, this ) );
+            }
+
+            rt.children.addItem( new ModelOperationMenuType() );
+
+            var addPlanes:ModelOperationMenuChildren = new ModelOperationMenuChildren( getStructureCenterAddPlaneExeArray(),
+                    null, "add Plane through model center" );
+            rt.children.addItem( addPlanes );
+
+            rt.children.addItem( new ModelOperationMenuType() );
+            rt.children.addItem( new Voxel3dOperationRemoveStructures( new <Voxel3dStructureTreeGridDataRow>[ this ] ) );
+            return rt;
+        }
+
+        override public function onOpenCloseClick():void{
+            if( directChildren.length == 0 && structure.directChildren.length > getNextLevelChildrenLength() ){
+                new Voxel3dOperationAddMoreStructures( null, this ).execute();
+            }
+            else{
+                super.onOpenCloseClick();
+            }
+        }
+
+        private function getNextLevelChildrenLength():uint{
+            var rt:uint = 0;
+            for( var i:int = directChildren.length - 1; i >= 0; i -- ){
+                var row:Voxel3dStructureTreeGridDataRow = directChildren.getItemAt( i ) as
+                        Voxel3dStructureTreeGridDataRow;
+                if( row.depth == depth + 1 ){
+                    rt ++;
+                }
+            }
+            return rt;
+        }
+        ]]></fx:Script>
+</model:StructureTreeGridDataRow>

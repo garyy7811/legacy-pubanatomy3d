@@ -1,0 +1,62 @@
+<?xml version="1.0"?>
+<as3lib:MxmlEventDispatcher xmlns:fx="http://ns.adobe.com/mxml/2009"
+                            xmlns:as3lib="com.flashflexpro.as3lib.*"
+        >
+    <fx:Script><![CDATA[
+        [Bindable]
+        public var sectionPlane:ModelSectionPlane;
+
+        [Bindable]
+        public var structure2d:ModelSection2dStructure;
+
+        public function equals( another:ModelSection2dPlaneStructureEdge ):Boolean{
+            throw new Error( "override me" );
+        }
+
+        public function destroy():void{
+
+        }
+        ]]></fx:Script>
+
+    <fx:Script><![CDATA[
+        protected var _graphicsEdges:Vector.<IGraphicsData>;
+
+        [Bindable(event="graphicsEdgesChanged")]
+        public function get graphicsEdges():Vector.<IGraphicsData>{
+            return _graphicsEdges;
+        }
+
+        protected function setGraphicsEdges( value:Vector.<IGraphicsData> ):void{
+            if( value != _graphicsEdges ){
+                _graphicsEdges = value;
+                dispatchEvent( new Event( "graphicsEdgesChanged" ) );
+
+                if( _graphicsEdges == null ){
+                    setEdgesShape( null );
+                }
+                else{
+                    var shape:Shape = new Shape();
+                    shape.cacheAsBitmap = true;
+                    shape.graphics.beginBitmapFill( structure2d.textBitMapData );
+                    shape.graphics.drawGraphicsData( _graphicsEdges );
+                    shape.graphics.endFill();
+                    setEdgesShape( shape );
+                }
+            }
+        }
+
+
+        private var _edgesShape:Shape;
+        [Bindable(event="edgesShapeChanged")]
+        public function get edgesShape():Shape{
+            return _edgesShape;
+        }
+
+        protected function setEdgesShape( value:Shape ):void{
+            if( value != _edgesShape ){
+                _edgesShape = value;
+                dispatchEvent( new Event( "edgesShapeChanged" ) );
+            }
+        }
+        ]]></fx:Script>
+</as3lib:MxmlEventDispatcher>

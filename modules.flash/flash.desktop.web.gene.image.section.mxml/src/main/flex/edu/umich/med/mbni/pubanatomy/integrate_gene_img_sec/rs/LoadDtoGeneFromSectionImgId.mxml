@@ -1,0 +1,36 @@
+<?xml version="1.0"?>
+<rs:GetXmlFromAba xmlns:fx="http://ns.adobe.com/mxml/2009" xmlns:rs="edu.umich.med.mbni.pubanatomy.flash.rs.*">
+    <fx:Script><![CDATA[
+        import edu.umich.med.mbni.pubanatomy.flash.dto.DtoGene;
+        import edu.umich.med.mbni.pubanatomy.integrate_gene_img_sec.model.GeneImgSectionRootModel;
+
+        [Bindable(event="modelChanged")]
+        public function get giModel():GeneImgSectionRootModel{
+            return model as GeneImgSectionRootModel;
+        }
+
+        override public function callRemote():Boolean{
+            paramStrAfterQ =  "criteria=model::SectionImage[id$eq" + giModel.sectionImageId + "]" ;
+            return super.callRemote();
+        }
+
+        override protected function onXMLResult( x:XML ):void{
+            super.onXMLResult( x );
+
+            if( giModel.sectionDSId < 0 ){
+
+                var siXml:XML = _result.children()[0].children()[0];
+
+                giModel.sectionDSId = Number( siXml[ "data-set-id" ].toString() );
+                paramStrAfterQ = ( "criteria=model::SectionDataSet[failed$eqfalse],[id$eq" + giModel.sectionDSId + "],rma::include,genes" )
+                callRemote();
+            }
+            else{
+                var gdto:DtoGene = new DtoGene();
+                gdto.geneId = int( _result..gene[0].id.toString() );
+                giModel.rootModelVoxel3d.on3dStageStructureTreeGridData.addGene( gdto );
+                giModel.geneDto = gdto;
+            }
+        }
+        ]]></fx:Script>
+</rs:GetXmlFromAba>

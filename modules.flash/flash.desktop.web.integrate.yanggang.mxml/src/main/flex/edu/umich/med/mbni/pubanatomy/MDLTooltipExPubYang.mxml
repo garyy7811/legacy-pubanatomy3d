@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<model:MDLTooltipExPub xmlns:fx="http://ns.adobe.com/mxml/2009"
+                       xmlns:model="edu.umich.med.mbni.pubanatomy.integrate.model.*">
+
+
+    <fx:Script><![CDATA[
+        import mx.collections.ArrayList;
+
+        override public function set editorTip( value:String ):void{
+            super.editorTip = value;
+            if( dynamicTips != null ){
+                tipList = new ArrayList( dynamicTips );
+            }
+        }
+
+        [Bindable]
+        public var tipList:ArrayList;
+
+        ]]></fx:Script>
+</model:MDLTooltipExPub>

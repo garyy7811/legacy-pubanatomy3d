@@ -1,0 +1,321 @@
+<?xml version="1.0"?>
+<utils:RootModelModule xmlns:fx="http://ns.adobe.com/mxml/2009" xmlns:utils="edu.umich.med.mbni.utils.*"
+                       xmlns:m="edu.umich.med.mbni.pubanatomy.search.model.*"
+                       xmlns:s="library://ns.adobe.com/flex/spark">
+    <fx:Script><![CDATA[
+        import edu.umich.med.mbni.utils.RootModelApp;
+
+        override public function set rootApp( value:RootModelApp ):void{
+            super.rootApp = value;
+
+            CONFIG::debugging{
+                for( var j:int = statisticFields.length - 1; j >= 0; j-- ){
+                    var qf:QueryField = statisticFields.getItemAt( j ) as QueryField;
+                    if( qf.type != QueryField.type_single_word ){
+                        throw new Error( "" );
+                    }
+                }
+            }
+            sortArrayList( resultFields );
+            sortArrayList( queryFields );
+            sortArrayList( statisticFields );
+        }
+
+        private function sortArrayList( lst:ArrayList ):void{
+            var src = lst.toArray();
+
+            src.sort( function ( a:QueryField, b:QueryField ):int{
+                return a.label < b.label ? 1 : -1;
+            } );
+
+            lst.removeAll();
+            lst.addAll( new ArrayList( src ) );
+        }
+
+        public function findSameTypeQueryFields( type:String ):ArrayList{
+            var rt:ArrayList = new ArrayList();
+            for( var j:int = queryFields.length - 1; j >= 0; j-- ){
+                var queryField:QueryField = queryFields.getItemAt( j ) as QueryField;
+                if( queryField.type == type ){
+                    rt.addItem( queryField );
+                }
+            }
+            sortArrayList( rt );
+            return rt;
+        }
+        ]]></fx:Script>
+    <fx:Declarations>
+        <s:ArrayList id="statisticFields">
+            <fx:Object>{articleAuthorFullNames}</fx:Object>
+            <fx:Object>{geneSymbols}</fx:Object>
+            <fx:Object>{diseases}</fx:Object>
+            <fx:Object>{functions}</fx:Object>
+            <fx:Object>{brainStructureSymbols}</fx:Object>
+            <fx:Object>{keywords}</fx:Object>
+            <fx:Object>{chemicalNameOfSubstances}</fx:Object>
+            <fx:Object>{meshHeadingDescNames}</fx:Object>
+            <fx:Object>{articlePublicationTypeList}</fx:Object>
+            <fx:Object>{protocols}</fx:Object>
+            <fx:Object>{grantAgencis}</fx:Object>
+            <!--<fx:Object>{investigatorList}</fx:Object>-->
+        </s:ArrayList>
+
+        <s:ArrayList id="queryFields">
+            <fx:Object>{query_fullText}</fx:Object>
+            <fx:Object>{chemicalNameOfSubstances}</fx:Object>
+            <fx:Object>{meshHeadingDescNames}</fx:Object>
+            <fx:Object>{diseases}</fx:Object>
+            <fx:Object>{functions}</fx:Object>
+            <fx:Object>{keywords}</fx:Object>
+
+            <fx:Object>{articleTitle}</fx:Object>
+            <fx:Object>{abstractTexts}</fx:Object>
+            <fx:Object>{articleAuthorFullNames}</fx:Object>
+
+            <fx:Object>{geneIds}</fx:Object>
+            <fx:Object>{geneSymbols}</fx:Object>
+            <fx:Object>{geneNames}</fx:Object>
+
+            <fx:Object>{brainStructureIds}</fx:Object>
+            <fx:Object>{brainStructureSymbols}</fx:Object>
+            <fx:Object>{brainStructureNames}</fx:Object>
+
+            <fx:Object>{articlePublicationTypeList}</fx:Object>
+            <fx:Object>{protocols}</fx:Object>
+
+            <fx:Object>{articleJournalPubDateYear}</fx:Object>
+        </s:ArrayList>
+
+        <s:ArrayList id="resultFields">
+            <fx:Object>{pmid}</fx:Object>
+            <fx:Object>{articleAuthorFullNames}</fx:Object>
+            <fx:Object>{abstractTexts}</fx:Object>
+            <fx:Object>{otherAbstractTexts}</fx:Object>
+            <fx:Object>{geneIds}</fx:Object>
+            <fx:Object>{geneSymbols}</fx:Object>
+            <fx:Object>{geneNames}</fx:Object>
+            <fx:Object>{brainStructureIds}</fx:Object>
+            <fx:Object>{brainStructureSymbols}</fx:Object>
+            <fx:Object>{brainStructureNames}</fx:Object>
+            <fx:Object>{diseases}</fx:Object>
+            <fx:Object>{functions}</fx:Object>
+            <fx:Object>{chemicalNameOfSubstances}</fx:Object>
+            <fx:Object>{chemicalRegistryNumbers}</fx:Object>
+            <fx:Object>{protocols}</fx:Object>
+            <fx:Object>{articlePublicationTypeList}</fx:Object>
+            <fx:Object>{meshHeadingDescNames_majorTopic_y}</fx:Object>
+            <fx:Object>{meshHeadingDescNames_majorTopic_n}</fx:Object>
+            <fx:Object>{keywords}</fx:Object>
+            <!--
+                        <fx:Object>{keywordList_majorTopic_y}</fx:Object>
+                        <fx:Object>{keywordList_majorTopic_n}</fx:Object>-->
+            <fx:Object>{articlePaginationMedlinePgn}</fx:Object>
+            <fx:Object>{grantAgencis}</fx:Object>
+            <fx:Object>{articleAffiliation}</fx:Object>
+            <fx:Object>{articleJournalTitle}</fx:Object>
+            <fx:Object>{articleJournalIsoAbbrev}</fx:Object>
+            <fx:Object>{articleTitle}</fx:Object>
+            <fx:Object>{grantIds}</fx:Object>
+            <fx:Object>{grantCountries}</fx:Object>
+            <fx:Object>{grantAcronyms}</fx:Object>
+            <fx:Object>{journalNlmUniqueId}</fx:Object>
+            <fx:Object>{journalMedlineTa}</fx:Object>
+            <fx:Object>{journalCountry}</fx:Object>
+            <fx:Object>{articleJournalIssn}</fx:Object>
+            <fx:Object>{articleJournalPubDateYear}</fx:Object>
+            <fx:Object>{articleJournalIssueIssue}</fx:Object>
+            <fx:Object>{articleJournalIssueVolume}</fx:Object>
+            <fx:Object>{articleLangs}</fx:Object>
+            <!--<fx:Object>{investigatorList}</fx:Object>-->
+        </s:ArrayList>
+
+        <s:ArrayList id="___allFields">
+            <m:QueryFieldT id="query_fullText" type="{QueryField.type_single_word}" label="Full Medline Record"
+                           searchModel="{this}"/>
+            <m:QueryFieldR id="pmid" type="{QueryField.type_number}" url="#pmid" sortable="true"
+                           label="PMID"
+                           citationItemRenderer="edu.umich.med.mbni.pubanatomy.search.view.SearchViewRecordGridPmidRenderer"
+                           toolTip="#t(tfpmid0)p#"
+                           searchModel="{this}"/>
+
+            <m:QueryFieldT id="articleAuthorFullNames" type="{QueryField.type_single_word}" label="Author"
+                           toolTip="#t(tfatclfnm0)p#" searchModel="{this}"/>
+            <m:QueryFieldT id="articleAuthorListSuffixs" type="{QueryField.type_single_word}" label="Author Suffix"
+                           toolTip="#t(tfatclfsfx)p#" searchModel="{this}"/>
+            <m:QueryFieldT id="abstractTexts" type="{QueryField.type_sentences}" label="Article Abstract Text"
+                           url="#abstract"
+                           toolTip="#t(tfabstr0)p#" searchModel="{this}"/>
+            <m:QueryFieldT id="otherAbstractTexts" type="{QueryField.type_sentences}" label="Other Abstract Text"
+                           searchModel="{this}"/>
+            <m:QueryFieldRGeneIds id="geneIds" type="{QueryField.type_number}"
+                                  label="Gene IDs" searchModel="{this}"/>
+            <m:QueryFieldTGeneSymbols id="geneSymbols" type="{QueryField.type_single_word}"
+                                      label="Gene Symbols" searchModel="{this}" minimalChar="1"/>
+            <m:QueryFieldT id="geneNames" type="{QueryField.type_single_word}"
+                           label="Gene Names" searchModel="{this}" queryField="query_geneNames"/>
+
+            <m:QueryFieldRBrainStrIds id="brainStructureIds" type="{QueryField.type_number}"
+                                      label="Brain Structure IDs" searchModel="{this}"/>
+            <m:QueryFieldTBrainStrSymbols id="brainStructureSymbols" type="{QueryField.type_single_word}"
+                                          label="Brain Structure Symbols" searchModel="{this}" minimalChar="1"/>
+            <m:QueryFieldT id="brainStructureNames" type="{QueryField.type_single_word}"
+                           label="Brain Structure Names" searchModel="{this}"
+                           queryField="query_brainStructureNames"/>
+
+            <m:QueryFieldT id="diseases" type="{QueryField.type_single_word}" label="Diseases" searchModel="{this}"
+                           queryField="query_diseases"/>
+
+            <m:QueryFieldT id="functions" type="{QueryField.type_single_word}" label="Functions" searchModel="{this}"
+                           queryField="query_functions"/>
+
+            <m:QueryFieldT id="chemicalNameOfSubstances" type="{QueryField.type_single_word}" label="Chemical Name"
+                           searchModel="{this}"
+                           queryField="query_chemicalNameOfSubstances"/>
+
+            <m:QueryFieldT id="chemicalRegistryNumbers" type="{QueryField.type_single_word}"
+                           label="Chemical Registry Numbers" searchModel="{this}"/>
+            <m:QueryFieldT id="protocols" type="{QueryField.type_single_word}" label="Protocols" searchModel="{this}"/>
+            <m:QueryFieldT id="articlePublicationTypeList" type="{QueryField.type_single_word}" label="Publication type"
+                           url="#publicationtypelist" searchModel="{this}"/>
+
+            <m:QueryFieldT id="meshHeadingQualifierNames" type="{QueryField.type_single_word}"
+                           label="Mesh heading Qualifier Name" searchModel="{this}"/>
+            <m:QueryFieldT id="meshHeadingQualifierNames_majorTopic_y" type="{QueryField.type_sentences}"
+                           label="Major Mesh heading Qualifier Name" searchModel="{this}"/>
+            <m:QueryFieldT id="meshHeadingQualifierNames_majorTopic_n" type="{QueryField.type_sentences}"
+                           searchModel="{this}"/>
+
+            <m:QueryFieldT id="meshHeadingDescNames" type="{QueryField.type_single_word}"
+                           label="Mesh heading Description Name" searchModel="{this}"
+                           queryField="query_meshHeadingDescNames"/>
+            <m:QueryFieldT id="meshHeadingDescNames_majorTopic_y" type="{QueryField.type_sentences}"
+                           label="Major Mesh heading Description Name" searchModel="{this}"/>
+            <m:QueryFieldT id="meshHeadingDescNames_majorTopic_n" type="{QueryField.type_sentences}"
+                           label="None Major Mesh heading Qualifier Name" searchModel="{this}"/>
+
+            <m:QueryFieldT id="keywords" type="{QueryField.type_single_word}" label="Major Keywords"
+                           searchModel="{this}"
+                           queryField="query_keywords"/>
+            <!--
+                        <m:QueryFieldT id="keywordList_majorTopic_n" type="{QueryField.type_sentences}" label="None Major Keywords"
+                                       searchModel="{this}"/>
+                        <m:QueryFieldT id="keywordList_majorTopic_y" type="{QueryField.type_sentences}" label="Major Keywords"
+                                       searchModel="{this}"/>-->
+
+            <m:QueryFieldT id="articlePaginationMedlinePgn" type="{QueryField.type_single_word}"
+                           label="Article inclusive pages"
+                           url="#pagination" searchModel="{this}"/>
+            <m:QueryFieldT id="grantAgencis" type="{QueryField.type_single_word}" label="Grant Agency"
+                           searchModel="{this}"/>
+
+            <m:QueryFieldT id="articleAffiliation" type="{QueryField.type_sentences}" label="Author affiliations"
+                           url="#affiliation"
+                           sortable="true" searchModel="{this}"/>
+
+            <m:QueryFieldT id="articleJournalTitle" type="{QueryField.type_sentences}" sortable="true"
+                           label="Journal title" searchModel="{this}"/>
+            <m:QueryFieldT id="articleJournalIsoAbbrev" type="{QueryField.type_single_word}" sortable="true"
+                           label="Journal ISO Abbrev" searchModel="{this}"/>
+
+            <m:QueryFieldT id="articleTitle" type="{QueryField.type_sentences}" sortable="true" label="Article title"
+                           url="#articletitle"
+                           toolTip="contains the entire title of the journal article; always in English; those titles originally published in a foreign language and translated for ArticleTitle are enclosed in square brackets. All titles end with a period unless another punctuation mark such as a question mark or bracket is present. Explanatory information about the title itself is enclosed in parentheses, e.g.: (author's transl). Corporate/collective authors may appear at the end of ArticleTitle for citations up to about the year 2000."
+                           searchModel="{this}"/>
+
+            <m:QueryFieldT id="articleJournalPubDateMedlineDate" type="{QueryField.type_sentences}" sortable="false"
+                           label="Article Journal Pub Medline Date"
+                           url="#articletitle"
+                           toolTip="contains the entire title of the journal article; always in English; those titles originally published in a foreign language and translated for ArticleTitle are enclosed in square brackets. All titles end with a period unless another punctuation mark such as a question mark or bracket is present. Explanatory information about the title itself is enclosed in parentheses, e.g.: (author's transl). Corporate/collective authors may appear at the end of ArticleTitle for citations up to about the year 2000."
+                           searchModel="{this}"/>
+
+            <m:QueryFieldT id="grantIds" type="{QueryField.type_single_word}" label="Grant ID" searchModel="{this}"/>
+            <m:QueryFieldT id="grantCountries" type="{QueryField.type_single_word}" label="Grant Country"
+                           searchModel="{this}"/>
+            <m:QueryFieldT id="grantAcronyms" type="{QueryField.type_single_word}" searchModel="{this}"/>
+
+            <m:QueryFieldT id="journalNlmUniqueId" type="{QueryField.type_single_word}" sortable="true"
+                           label="Journal unique id" searchModel="{this}"/>
+            <m:QueryFieldT id="journalMedlineTa" type="{QueryField.type_single_word}" sortable="true"
+                           label="Journal Medline TA" searchModel="{this}"/>
+            <m:QueryFieldT id="journalCountry" type="{QueryField.type_single_word}" sortable="true"
+                           searchModel="{this}"/>
+            <m:QueryFieldT id="articleJournalIssn" type="{QueryField.type_single_word}" sortable="true"
+                           label="Journal Issn" searchModel="{this}"/>
+
+            <m:QueryFieldR id="articleJournalPubDateYear" type="{QueryField.type_date}" sortable="true"
+                           label="Article Journal Publish Year" searchModel="{this}"/>
+            <m:QueryFieldT id="articleJournalIssueIssue" type="{QueryField.type_single_word}" sortable="true"
+                           searchModel="{this}"/>
+            <m:QueryFieldT id="articleJournalIssueVolume" type="{QueryField.type_single_word}" sortable="true"
+                           label="Articale Journal Issue Volume" searchModel="{this}"/>
+            <m:QueryFieldT id="articleLangs" type="{QueryField.type_single_word}" label="Article Language"
+                           url="#language"
+                           toolTip="The language in which an article was published is recorded in Language. All entries are three letter abbreviations stored in lower case, such as eng, fre, ger, jpn, etc."
+                           searchModel="{this}"/>
+            <!--
+                        <m:QueryFieldT id="investigatorList" type="{QueryField.type_single_word}" label="Investigators"
+                                       url="#investigatorlist" searchModel="{this}"/>-->
+        </s:ArrayList>
+
+    </fx:Declarations>
+    <fx:Script><![CDATA[
+        import edu.umich.med.mbni.pubanatomy.flash.dto.DtoGene;
+        import edu.umich.med.mbni.pubanatomy.flash.dto.DtoStructure;
+
+        import mx.core.DragSource;
+
+
+        private function set rfrDragging( ignoreVar:* ):void{
+            callInNext.putIn( refreshDragging );
+        }
+
+        private var _draggingTerm:QueryRelate2Terms;
+
+        [Bindable(event="draggingTermChanged")]
+        public function get draggingTerm():QueryRelate2Terms{
+            return _draggingTerm;
+        }
+
+        private function setDraggingTerm( value:QueryRelate2Terms ):void{
+            if( value != _draggingTerm ){
+                _draggingTerm = value;
+                dispatchEvent( new Event( "draggingTermChanged" ) );
+            }
+        }
+
+        private function refreshDragging():void{
+            var draggingSrc:DragSource = rootApp.dragging;
+            if( draggingSrc != null ){
+                var obj:Object = draggingSrc.dataForFormat( RootModelModule.DRAGGING_FORMAT );
+                var draggingR2:QueryRelate2Terms = obj as QueryRelate2Terms;
+
+                if( draggingR2 == null ){
+                    var gDto:DtoGene = obj as DtoGene;
+                    if( gDto != null ){
+                        draggingR2 = instantiate( QueryRelate2Terms ) as QueryRelate2Terms;
+                        draggingR2.term = instantiate( QueryTermT ) as QueryTermT;
+                        draggingR2.term.field = geneSymbols;
+                        ( draggingR2.term as QueryTermT ).inputTxt = gDto.acronym.toLowerCase();
+                    }
+
+                    var tmp:Vector.<Object> = obj as Vector.<Object>;
+                    if( tmp != null && tmp.length == 1 ){
+                        var sDto:DtoStructure = tmp[ 0 ] as DtoStructure;
+                        if( sDto != null ){
+                            draggingR2 = instantiate( QueryRelate2Terms ) as QueryRelate2Terms;
+                            draggingR2.term = instantiate( QueryTermT ) as QueryTermT;
+                            draggingR2.term.field = brainStructureSymbols;
+                            ( draggingR2.term as QueryTermT ).inputTxt = sDto.acronym.toLowerCase();
+                        }
+                    }
+
+                }
+                setDraggingTerm( draggingR2 );
+            }
+            else{
+                setDraggingTerm( null );
+            }
+        }
+        ]]></fx:Script>
+    <fx:Binding source="rootApp.dragging" destination="rfrDragging"/>
+</utils:RootModelModule>

@@ -1,0 +1,50 @@
+<?xml version="1.0"?>
+<m:ModelSection2dPlaneStructureEdge xmlns:fx="http://ns.adobe.com/mxml/2009"
+                                    xmlns:m="edu.umich.med.mbni.pubanatomy.sectioninteract.model.*"
+        >
+    <fx:Script><![CDATA[
+        [Bindable]
+        public var paths:Vector.<XML>;
+
+        override public function equals( another:ModelSection2dPlaneStructureEdge ):Boolean{
+            var a:ModelSection2dPlaneStructureEdgeAnnotation = another as ModelSection2dPlaneStructureEdgeAnnotation;
+            return ( a != null && a.sectionPlane == sectionPlane && a.structure2d == structure2d );
+        }
+
+        override public function destroy():void{
+
+        }
+        ]]></fx:Script>
+
+    <fx:Script><![CDATA[
+        private function set rfrBitMap( v:* ):void{
+            sectionPlane.rootModelSection2d.callInNext.putIn( refreshBitmap );
+        }
+
+        private function refreshBitmap():void{
+            if( paths != null ){
+                var ts:Number = sectionPlane.viewScale / sectionPlane.rootModelSection2d.rootModelVoxel3d.config.unitLength;
+                var pathes:Vector.<IGraphicsData> = new Vector.<IGraphicsData>();
+                for( var j:int = paths.length - 1; j >= 0; j-- ){
+                    var p:XML = paths[j] as XML;
+
+                    var tmp:GraphicsPath = new GraphicsPath();
+                    new ModelSectionImagePaths( p.@d ).generateGraphicsPath( tmp, 0, 0, ts, ts );
+                    pathes.push( tmp );
+                }
+                setGraphicsEdges( pathes );
+            }
+            else{
+                setGraphicsEdges( null );
+            }
+        }
+        ]]></fx:Script>
+    <fx:Binding source="sectionPlane.dirHor" destination="rfrBitMap"/>
+    <fx:Binding source="sectionPlane.dirVer" destination="rfrBitMap"/>
+    <fx:Binding source="sectionPlane.dirVerBigHor" destination="rfrBitMap"/>
+    <fx:Binding source="sectionPlane.viewScale" destination="rfrBitMap"/>
+
+    <fx:Binding source="paths" destination="rfrBitMap"/>
+
+    <fx:Binding source="structure2d.textBitMapData" destination="rfrBitMap"/>
+</m:ModelSection2dPlaneStructureEdge>

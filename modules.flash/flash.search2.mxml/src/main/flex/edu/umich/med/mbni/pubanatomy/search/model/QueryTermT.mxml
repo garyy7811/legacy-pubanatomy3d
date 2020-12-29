@@ -1,0 +1,98 @@
+<?xml version="1.0"?>
+<model:QueryTerm xmlns:fx="http://ns.adobe.com/mxml/2009" xmlns:model="edu.umich.med.mbni.pubanatomy.search.model.*">
+    <fx:Metadata>
+        [RemoteClass]
+    </fx:Metadata>
+    <fx:Script><![CDATA[
+        private static var _fieldIdToSuggestDic:Dictionary = new Dictionary();
+
+        public function get autoCompleteDic():Dictionary{
+            var rt:Dictionary = _fieldIdToSuggestDic[field.id];
+            if( rt == null ){
+                rt = new Dictionary();
+                _fieldIdToSuggestDic[field.id] = rt;
+            }
+            return rt;
+        }
+
+        override public function clone( newQuery:Query = null, newInst:QueryTerm = null ):QueryTerm{
+            var ni:QueryTermT = new QueryTermT();
+            super.clone( newQuery, ni );
+            ni.inputTxt = inputTxt;
+            ni.setQueryTxt( _queryTxt );
+            return ni;
+        }
+        ]]></fx:Script>
+
+
+    <fx:Script><![CDATA[
+        import mx.events.PropertyChangeEvent;
+
+        private var _inputTxt:String = "";
+
+        [Bindable(event="propertyChange")]
+        public function get inputTxt():String{
+            return _inputTxt;
+        }
+
+        public function set inputTxt( value:String ):void{
+            var l:String = ( value == null ? null : value.toLowerCase() );
+            if( l != _inputTxt ){
+                var old:String = _inputTxt;
+                _inputTxt = l;
+                dispatchEvent( PropertyChangeEvent.createUpdateEvent( this, "inputTxt", old, _inputTxt ) );
+            }
+        }
+
+        private var _queryTxt:String = "";
+        [Bindable(event="queryTxtChanged")]
+        public function get queryTxt():String{
+            return _queryTxt;
+        }
+
+        protected function setQueryTxt( value:String ):void{
+            if( value != _queryTxt ){
+                _queryTxt = value;
+                dispatchEvent( new Event( "queryTxtChanged" ) );
+                setQueryStr( "(\"" + escapeQuotationMark( _queryTxt ) + "\")" );
+            }
+        }
+
+        override public function commit():Boolean{
+            super.commit();
+            if( inputTxt.length < 1 ){
+                return false;
+            }
+            setQueryTxt( inputTxt );
+            return true;
+        }
+
+        override public function revert():void{
+            inputTxt = _queryTxt;
+        }
+
+        public static function escapeQuotationMark( value:String ):String{
+            return value.replace( /\"/g, "\\\"" );
+        }
+        ]]></fx:Script>
+    <fx:Binding source="queryTxt" destination="label"/>
+    <fx:Script><![CDATA[
+        /**
+         *
+         ni.inputTxt = inputTxt;
+         ni.setQueryTxt( _queryTxt );
+         * @param output
+         */
+        override public function writeExternal( output:IDataOutput ):void{
+            super.writeExternal( output );
+            output.writeUTF( _inputTxt );
+            output.writeUTF( _queryTxt);
+        }
+
+        override public function readExternal( input:IDataInput ):void{
+            super.readExternal( input );
+            _inputTxt = input.readUTF();
+            _queryTxt = input.readUTF();
+        }
+        ]]></fx:Script>
+</model:QueryTerm>

@@ -1,0 +1,190 @@
+<?xml version="1.0"?>
+<datadriven3dwindow:Dd3dModelMeshPlane xmlns:fx="http://ns.adobe.com/mxml/2009"
+                                       xmlns:datadriven3dwindow="edu.umich.med.mbni.pubanatomy.datadriven3dwindow.*"
+                                       xmlns:as3lib="com.flashflexpro.as3lib.*"
+                                       xmlns:s="library://ns.adobe.com/flex/spark">
+    <fx:Script><![CDATA[
+        import edu.umich.med.mbni.pubanatomy.flash.dto.Dto3DConfig;
+        import edu.umich.med.mbni.pubanatomy.flash.dto.DtoPlane;
+
+        private function planeToPlaneMate( p:Voxel3dPlane ):Voxel3dPlane{
+            if( imageSectionMode == IMG_SECTION_MODE_XYZ
+                    && p.imageSectionMode == IMG_SECTION_MODE_XYZ
+                    && p.projectionDirection >= 0
+                    && p.projectionDirection < 3
+                    && p.projectionDirection != projectionDirection
+                    && planeMateLst.getItemIndex( p ) < 0 ){
+                planeMateLst.addItem( p );
+            }
+            return p;
+        }
+
+        private function removePlaneMate( p:Voxel3dPlane ):void{
+            planeMateLst.removeItem( p );
+        }
+
+        public function getDtoPlane():DtoPlane{
+            var _dtoPlane:DtoPlane;
+            _dtoPlane = new DtoPlane();
+            _dtoPlane.direction = projectionDirection;
+            _dtoPlane.value = projectionPosition;
+            return _dtoPlane;
+        }
+
+        [Bindable(event="sceneChanged")]
+        public function get scene3d():Voxel3dSceneModel{
+            return scene as Voxel3dSceneModel;
+        }
+
+        private function set rfrSz( v:* ):void{
+            scene3d.callInNext.putIn( refreshSize );
+        }
+
+        private function refreshSize():void{
+            var config:Dto3DConfig = scene3d.rootModel3d.config;
+            var min:Array = [
+                config.spaceFromX , config.spaceFromY, config.spaceFromZ
+            ];
+            var max:Array = [
+                config.spaceToX, config.spaceToY, config.spaceToZ
+            ];
+            width = max[horizontalDirection] + min[horizontalDirection ];
+            height = max[verticalDirection] + min[ verticalDirection ];
+        }
+
+        override public function onPlanePointTo3d( p:Point ):Vector3D{
+            if( imageSectionMode == IMG_SECTION_MODE_XYZ ){
+                return super.onPlanePointTo3d( p );
+            }
+            if( image.svgSize == null ){
+                return null;
+            }
+            p.x *= ( image.width / image.svgSize.x );
+            p.y *= ( image.height / image.svgSize.y );
+
+            var unitLen:uint = scene3d.rootModel3d.config.unitLength;
+            var v3:Vector3D = image.point2vector3d( new Point( p.x * unitLen, p.y * unitLen ) );
+            v3.scaleBy( 1 / unitLen );
+            return v3;
+        }
+
+        public function vector3dToPoint( tv:Vector3D ):Point{
+            var rt:Point = image.vector3dToPoint( tv );
+            if( imageSectionMode == IMG_SECTION_MODE_CLIP ){
+                rt.x *= ( image.svgSize.x / image.width  );
+                rt.y *= ( image.svgSize.y / image.height );
+            }
+            return rt;
+        }
+        ]]></fx:Script>
+    <fx:Binding source="projectionDirection" destination="rfrSz"/>
+    <fx:Binding source="scene3d.rootModel3d.config" destination="rfrSz"/>
+    <fx:Declarations>
+        <s:ArrayList id="planeMateLst"/>
+        <as3lib:Sync2Lists
+                source="{( imageSectionMode == IMG_SECTION_MODE_XYZ &amp;&amp; projectionDirection >= 0 )? scene3d.rootModel3d.planeLst : null}"
+                getDestInst="planeToPlaneMate" id="syncPlaneToMates"
+                propertiesReplaceOnUpdate="{[ 'imageSectionMode', 'projectionDirection' ]}"
+                destroyInst="removePlaneMate">
+            <as3lib:destination>
+                <s:ArrayList id="__dummyPlaneMateLst"/>
+            </as3lib:destination>
+        </as3lib:Sync2Lists>
+    </fx:Declarations>
+    <fx:Script><![CDATA[
+        [Bindable]
+        public var image:MDLISHImage;
+
+        import mx.events.PropertyChangeEvent;
+
+        public static const IMG_SECTION_MODE_XYZ:uint = 0;
+        public static const IMG_SECTION_MODE_CLIP:uint = 1;
+        public static const IMG_SECTION_MODE_SVG:uint = 2;
+
+        private var _imageSectionMode:uint = IMG_SECTION_MODE_XYZ;
+
+        [Bindable(event="propertyChange")]
+        public function get imageSectionMode():uint{
+            return _imageSectionMode;
+        }
+
+        public function set imageSectionMode( value:uint ):void{
+            if( value != _imageSectionMode ){
+                var old:uint = _imageSectionMode;
+                _imageSectionMode = value;
+                dispatchEvent( PropertyChangeEvent.createUpdateEvent( this, "imageSectionMode", old, _imageSectionMode ) );
+            }
+        }
+
+        private function set rfrLoadSectionOrSvg( ignoreVar:* ):void{
+            if( image != null ){
+                if( !isNaN( image.svgId ) ){
+                    image.loadSvgImg();
+                    if( _imageSectionMode == IMG_SECTION_MODE_CLIP ){
+                        image.loadSections();
+                    }
+                }
+            }
+        }
+        ]]></fx:Script>
+    <fx:Binding source="image.svgId" destination="rfrLoadSectionOrSvg"/>
+    <fx:Binding source="imageSectionMode" destination="rfrLoadSectionOrSvg"/>
+    <fx:Script><![CDATA[
+        import edu.umich.med.mbni.pubanatomy.atlas.model.MDLISHImage;
+
+        private function set rfrPerspPstn( ignoreVar:* ):void{
+            if( imageSectionMode != IMG_SECTION_MODE_XYZ ){
+                projectionPosition = image.projectionPosition / scene3d.rootModel3d.config.unitLength;
+                setHorizontalTxt( "" );
+                setVerticalTxt( "" );
+            }
+            else{
+                setHorizontalTxt( axisNames[horizontalDirection] );
+                setVerticalTxt( axisNames[ verticalDirection ] );
+            }
+        }
+        ]]></fx:Script>
+    <fx:Binding source="imageSectionMode" destination="rfrPerspPstn"/>
+    <fx:Binding source="image.projectionPosition" destination="rfrPerspPstn"/>
+
+
+    <fx:Declarations>
+        <s:ArrayList id="closestImages"/>
+    </fx:Declarations>
+    <fx:Script><![CDATA[
+        private function set rfrClosestImgs( ignoreVar:* ):void{
+            scene3d.callInNext.putIn( refreshClosestImgs );
+        }
+
+        private function refreshClosestImgs():void{
+            var imgs:Dictionary = scene3d.rootModel3d.rootModelAtlas.findClosestImages( projectionDirection, projectionPosition * scene3d.rootModel3d.config.unitLength );
+
+            closestImages.removeAll();
+            for( var k:* in imgs ){
+                var img:MDLISHImage = imgs[ k ];
+                if( imageSectionMode != IMG_SECTION_MODE_XYZ
+                        && img == image ){
+                    continue;
+                }
+                CONFIG::debugging{
+                    if( img == null ){
+                        throw new Error( this + ".refreshClosestImgs " );
+                    }
+                }
+                closestImages.addItem( img );
+            }
+        }
+
+        public function jumpToImage( img:MDLISHImage ):void{
+            image = img;
+            imageSectionMode = IMG_SECTION_MODE_SVG;
+        }
+        ]]></fx:Script>
+    <fx:Binding source="projectionDirection" destination="rfrClosestImgs"/>
+    <fx:Binding source="projectionPosition" destination="rfrClosestImgs"/>
+    <fx:Binding source="scene3d.rootModel3d.rootModelAtlas.geneDataSetModelList.length"
+                destination="rfrClosestImgs"/>
+    <fx:Binding source="image" destination="rfrClosestImgs"/>
+    <fx:Binding source="imageSectionMode" destination="rfrClosestImgs"/>
+
+</datadriven3dwindow:Dd3dModelMeshPlane>

@@ -1,0 +1,57 @@
+<?xml version="1.0"?>
+<datadriven3dwindow:Dd3dViewMeshBase xmlns:fx="http://ns.adobe.com/mxml/2009"
+                                 xmlns:datadriven3dwindow="edu.umich.med.mbni.pubanatomy.datadriven3dwindow.*">
+
+    <fx:Script><![CDATA[
+        import away3d.primitives.PlaneGeometry;
+
+        [Bindable(event="modelChanged")]
+        public function get modelPlane():Dd3dModelMeshPlane{
+            return model as Dd3dModelMeshPlane;
+        }
+
+        protected var _3dPlane:PlaneGeometry = new PlaneGeometry();
+
+        override public function set model( value:Dd3dModelMeshBase ):void{
+            super.model = value;
+            geometry = _3dPlane;
+        }
+
+        protected function set assPosition( any:* ):void{
+            _3dPlane.yUp = ( modelPlane.projectionDirection != 2 );
+            rotationZ = ( modelPlane.projectionDirection == 0 ? 90 : 0 );
+
+            _3dPlane.width = modelPlane.scaledWidth + modelPlane.margin * 2;
+            _3dPlane.height = modelPlane.scaledHeight + modelPlane.margin * 2;
+
+            var h:Number = _3dPlane.width / 2 - modelPlane.margin;
+            var v:Number = _3dPlane.height / 2 - modelPlane.margin;
+
+            var p:Number = modelPlane.scaledProjectionPosition;
+            //xy or yx
+            if( modelPlane.projectionDirection == 2 ){
+                x = h;
+                y = v;
+                z = p;
+            }
+            else //xz or zx
+            if( modelPlane.projectionDirection == 1 ){
+                x = h;
+                z = v;
+                y = p;
+            }
+            else //yz or zy
+            if( modelPlane.projectionDirection == 0 ){
+                y = h;
+                z = v;
+                x = p;
+            }
+        }
+
+        ]]></fx:Script>
+    <fx:Binding source="modelPlane.projectionDirection" destination="assPosition"/>
+    <fx:Binding source="modelPlane.projectionPosition" destination="assPosition"/>
+    <fx:Binding source="modelPlane.width" destination="assPosition"/>
+    <fx:Binding source="modelPlane.height" destination="assPosition"/>
+
+</datadriven3dwindow:Dd3dViewMeshBase>

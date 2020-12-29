@@ -1,0 +1,109 @@
+<?xml version="1.0"?>
+<as3lib:MxmlEventDispatcher xmlns:fx="http://ns.adobe.com/mxml/2009"
+                            xmlns:as3lib="com.flashflexpro.as3lib.*"
+                            implements="mx.core.IMXMLObject">
+    <fx:Script><![CDATA[
+        import edu.umich.med.mbni.pubanatomy.search.view.SearchViewRecordGridHeaderRenderer;
+
+        import spark.skins.spark.DefaultGridItemRenderer;
+
+        [Bindable]
+        public var searchModel:SearchModel;
+
+        public static const BASE_URL:String = "http://www.nlm.nih.gov/bsd/licensee/elements_descriptions.html";
+
+        public static const type_single_word:String = "single_word";
+        public static const type_number:String = "number";
+        public static const type_date:String = "date";
+        public static const type_sentences:String = "sentences";
+
+        private var _type:String;
+
+        [Bindable]
+        public var citationItemRenderer:IFactory = new ClassFactory(DefaultGridItemRenderer);
+
+        [Bindable]
+        public var citationHeaderRenderer:IFactory = new ClassFactory(SearchViewRecordGridHeaderRenderer);
+
+        [Bindable]
+        public var citationColWidth:uint = 80;
+
+        [Bindable(event="typeChanged")]
+        public function get type():String{
+            return _type;
+        }
+
+        public function set type( value:String ):void{
+            if( value != _type ){
+                _type = value;
+                dispatchEvent( new Event( "typeChanged" ) );
+            }
+
+            CONFIG::debugging{
+                var tmp:String = flash.utils.getQualifiedClassName( this );
+                if( tmp == "edu.umich.med.mbni.pubanatomy.search.model::QueryField" ){
+                    throw new Error( this + ".type I'm abstract!!!" );
+                }
+            }
+        }
+
+        [Bindable]
+        public var sortable:Boolean = false;
+
+
+        private var _label:String;
+        public static const label_CHANGED:String = "labelChanged";
+
+        [Bindable(event="labelChanged")]
+        public function get label():String{
+            return _label == null ? id : _label;
+        }
+
+        public function set label( value:String ):void{
+            if( value != _label ){
+                _label = value;
+                dispatchEvent( new Event( label_CHANGED ) );
+            }
+        }
+
+        private var _toolTip:String;
+
+        [Bindable(event="toolTipChanged")]
+        public function get toolTip():String{
+            return _toolTip == null ? id : _toolTip;
+        }
+
+        public function set toolTip( value:String ):void{
+            if( value != _toolTip ){
+                _toolTip = value;
+                dispatchEvent( new Event( "toolTipChanged" ) );
+            }
+        }
+
+        public function instanciateResultFacet():ResultFacet{
+            throw new Error( "" );
+        }
+
+        public function instanciateTermClass():QueryTerm{
+            throw new Error( "" );
+        }
+
+        private var _queryField:String = null;
+
+
+        [Bindable(event="queryFieldChanged")]
+        public function get queryField():String{
+            return _queryField == null? id:_queryField;
+        }
+
+        public function set queryField( value:String ):void{
+            if( value != _queryField ){
+                _queryField = value;
+                dispatchEvent( new Event( "queryFieldChanged" ) );
+            }
+        }
+        ]]></fx:Script>
+    <fx:Declarations>
+        <fx:String id="url"/>
+    </fx:Declarations>
+</as3lib:MxmlEventDispatcher>

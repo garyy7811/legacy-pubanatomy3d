@@ -1,0 +1,57 @@
+<?xml version="1.0"?>
+<s:GridItemRenderer xmlns:fx="http://ns.adobe.com/mxml/2009"
+                    xmlns:s="library://ns.adobe.com/flex/spark"
+                    width="100%" height="100%">
+    <fx:Script><![CDATA[
+        import spark.components.DataGrid;
+
+        private var _treeGrid:TreeGrid;
+        [Bindable(event="treeGridChanged")]
+        public function get treeGrid():TreeGrid{
+            return _treeGrid;
+        }
+
+        private function set assTreeGrid( g:DataGrid ):void{
+            if( g != _treeGrid ){
+                _treeGrid = g as TreeGrid;
+                dispatchEvent( new Event( "treeGridChanged" ) );
+            }
+        }
+
+        [Bindable(event="treeGridChanged")]
+        private var _treeGridData:TreeGridData;
+        [Bindable(event="treeGridDataChanged")]
+        public function get treeGridData():TreeGridData{
+            return _treeGridData;
+        }
+
+        protected function set assTreeGridData( value:TreeGridData ):void{
+            if( value != _treeGridData ){
+                _treeGridData = value;
+                dispatchEvent( new Event( "treeGridDataChanged" ) );
+            }
+        }
+        ]]></fx:Script>
+    <fx:Binding source="treeGridColumn.treeGrid" destination="assTreeGrid"/>
+    <fx:Binding source="treeGrid.treeGridData" destination="assTreeGridData"/>
+    <fx:Script><![CDATA[
+        [Bindable("columnChanged")]
+        public function get treeGridColumn():TreeGridColumn{
+            return column as TreeGridColumn;
+        }
+
+        private var _treeGridColData:TreeGridDataColumn;
+        [Bindable(event="treeGridColDataChanged")]
+        public function get treeGridColData():TreeGridDataColumn{
+            return _treeGridColData;
+        }
+
+        protected function set assGridColData( value:TreeGridDataColumn ):void{
+            if( value != _treeGridColData ){
+                _treeGridColData = value;
+                dispatchEvent( new Event( "treeGridColDataChanged" ) );
+            }
+        }
+        ]]></fx:Script>
+    <fx:Binding source="treeGridColumn.data" destination="assGridColData"/>
+</s:GridItemRenderer>

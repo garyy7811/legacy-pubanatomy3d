@@ -1,0 +1,112 @@
+<?xml version="1.0"?>
+<rs:RpcSpringMvcGet xmlns:fx="http://ns.adobe.com/mxml/2009"
+            xmlns:rs="edu.umich.med.mbni.pubanatomy.flash.rs.*" path="allen-inst">
+    <fx:Script><![CDATA[
+        import edu.umich.med.mbni.pubanatomy.flash.dto.Dto3DConfig;
+        import edu.umich.med.mbni.pubanatomy.flash.dto.DtoGeneExprAnnotation;
+        import edu.umich.med.mbni.pubanatomy.flash.dto.DtoStructure;
+
+        [Embed(source="../../../../../../../../resources/structureIdToAtlasImgIdArrayEmbeded.amf3", mimeType="application/octet-stream")]
+        private static const structureIdToAtlasImgIdArrayEmbeded:Class;
+
+        private static var structureIdToAtlasImgIdArray:Object;
+
+        [Bindable(event="modelChanged")]
+        public function get atlasModel():RootModelAtlas{
+            return model as RootModelAtlas;
+        }
+
+        override protected function onObjResult( result:* = null ):void{
+            structureIdToAtlasImgIdArray = ( new structureIdToAtlasImgIdArrayEmbeded() as ByteArray ).readObject();
+
+            var rt:Array = result as Array;
+
+            atlasModel.config = rt[ 0 ] as Dto3DConfig;
+            atlasModel.rootStructure = collectChildrenFor( rt[1] as DtoStructure );
+            atlasModel.geneAnnotation = rt[ 2 ] as DtoGeneExprAnnotation;
+            atlasModel.geneAnnotation.initialize();
+
+            CONFIG::debugging{
+                if( atlasModel.rootStructure.dtoStructure.visualModel == null ||
+                        atlasModel.rootStructure.dtoStructure.sectionModel == null ){
+                    throw new Error( this + ".collectChildrenFor " );
+                }
+            }
+            _tmpDic = null;
+        }
+
+        private var _depth:uint = 0;
+
+        private function collectChildrenFor( dtoStructure:DtoStructure ):StructureItem{
+            var structureItem:StructureItem = new StructureItem();
+            CONFIG::debugging{
+                if( dtoStructure.depth != _depth ){
+                    throw new Error( this + ".collectChildrenFor " );
+                }
+            }
+            _depth++;
+            for( var j:int = dtoStructure.children.length - 1; j >= 0; j-- ){
+                var childDtoStructure:DtoStructure = dtoStructure.children.getItemAt( j ) as DtoStructure;
+                //todo: we need a real switch to make invisible structures  useful
+                if( childDtoStructure.visualModel == null || childDtoStructure.sectionModel == null ){
+                    continue;
+                }
+                var item:StructureItem = collectChildrenFor( childDtoStructure );
+                item.parent = structureItem;
+                addChildStructureItem( structureItem, item );
+            }
+            _depth--;
+            structureItem.model = atlasModel;
+            structureItem.dtoStructure = dtoStructure;
+            structureItem.atlasImgIdArr = structureIdToAtlasImgIdArray[ dtoStructure.structureId ] as Array;
+            DtoStructure.structureSymbol2Item[ dtoStructure.acronym.toLowerCase() ] = structureItem;
+            DtoStructure.structureSymbol2ItemDto[ dtoStructure.acronym.toLowerCase() ] = structureItem.dtoStructure;
+            return structureItem;
+        }
+
+        private function addChildStructureItem( structureItem:StructureItem, item:StructureItem ):void{
+            var addingTotl:uint = getTotalChildrenNum( item.dtoStructure );
+            const len:int = structureItem.directChildren.length;
+            if( len > 0 ){
+                for( var i:int = 0; i < len; i++ ){
+                    var child:StructureItem = structureItem.directChildren.getItemAt( i ) as StructureItem;
+                    if( addingTotl > getTotalChildrenNum( child.dtoStructure ) ){
+                        structureItem.directChildren.addItemAt( item, i );
+                        return;
+                    }
+                }
+            }
+            structureItem.directChildren.addItem( item );
+        }
+
+        private var _tmpDic:Dictionary = new Dictionary();
+
+        private function getTotalChildrenNum( dtoOrgan:DtoStructure ):uint{
+            if( _tmpDic[ dtoOrgan ] is uint ){
+                return _tmpDic[ dtoOrgan ];
+            }
+            var rt:uint = dtoOrgan.children.length;
+            for( var j:int = dtoOrgan.children.length - 1; j >= 0; j-- ){
+                rt += getTotalChildrenNum( dtoOrgan.children.getItemAt( j ) as DtoStructure );
+            }
+            _tmpDic[ dtoOrgan ] = rt;
+            return rt;
+        }
+
+        override public function callRemote():Boolean{
+            var ftssn:String;
+            var so:SharedObject = SharedObject.getLocal( "persist" );
+            if( so.data != null ){
+                ftssn = so.data[ "sessionId" ];
+            }
+            if( ftssn == null ){
+                ftssn = model.rootApp.sessionId;
+                so.data[ "sessionId" ] = ftssn;
+                so.flush();
+            }
+            model.log( path + "->" + remoteMethodName + "[" + ftssn + "](" + model.rootApp.stage.loaderInfo.url + ");ss:" + Capabilities.serverString );
+            return super.callRemote();
+        }
+
+        ]]></fx:Script>
+</rs:RpcSpringMvcGet>

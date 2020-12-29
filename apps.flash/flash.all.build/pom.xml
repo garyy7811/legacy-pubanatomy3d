@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>edu.umich.med.mbni</groupId>
+    <artifactId>pubanatomy.module.flash.app.all.build</artifactId>
+    <version>0.1-SNAPSHOT</version>
+    <packaging>pom</packaging>
+
+    <modules>
+
+        <module>../../modules.flash/flash.utils</module>
+
+        <module>../../modules.flash/flash.remote.data.service</module>
+        <module>../../modules.flash/flash.webdesktop</module>
+
+        <module>../../modules.flash/flash.gene.expression.section.mxml</module>
+        <module>../../apps.flash/flash.gene.expression.section.swf.mxml</module>
+
+        <module>../../modules.flash/flash.atlas.mxml</module>
+
+        <module>../../3rd-party/away3d-core-fp11_4_1_0_Alpha</module>
+        <module>../../modules.flash/flash.interface.away3d</module>
+
+        <module>../../modules.flash/flash.voxel.interact.mxml</module>
+        <module>../../apps.flash/flash.voxel.interact.swf.mxml</module>
+
+        <module>../../modules.flash/flash.voxel.section.interact.mxml</module>
+
+        <module>../../modules.flash/flash.search.mxml</module>
+        <module>../../apps.flash/flash.search.swf.mxml</module>
+
+        <module>../../modules.flash/flash.user.mxml</module>
+        <module>../../apps.flash/flash.user.swf.mxml</module>
+
+
+        <module>../../modules.flash/flash.desktop.web.integrate.mxml</module>
+        <module>../../apps.flash/flash.desktop.web.integrate.swf.mxml</module>
+
+        <module>../../modules.flash/flash.desktop.web.integrate.yanggang.mxml</module>
+        <module>../../apps.flash/flash.desktop.web.integrate.yanggang.swf.mxml</module>
+
+        <module>../../modules.flash/flash.oauth.callback.as</module>
+        <module>../../apps.flash/flash.oauth.callback.swf.as</module>
+
+        
+    </modules>
+</project>

@@ -1,0 +1,92 @@
+<?xml version="1.0"?>
+<histogram:ModelLevelHistogram xmlns:fx="http://ns.adobe.com/mxml/2009"
+                               xmlns:histogram="edu.umich.med.mbni.histogram.*"
+                               xmlns:as3lib="com.flashflexpro.as3lib.*" xmlns:s="library://ns.adobe.com/flex/spark">
+    <fx:Binding source="structureTreeGridData.rootModel" destination="rootModel"/>
+    <fx:Script><![CDATA[
+        import edu.umich.med.mbni.pubanatomy.flash.dto.DtoGeneExprLevel;
+        import edu.umich.med.mbni.pubanatomy.flash.dto.DtoVoxelLevel;
+
+        [Bindable(event="rootModelChanged")]
+        public function get atlasModel():RootModelAtlas{
+            return rootModel as RootModelAtlas;
+        }
+
+        [Bindable]
+        public var structureTreeGridData:StructureTreeGridData;
+
+        public function set rfrInput( ignoreVar:* ):void{
+            setBusy( true );
+            rootModel.callInNext.putIn( refreshInput );
+        }
+
+        private function refreshInput():void{
+            try{
+                const dsLstLen:uint = geneColWatchers.length;
+                if( dsLstLen > 0 ){
+                    var gsvLevels:Vector.<Vector.<Number>> = new Vector.<Vector.<Number>>( dsLstLen );
+                    for( var i:int = 0; i < dsLstLen; i++ ){
+                        var geneDs:MDLDataSet = ( geneColWatchers.getItemAt( i ) as HistogramWatchGeneSelectedDataSet ).geneCol.selectedDataSet;
+                        var geneExpr:DtoGeneExprLevel = geneDs.getExprByType( structureTreeGridData.selectedGeneExprType );
+                        var svLevels:Vector.<Number> = new Vector.<Number>();
+                        if( geneExpr != null && geneExpr.structureId2VoxelLevels != null ){
+                            for( var kk:int = structureTreeGridData.inputStructureItems.length - 1; kk >= 0; kk-- ){
+                                var strRow:StructureItem = structureTreeGridData.inputStructureItems[kk] as StructureItem;
+                                var vls:Vector.<DtoVoxelLevel> = geneExpr.structureId2VoxelLevels[ strRow.dtoStructure.structureId ] as
+                                        Vector.<DtoVoxelLevel>;
+                                if( vls != null ){
+                                    for( var pp:int = vls.length - 1; pp >= 0; pp-- ){
+                                        var dtoVoxelLevel:DtoVoxelLevel = vls[pp] as DtoVoxelLevel;
+                                        if( dtoVoxelLevel.voxel.structureId > 0 ){
+                                            svLevels.push( dtoVoxelLevel.level );
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        gsvLevels[ i ] = svLevels;
+                    }
+                    inputLevelArray = gsvLevels;
+                }
+                else{
+                    inputLevelArray = new <Vector.<Number>>[];
+                }
+            }
+            catch( bindingError:Error ){
+                CONFIG::debugging{
+                    trace( this + ":" + bindingError.getStackTrace() );
+                }
+            }
+        }
+
+        public function getColumnByBarIndex( index:int ):StructureTreeGridDataColumnGene{
+            return ( geneColWatchers.getItemAt( index ) as HistogramWatchGeneSelectedDataSet ).geneCol;
+        }
+        ]]></fx:Script>
+    <fx:Binding source="structureTreeGridData.inputStructureItems" destination="rfrInput"/>
+    <fx:Binding source="structureTreeGridData.selectedGeneExprType" destination="rfrInput"/>
+
+    <fx:Script><![CDATA[
+        import edu.umich.med.mbni.treedatagrid.TreeGridDataColumn;
+
+        private function getWatcher( g:TreeGridDataColumn ):HistogramWatchGeneSelectedDataSet{
+            var rt:HistogramWatchGeneSelectedDataSet = new HistogramWatchGeneSelectedDataSet();
+            rt.owner = this;
+            rt.geneCol = g as StructureTreeGridDataColumnGene;
+            return rt;
+        }
+
+        private function destroyWatcher( w:HistogramWatchGeneSelectedDataSet ):void{
+            w.destroy();
+        }
+        ]]></fx:Script>
+
+    <fx:Declarations>
+        <as3lib:Sync2Lists source="{structureTreeGridData.geneColumns}" getDestInst="getWatcher"
+                           destroyInst="destroyWatcher">
+            <as3lib:destination>
+                <s:ArrayList id="geneColWatchers" collectionChange="rfrInput = null;"/>
+            </as3lib:destination>
+        </as3lib:Sync2Lists>
+    </fx:Declarations>
+</histogram:ModelLevelHistogram>

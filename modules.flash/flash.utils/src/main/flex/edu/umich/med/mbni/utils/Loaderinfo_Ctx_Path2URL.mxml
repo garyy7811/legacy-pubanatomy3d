@@ -1,0 +1,101 @@
+<?xml version="1.0"?>
+<as3lib:MxmlEventDispatcher xmlns:as3lib="com.flashflexpro.as3lib.*" xmlns:fx="http://ns.adobe.com/mxml/2009">
+    <fx:Script><![CDATA[
+        private var _path:String;
+        [Bindable(event="amfPathChanged")]
+        public function get path():String{
+            return _path;
+        }
+
+        public function set path( value:String ):void{
+            if( value != _path ){
+                _path = addSlashWhenNeeded( value );
+                dispatchEvent( new Event( "amfPathChanged" ) );
+            }
+        }
+
+        private var _serverContextPath:String;
+        [Bindable(event="serviceContentPathChanged")]
+        public function get serverContextPath():String{
+            return _serverContextPath;
+        }
+
+        public function set serverContextPath( value:String ):void{
+            if( value != _serverContextPath ){
+                _serverContextPath = addSlashWhenNeeded( value );
+                dispatchEvent( new Event( "serviceContentPathChanged" ) );
+            }
+        }
+
+        private function addSlashWhenNeeded( contentpath:String ):String{
+            if( contentpath != null && contentpath.substr( 0, 4 ) != "http" && contentpath.substr( 0, 1 ) != "/" ){
+                contentpath = "/" + contentpath;
+            }
+            return contentpath;
+        }
+
+        private var _url:String;
+        [Bindable(event="amfUrlChanged")]
+        public function get url():String{
+            return _url;
+        }
+
+        private function setUrl( value:String ):void{
+            if( value != _url ){
+                _url = value;
+                dispatchEvent( new Event( "amfUrlChanged" ) );
+            }
+        }
+
+        public function getUrl( loaderInfo:LoaderInfo ):String{
+            var serviceContentUrl:String = null;
+            var arr:Array = loaderInfo.url.split( "//" );
+            if( arr.length > 1 ){
+                var protocal:String = arr[ 0 ] + "//";
+                var url:String = arr[ 1 ];
+                arr = url.split( "/" );
+
+                //look for path by loading url
+                if( serverContextPath == null || serverContextPath.length == 0 ){
+                    arr.pop();
+                    serviceContentUrl = protocal + arr.join( "/" );
+                }
+                //just use it then
+                else{
+                    serviceContentUrl = protocal + arr[ 0 ];
+                    //ROOT
+                    if( serverContextPath.length == 1 ){
+                        CONFIG::debugging{
+                            if( serverContextPath != "/" ){
+                                throw new Error( this + ".refreshInNext what contentpath is this??" );
+                            }
+                        }
+                    }
+                    //NOT ROOT then
+                    else{
+                        CONFIG::debugging{
+                            if( serverContextPath.substr( 0, 1 ) != "/" ){
+                                throw new Error( this + ".refreshInNext what contentpath is this??" );
+                            }
+                        }
+                        serviceContentUrl += serverContextPath;
+                    }
+                }
+            }
+
+            if( path != null ){
+                //this is it then
+                if( path.indexOf( "http" ) == 0 ){
+                    setUrl( path );
+                }
+                //other wise it's loader info + content path
+                else if( serviceContentUrl != null ){
+                    setUrl( serviceContentUrl + path );
+                }
+            }
+
+            return _url;
+        }
+        ]]></fx:Script>
+
+</as3lib:MxmlEventDispatcher>

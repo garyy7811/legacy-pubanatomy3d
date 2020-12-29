@@ -1,0 +1,192 @@
+<?xml version="1.0"?>
+<as3lib:MxmlEventDispatcher xmlns:fx="http://ns.adobe.com/mxml/2009" xmlns:as3lib="com.flashflexpro.as3lib.*"
+                            xmlns:model="edu.umich.med.mbni.pubanatomy.search.model.*"
+                            xmlns:utils="edu.umich.med.mbni.utils.*">
+    <fx:Script><![CDATA[
+
+        [Bindable]
+        public var searchModel:SearchModel;
+
+        [Bindable]
+        public var draggingOverTerm:QueryRelate2Terms;
+
+        private var _mouseOverTerm:QueryRelate2Terms;
+
+        [Bindable(event="mouseOverTermChanged")]
+        public function get mouseOverTerm():QueryRelate2Terms{
+            return _mouseOverTerm;
+        }
+
+        public function set mouseOverTerm( value:QueryRelate2Terms ):void{
+            if( value != _mouseOverTerm ){
+                var oldVal:QueryRelate2Terms = _mouseOverTerm;
+                _mouseOverTerm = value;
+                dispatchEvent( new Event( "mouseOverTermChanged" ) );
+
+                if( ( _mouseOverTerm != null && searchModel.draggingTerm != null )
+                        || ( _mouseOverTerm == null && draggingOverTerm == oldVal ) ){
+                    draggingOverTerm = _mouseOverTerm;
+                }
+            }
+        }
+
+        private function set rfrDragingNullMouseOver( ignoreVar:* ):void{
+            if( searchModel.draggingTerm == null ){
+                mouseOverTerm = null;
+            }
+        }
+        ]]></fx:Script>
+    <fx:Binding source="searchModel.draggingTerm" destination="rfrDragingNullMouseOver"/>
+    <fx:Declarations>
+        <model:Query id="queryModel" queryResult="{this}"/>
+        <model:Result id="resultModel" queryResult="{this}"/>
+    </fx:Declarations>
+    <fx:Script><![CDATA[
+        private var _resultIsDirty:Boolean;
+
+        [Bindable(event="resultIsDirtyChanged")]
+        public function get resultIsDirty():Boolean{
+            return _resultIsDirty;
+        }
+
+        private function setResultIsDirty( value:Boolean ):void{
+            if( value != _resultIsDirty ){
+                _resultIsDirty = value;
+                dispatchEvent( new Event( "resultIsDirtyChanged" ) );
+            }
+        }
+
+        private function set rfrEnableBtn( ignoreVar:* ):void{
+            searchModel.callInNext.putIn( refreshEnableBtn );
+        }
+
+        protected function refreshEnableBtn():void{
+            var rqs:String = null;
+
+            try{
+                rqs = resultModel.query.rootQueryStr;
+            }
+            catch( e:Error ){
+            }
+            CONFIG::debugging{
+                if( queryModel == null || queryModel.rootTerm == null ){
+                    throw new Error( this + ".refreshEnableBtn " );
+                }//debug
+            }
+
+            var qs:String = queryModel.rootQueryStr;
+
+            setResultIsDirty( qs != null && qs != rqs );
+
+            setCanRevert( rqs != null && qs != rqs );
+
+            CONFIG::debugging{
+                trace( ".refreshEnableBtn: rqs:" + rqs + "||||qs=" + qs );
+            }//debug
+        }
+
+        private var _canRevert:Boolean;
+        [Bindable(event="canRevertChanged")]
+        public function get canRevert():Boolean{
+            return _canRevert;
+        }
+
+        private function setCanRevert( value:Boolean ):void{
+            if( value != _canRevert ){
+                _canRevert = value;
+                dispatchEvent( new Event( "canRevertChanged" ) );
+            }
+        }
+        ]]></fx:Script>
+    <fx:Binding source="searchModel.callInNext" destination="rfrEnableBtn"/>
+    <fx:Binding source="queryModel.rootQueryStr" destination="rfrEnableBtn"/>
+    <fx:Binding source="resultModel.query.rootQueryStr" destination="rfrEnableBtn"/>
+    <fx:Script><![CDATA[
+        private static function is2QueryEquals( q1:Query, q2:Query ):Boolean{
+            return q1.rootQueryStr == q2.rootQueryStr;
+        }
+
+        private static function destroyQuery( q:Query ):void{
+            q.destroy();
+        }
+
+        public function sendQuery():void{
+            resultModel.sendQuery( queryModel.clone() );
+            CONFIG::debugging{
+                if( resultModel.query.rootQueryStr == null ){
+                    throw new Error( this + ".sendQuery " );
+                }//debug
+            }
+            history.execute( queryModel.clone() );
+            queryModel.setFocusedOnTerm( null );
+        }
+
+        public function revert():void{
+            if( resultModel != null && resultModel.query != null ){
+                queryModel = resultModel.query.clone();
+            }
+        }
+
+        public function goBack():void{
+            queryModel = history.goBack().clone();
+        }
+
+        public function goForward():void{
+            queryModel = history.goForward().clone();
+        }
+        ]]></fx:Script>
+    <fx:Declarations>
+        <utils:HistoryNavigation id="history"
+                                 is2equals="{is2QueryEquals}"
+                                 destroyIt="{destroyQuery}"
+                />
+    </fx:Declarations>
+    <fx:Script><![CDATA[
+        import spark.components.Alert;
+
+
+        public function onSave(){
+            var b:ByteArray = new ByteArray();
+            b.objectEncoding = ObjectEncoding.AMF3;
+            var tmp:QueryTerm = queryModel.rootTerm.clone();
+            b.writeObject( tmp );
+            b.compress( CompressionAlgorithm.LZMA );
+            var fr:FileReference = new FileReference();
+            fr.save( b );
+        }
+
+        public function onLoad():void{
+            _fr.addEventListener( Event.SELECT, onSelected );
+            _fr.browse()
+        }
+
+        private var _fr:FileReference = new FileReference();
+
+        private function onSelected( ev:Event ):void{
+            _fr.removeEventListener( Event.SELECT, onSelected );
+            _fr.addEventListener( Event.COMPLETE, onLoaded );
+            _fr.load();
+        }
+
+        private function onLoaded( ev:Event ):void{
+            _fr.removeEventListener( Event.COMPLETE, onLoaded );
+            var b:ByteArray = _fr.data;
+            b.objectEncoding = ObjectEncoding.AMF3;
+            try{
+                b.uncompress( CompressionAlgorithm.LZMA );
+                var loadedRootTerm:QueryRelate2Terms = b.readObject();
+            }
+            catch( e:Error ){
+                Alert.show( "Error encountered when reading file!", "Please make sure this file is from Pubanatomy!"  );
+                return;
+            }
+
+            var n:Query = new Query();
+            n.queryResult = queryModel.queryResult;
+            n.rootTerm = loadedRootTerm.clone( n ) as QueryRelate2Terms;
+
+            queryModel = n;
+        }
+
+        ]]></fx:Script>
+</as3lib:MxmlEventDispatcher>

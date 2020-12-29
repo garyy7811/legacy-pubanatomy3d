@@ -1,0 +1,40 @@
+<?xml version="1.0"?>
+<as3lib:MxmlEventDispatcher xmlns:fx="http://ns.adobe.com/mxml/2009" xmlns:as3lib="com.flashflexpro.as3lib.*"
+                            xmlns:s="library://ns.adobe.com/flex/spark">
+    <fx:Script><![CDATA[
+        import edu.umich.med.mbni.pubanatomy.atlas.model.StructureGeneExpr;
+        import edu.umich.med.mbni.pubanatomy.atlas.model.StructureGeneExprTypeDs;
+
+        [Bindable]
+        public var v3dStructure:Voxel3dStructure;
+
+        [Bindable]
+        public var structureGene:StructureGeneExpr;
+
+        private function addTgTo3d( sgt:StructureGeneExprTypeDs ):Voxel3dStructureGeneExprType{
+            var rt:Voxel3dStructureGeneExprType = new Voxel3dStructureGeneExprType();
+            rt.atlasGeneTypeDs = sgt;
+            rt.v3dStructureGeneExpr = this;
+            return rt;
+        }
+
+        private function removeTg( tg:Voxel3dStructureGeneExprType ):void{
+            tg.destroy();
+        }
+
+        public function destroy():void{
+            syncTypeDs2v3d.destroy();
+        }
+        ]]></fx:Script>
+    <fx:Declarations>
+        <as3lib:Sync2Lists id="syncTypeDs2v3d"
+                source="{structureGene.typeDsList}"
+                           getDestInst="addTgTo3d"
+                           destroyInst="removeTg"
+                >
+            <as3lib:destination>
+                <s:ArrayList id="v3dTypeGeneList"/>
+            </as3lib:destination>
+        </as3lib:Sync2Lists>
+    </fx:Declarations>
+</as3lib:MxmlEventDispatcher>

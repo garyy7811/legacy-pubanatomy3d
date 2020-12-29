@@ -1,0 +1,32 @@
+<?xml version="1.0"?>
+<rs:RpcSpringMvcGet xmlns:fx="http://ns.adobe.com/mxml/2009"
+            xmlns:rs="edu.umich.med.mbni.pubanatomy.flash.rs.*"
+            path="allen-inst" singletonByUrl="true">
+    <fx:Script><![CDATA[
+        import edu.umich.med.mbni.pubanatomy.flash.dto.DtoGeneExprLevel;
+
+        override protected function onObjResult( result:* = null ):void{
+            var rslt:DtoGeneExprLevel = result as DtoGeneExprLevel;
+            if( rslt == null ){
+                rslt = new DtoGeneExprLevel();
+                rslt.type = type;
+            }
+            if( rslt.voxelLevels != null ){
+                sectionDataSet.modelGene.model.geneAnnotation.structurizeExpr( rslt );
+            }
+            sectionDataSet.onExprLevel( rslt );
+        }
+
+        [Bindable]
+        public var sectionDataSet:MDLDataSet;
+
+        [Bindable]
+        public var type:String;
+
+        override public function callRemote():Boolean{
+            args = [ sectionDataSet.sectionDataSetId, type ];
+            model.log( path + "->" + remoteMethodName + "->" + args.join(  "," ) );
+            return super.callRemote();
+        }
+        ]]></fx:Script>
+</rs:RpcSpringMvcGet>

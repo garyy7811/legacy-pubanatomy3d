@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<model:ViewSectionPlaneGeneImg xmlns:fx="http://ns.adobe.com/mxml/2009"
+                               xmlns:model="edu.umich.med.mbni.pubanatomy.sectioninteract.model.*">
+    <fx:Script><![CDATA[
+        private function set rfrRect( ignoreVar:* ):void{
+            //todo: section image details
+            //            trace( sectionPlane.clipRect + ">>>" + sectionPlane.viewWidth + ">>>" + sectionImage.width );
+            //            rfrUrl = null;
+        }
+
+        [Bindable]
+        public var loaded:Boolean = false;
+
+        ]]></fx:Script>
+    <fx:Binding source="sectionPlane.clipRect" destination="rfrRect"/>
+    <fx:Binding source="sectionPlane.viewWidth" destination="rfrRect"/>
+    <fx:Binding source="sectionPlane.viewHeight" destination="rfrRect"/>
+    <fx:Binding source="sectionImage.width" destination="rfrRect"/>
+    <fx:Binding source="sectionImage.height" destination="rfrRect"/>
+</model:ViewSectionPlaneGeneImg>

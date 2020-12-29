@@ -1,0 +1,51 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:batch="http://www.springframework.org/schema/batch"
+       xmlns:util="http://www.springframework.org/schema/util"
+       xsi:schemaLocation="
+       http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://www.springframework.org/schema/batch
+       http://www.springframework.org/schema/batch/spring-batch.xsd
+       http://www.springframework.org/schema/util
+       http://www.springframework.org/schema/util/spring-util.xsd
+       ">
+
+    <batch:job id="top5000_stop_words">
+        <batch:step id="top5000">
+            <batch:tasklet>
+                <batch:chunk commit-interval="500">
+                    <batch:reader>
+                        <bean class="org.springframework.batch.item.file.FlatFileItemReader">
+                            <property name="resource"
+                                      value="data/top5000_stop_words.txt"/>
+                            <property name="lineMapper">
+                                <bean class="org.springframework.batch.item.file.mapping.DefaultLineMapper">
+                                    <property name="lineTokenizer">
+                                        <bean class="org.springframework.batch.item.file.transform.DelimitedLineTokenizer">
+                                            <property name="delimiter">
+                                                <util:constant
+                                                        static-field="org.springframework.batch.item.file.transform.DelimitedLineTokenizer.DELIMITER_TAB"/>
+                                            </property>
+                                        </bean>
+                                    </property>
+                                    <property name="fieldSetMapper">
+                                        <bean class="edu.umich.med.mbni.pubanatomy.batch.BatchMapperTop5000"/>
+                                    </property>
+                                </bean>
+                            </property>
+                        </bean>
+                    </batch:reader>
+                    <batch:writer>
+                        <bean class="org.springframework.batch.item.file.FlatFileItemWriter">
+                            <property name="resource" value="file:d:\top5000.txt"/>
+                            <property name="lineAggregator">
+                                <bean class="org.springframework.batch.item.file.transform.PassThroughLineAggregator"/>
+                            </property>
+                        </bean>
+                    </batch:writer>
+                </batch:chunk>
+            </batch:tasklet>
+        </batch:step>
+    </batch:job>
+</beans>

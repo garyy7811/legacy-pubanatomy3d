@@ -1,0 +1,73 @@
+<?xml version="1.0"?>
+<s:BorderContainer xmlns:fx="http://ns.adobe.com/mxml/2009" xmlns:s="library://ns.adobe.com/flex/spark"
+                   xmlns:utils="edu.umich.med.mbni.utils.*" minHeight="2"
+                   borderColor="0x444444" backgroundColor="0x999999" cornerRadius="3"
+                   currentState="sa" creationComplete="rfrState=null;"
+        >
+    <fx:Metadata>
+        [ResourceBundle("TextIntegrate")]
+    </fx:Metadata>
+    <fx:Script><![CDATA[
+        import edu.umich.med.mbni.pubanatomy.integrate.model.MDLIntegrationRootModel;
+
+        [Bindable]
+        public var rootAppModel:MDLIntegrationRootModel;
+
+        private function set rfrState( ignoreVar:* ):void{
+            rootAppModel.callInNext.putIn( refreshState );
+        }
+
+        private function refreshState():void{
+            if( !initialized ){
+                return;
+            }
+            if( !rootAppModel.showAllBrainStructures && !rootAppModel.showMainMedlineSearch ){
+                setCurrentState( 'sa' );
+            }
+            else if( !rootAppModel.showAllBrainStructures ){
+                setCurrentState( 'a' );
+            }
+            else if( !rootAppModel.showMainMedlineSearch ){
+                setCurrentState( 's' );
+            }
+            else{
+                setCurrentState( 'n' );
+            }
+        }
+        ]]></fx:Script>
+    <fx:Binding source="rootAppModel.showAllBrainStructures" destination="rfrState"/>
+    <fx:Binding source="rootAppModel.showMainMedlineSearch" destination="rfrState"/>
+    <s:layout>
+        <s:HorizontalLayout verticalAlign="middle" paddingLeft="3" paddingRight="3"/>
+    </s:layout>
+    <s:states>
+        <s:State name="n"/>
+        <s:State name="s"/>
+        <s:State name="a"/>
+        <s:State name="sa"/>
+    </s:states>
+
+    <s:Button click="rootAppModel.showMainMedlineSearch=true" id="sb"
+              label="{resourceManager.getString( 'TextIntegrate', 'showMainSearchBtnLabel' )}"
+              toolTip="{resourceManager.getString( 'TextIntegrate', 'showMainSearchBtnTip' )}"
+            />
+    <s:Button click="rootAppModel.showAllBrainStructures=true;" id="ab"
+              label="{resourceManager.getString('TextIntegrate','showAllStrBtnLabel')}"
+              toolTip="{resourceManager.getString('TextIntegrate','showAllStrBtnTip')}"
+            />
+    <s:Button label="{resourceManager.getString( 'TextIntegrate', 'popupSearchBtnLabel' )}"
+              toolTip="#t(tpppscABbtn)p#"
+              click="rootAppModel.addNewAllenGeneSearchWin();"/>
+    <s:Button label="{resourceManager.getString( 'TextIntegrate', 'popupNewLitSearchBtnLabel' )}"
+              toolTip="#t(tpppscbtn)p#"
+              click="rootAppModel.addNewSearchWin();"/>
+
+    <s:transitions>
+        <utils:CommonTransition fromState="a" toState="sa" target="{sb}" currentState="{currentState}"/>
+        <utils:CommonTransition fromState="n" toState="s" target="{sb}" currentState="{currentState}"/>
+
+        <utils:CommonTransition fromState="s" toState="sa" target="{ab}" currentState="{currentState}"/>
+        <utils:CommonTransition fromState="n" toState="a" target="{ab}" currentState="{currentState}"/>
+
+    </s:transitions>
+</s:BorderContainer>

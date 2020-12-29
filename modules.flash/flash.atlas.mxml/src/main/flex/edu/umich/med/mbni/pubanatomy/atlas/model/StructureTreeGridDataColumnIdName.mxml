@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<v:TreeGridDataColumnName xmlns:fx="http://ns.adobe.com/mxml/2009"
+                          xmlns:v="edu.umich.med.mbni.treedatagrid.*"
+                          cellDataClass="edu.umich.med.mbni.pubanatomy.atlas.view.StructureTreeGridDataCellIdName"
+        >
+    <fx:Script><![CDATA[
+        [Bindable(event="treeGridDataChanged")]
+        public function get structureTreeGridData():StructureTreeGridData{
+            return _treeGridData as StructureTreeGridData;
+        }
+        ]]></fx:Script>
+</v:TreeGridDataColumnName>

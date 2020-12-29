@@ -1,0 +1,95 @@
+<?xml version="1.0"?>
+<tg:TreeGrid xmlns:fx="http://ns.adobe.com/mxml/2009"
+             xmlns:tg="edu.umich.med.mbni.treedatagrid.*"
+             dragEnter="onDragEnterOverDrop( event );"
+             dragOver="onDragEnterOverDrop( event );"
+             dragDrop="onDragEnterOverDrop( event );"
+             dragExit="onDragEnterOverDrop( event );"
+             variableRowHeight="false" rowHeight="20"
+             minWidth="1"
+        >
+    <fx:Script><![CDATA[
+        import edu.umich.med.mbni.pubanatomy.atlas.model.StructureTreeGridData;
+        import edu.umich.med.mbni.pubanatomy.atlas.model.StructureTreeGridDataColumnGene;
+        import edu.umich.med.mbni.pubanatomy.atlas.model.StructureTreeGridDataColumnIdName;
+        import edu.umich.med.mbni.pubanatomy.atlas.model.StructureTreeGridDataColumnSelection;
+        import edu.umich.med.mbni.pubanatomy.atlas.model.StructureTreeGridDataColumnStrCount;
+        import edu.umich.med.mbni.treedatagrid.TreeGridColumn;
+        import edu.umich.med.mbni.treedatagrid.TreeGridDataColumn;
+        import edu.umich.med.mbni.treedatagrid.TreeGridDataColumnTree;
+
+        import mx.core.UIComponent;
+
+        import mx.events.DragEvent;
+        import mx.managers.DragManager;
+
+        [Bindable(event="treeGridDataChanged")]
+        public function get structureTreeGridDataModel():StructureTreeGridData{
+            return treeGridData as StructureTreeGridData;
+        }
+
+        protected function onDragEnterOverDrop( event:DragEvent ):void{
+            if( event.type == DragEvent.DRAG_ENTER ){
+                if( event.dragInitiator == this && structureTreeGridDataModel.atlasModel.draggingGene == null ){
+                    return;
+                }
+                if( structureTreeGridDataModel.onDragEnter() ){
+                    DragManager.acceptDragDrop( event.target as UIComponent );
+                }
+            }
+            else if( event.type == DragEvent.DRAG_OVER ){
+                DragManager.showFeedback( structureTreeGridDataModel.draggingGene != null ? DragManager.COPY : DragManager.LINK );
+            }
+            else {
+                structureTreeGridDataModel.onDragDone( event.type == DragEvent.DRAG_DROP );
+            }
+        }
+
+        override protected function columnModel2View( m:TreeGridDataColumn ):TreeGridColumn{
+            var rt:TreeGridColumn = super.columnModel2View( m );
+            if( m is StructureTreeGridDataColumnSelection ){
+                rt.headerRenderer = new ClassFactory( StructureTreeGridColumnSelectionHeader );
+                rt.itemRenderer = new ClassFactory( StructureTreeGridColumnSelectionItemRenderer );
+                rt.maxWidth = 55;
+                rt.minWidth = 25;
+                rt.width = 30;
+            }
+            else if( m is TreeGridDataColumnTree ){
+                rt.headerRenderer = new ClassFactory( StructureTreeGridColumnTreeHeader );
+                rt.itemRenderer = new ClassFactory( StructureTreeGridColumnTreeItemRenderer );
+                rt.minWidth = 60;
+                rt.maxWidth = 210;
+                rt.width = 90;
+            }
+            else if( m is StructureTreeGridDataColumnIdName ){
+                rt.headerRenderer = new ClassFactory( StructureTreeGridColumnIdNameHeader );
+                rt.itemRenderer = new ClassFactory( StructureTreeGridColumnIdNameItemRenderer );
+                rt.minWidth = 100;
+                rt.maxWidth = 260;
+                rt.width = 150;
+            }
+            else if( m is StructureTreeGridDataColumnGene ){
+                rt.headerRenderer = new ClassFactory( StructureTreeGridColumnGeneHeader );
+                rt.itemRenderer = new ClassFactory( StructureTreeGridColumnGeneItemRenderer );
+                rt.minWidth= 85;
+                rt.maxWidth = 200;
+                rt.width = 180;
+            }
+            else if( m is StructureTreeGridDataColumnStrCount ){
+                rt.headerRenderer = new ClassFactory( StructureTreeGridColumnStr2CntHeader );
+                rt.itemRenderer = new ClassFactory( StructureTreeGridColumnStr2CntItemRenderer );
+                rt.maxWidth = 160;
+                rt.minWidth = 45;
+                rt.width = 150;
+            }
+            if( structureTreeGridDataModel.draggingGene != null || structureTreeGridDataModel.draggingStructureCount ){
+                treeGridData.rootModel.callInNext.putIn( scrollToRight, this, null, 11 );
+            }
+            return rt;
+        }
+
+        private function scrollToRight():void{
+            grid.horizontalScrollPosition = grid.getCellX( 0, columns.length -1 );
+        }
+        ]]></fx:Script>
+</tg:TreeGrid>

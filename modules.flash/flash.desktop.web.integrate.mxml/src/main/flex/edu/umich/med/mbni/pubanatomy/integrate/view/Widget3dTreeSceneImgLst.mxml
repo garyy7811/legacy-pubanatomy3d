@@ -1,0 +1,215 @@
+<?xml version="1.0"?>
+<wd:TiBoTlePanel xmlns:fx="http://ns.adobe.com/mxml/2009"
+                 xmlns:s="library://ns.adobe.com/flex/spark"
+                 xmlns:wd="edu.umich.med.mbni.webdesktop.*"
+                 xmlns:gv="edu.umich.med.mbni.pubanatomy.atlas.view.*"
+                 xmlns:view2="edu.umich.med.mbni.pubanatomy.integrate.view.*"
+                 borderColor="{treeGrid.selectedGeneColumn.selectedDataSet.color}"
+                 borderWeight="2" minWidth="25" rollOut="_justDropped = false; _btmLabel='';">
+    <fx:Metadata>
+        [ResourceBundle("TextIntegrate")]
+    </fx:Metadata>
+    <wd:titleGroupContent>
+        <s:Label text="{_dataSet.modelGene.dtoGene.acronym + ' > ' + _dataSet.label }" width="100%"
+                 maxDisplayedLines="1"
+                 toolTip="{'gene acronym|^|' + _dataSet.modelGene.dtoGene.acronym + '\r\n'}
+                  {'section dataset id|^|' + _dataSet.sectionDataSetId + '\r\n' }
+                  {'dataset lable(made up name)' + _dataSet.label + '\r\n' }
+                  #t(imglst.title)p#"/>
+        <s:Button skinClass="spark.skins.spark.TitleWindowCloseButtonSkin" click="treeGrid.selectedGeneColumn=null"
+                  top="1" right="1" width="15" height="15"/>
+    </wd:titleGroupContent>
+    <fx:Script><![CDATA[
+        private function set rfrMaxWidth( ignoreVar:* ):void{
+            var tmp:uint = imgLst.maxThumbSize.x + 30;
+            maxWidth = ( tmp > 120 ? tmp : 120 );
+        }
+
+        private function ensureVisibleCell():void{
+            if( _justDropped && draggingOverImg != null && imgLst != null && imgLst.highLightImgs.length > 0 ){
+                imgLst.ensureIndexIsVisible( _dataSet.sectionImageList.getItemIndex( imgLst.highLightImgs.getItemAt( 0 ) ) );
+            }
+        }
+        ]]></fx:Script>
+    <fx:Binding source="imgLst.maxThumbSize" destination="rfrMaxWidth"/>
+    <fx:Binding source="treeGrid.selectedGeneColumn.selectedDataSet" destination="_dataSet"/>
+    <fx:Script><![CDATA[
+        import edu.umich.med.mbni.pubanatomy.atlas.model.MDLDataSet;
+        import edu.umich.med.mbni.pubanatomy.atlas.model.MDLISHImage;
+        import edu.umich.med.mbni.pubanatomy.atlas.model.StructureItem;
+        import edu.umich.med.mbni.pubanatomy.atlas.model.StructureTreeGridData;
+        import edu.umich.med.mbni.pubanatomy.flash.dto.DtoStructure;
+        import edu.umich.med.mbni.utils.RootModelModule;
+
+        import mx.core.UIComponent;
+
+        import mx.events.DragEvent;
+        import mx.managers.DragManager;
+        import mx.resources.ResourceManager;
+
+        [Bindable]
+        private var _dataSet:MDLDataSet;
+
+        [Bindable]
+        public var treeGrid:StructureTreeGridData;
+
+        private function onDragOverEnterDropExit( event:DragEvent ):void{
+            if( event.type == DragEvent.DRAG_ENTER && event.dragInitiator != imgLst ){
+                var tmp:Object = event.dragSource.dataForFormat( RootModelModule.DRAGGING_FORMAT );
+                var sv:Vector.<Object> = tmp as Vector.<Object>;
+                var draggingImg:MDLISHImage = tmp as MDLISHImage;
+                if( sv != null && sv.length == 1 ){
+                    var draggingStructure:DtoStructure = sv[ 0 ] as DtoStructure;
+                    if( draggingStructure != null ){
+                        var si:StructureItem = DtoStructure.structureSymbol2Item[ draggingStructure.acronym.toLowerCase() ];
+                        if( si.atlasImgIdArr != null ){
+                            draggingOverStructure = si;
+                            DragManager.acceptDragDrop( event.target as UIComponent );
+                        }
+                        else{
+                            clear( ResourceManager.getInstance().getString( 'TextIntegrate', 'imglst.tip.drgStrHasNoImg' ) );
+                        }
+                    }
+                    else{
+                        clear( ResourceManager.getInstance().getString( 'TextIntegrate', 'imglst.tip.drgOneStrPlz' ) );
+                    }
+                }
+                else if( draggingImg != null ){
+                    if( draggingImg.modelSectionDs.projectionDir != _dataSet.projectionDir ){
+                        _btmLabel = ResourceManager.getInstance().getString( 'TextIntegrate', 'imglst.tip.drgImgInWrongDir' );
+                    }
+                    else{
+                        draggingOverImg = draggingImg;
+                        DragManager.acceptDragDrop( event.target as UIComponent );
+                    }
+                }
+            }
+            else if( event.type == DragEvent.DRAG_OVER ){
+                if( draggingOverStructure != null ){
+                    DragManager.showFeedback( ( draggingOverStructure != null && draggingOverStructure.atlasImgIdArr != null) ? DragManager.LINK : DragManager.NONE );
+                    if( imgLst.highLightImgs.length > 0 ){
+                        _btmLabel = ResourceManager.getInstance().getString( 'TextIntegrate', 'imglst.tip.nmImgsFoundDropToScrl', [ imgLst.highLightImgs.length ] );
+                    }
+                }
+                else if( draggingOverImg != null ){
+                    DragManager.showFeedback( DragManager.LINK );
+                    if( draggingOverImg.modelSectionDs == _dataSet ){
+                        _btmLabel = ResourceManager.getInstance().getString( 'TextIntegrate', 'imglst.tip.imgFndDrp2scroll2it' );
+                    }
+                    else if( draggingOverImg.modelSectionDs.projectionDir == _dataSet.projectionDir ){
+                        _btmLabel = ResourceManager.getInstance().getString( 'TextIntegrate', 'imglst.tip.Drp2scroll2closest' );
+                    }
+                }
+            }
+            else if( event.type == DragEvent.DRAG_DROP ){
+                _justDropped = true;
+                ensureVisibleCell();
+                _btmLabel = ResourceManager.getInstance().getString( 'TextIntegrate', 'imglst.tip.locked2found' );
+            }
+            else if( event.type == DragEvent.DRAG_EXIT ){
+                clear( "" );
+            }
+        }
+
+        [Bindable]
+        private var _btmLabel:String = "";
+
+        private function clear( s:String ):void{
+            draggingOverStructure = null;
+            draggingOverImg = null;
+            _btmLabel = s;
+        }
+        ]]></fx:Script>
+    <gv:SectionImageList id="imgLst" height="100%" width="100%" treeGrid="{treeGrid}"
+                         dragOver="onDragOverEnterDropExit( event )"
+                         dragEnter="onDragOverEnterDropExit( event )"
+                         dragDrop="onDragOverEnterDropExit( event )"
+                         dragExit="onDragOverEnterDropExit( event )"
+                         resize="ensureVisibleCell();"
+            >
+        <gv:layout>
+            <s:VerticalLayout gap="1" variableRowHeight="true" useVirtualLayout="true" horizontalAlign="center"/>
+        </gv:layout>
+    </gv:SectionImageList>
+    <fx:Script><![CDATA[
+        [Bindable]
+        private var _showPstnTip:Boolean;
+
+        private var _justDropped:Boolean;
+        ]]></fx:Script>
+    <fx:Binding source="
+    _dataSet.modelGene.model.mouseOverImg != null
+    &amp;&amp; _dataSet.modelGene.model.mouseOverImg.modelSectionDs == _dataSet
+    &amp;&amp; getBounds( this ).contains( mouseX, mouseY)
+    " destination="_showPstnTip"/>
+    <wd:botleGroupContent>
+        <view2:Widget3dTreeSceneImgLstBottomCtrls showOrHide="{_showPstnTip}"
+                                                  modelAtlas="{_dataSet.modelGene.model}"/>
+        <s:HGroup width="100%">
+            <s:Label text="{_btmLabel}" width="100%"/>
+            <s:Button click="clear( '' )"
+                      label="{resourceManager.getString( 'TextIntegrate', 'imglst.clearHighLightImgs' )}"
+                      toolTip="{resourceManager.getString( 'TextIntegrate', 'imglst.clearHighLightImgsTooltip' )}"
+                      visible="{imgLst.highLightImgs.length > 0 }"
+                      includeInLayout="{imgLst.highLightImgs.length > 0 }"
+                    />
+        </s:HGroup>
+    </wd:botleGroupContent>
+    <wd:botleGroupLayout>
+        <s:VerticalLayout horizontalAlign="center"/>
+    </wd:botleGroupLayout>
+
+    <fx:Binding source="_dataSet.allImgAtlasSvgIdReady" destination="rfrStructure"/>
+
+    <fx:Script><![CDATA[
+        import mx.collections.ArrayList;
+
+        [Bindable]
+        public var draggingOverStructure:StructureItem;
+
+        [Bindable]
+        public var draggingOverImg:MDLISHImage;
+
+
+        private function set rfrStructure( ignoreVar:* ):void{
+            _dataSet.modelGene.model.callInNext.putIn( refreshStructure );
+        }
+
+        private function refreshStructure():void{
+            var tmp:ArrayList = new ArrayList();
+            if( draggingOverStructure != null ){
+                for( var j:int = _dataSet.sectionImageList.length - 1; j >= 0; j-- ){
+                    var img:MDLISHImage = _dataSet.sectionImageList.getItemAt( j ) as MDLISHImage;
+                    if( draggingOverStructure.atlasImgIdArr.indexOf( img.svgId ) >= 0 ){
+                        tmp.addItem( img );
+                    }
+                }
+            }
+
+            imgLst.highLightImgs = tmp;
+            dispatchEvent( new Event( "highLightImgsChanged" ) );
+        }
+
+        private function set rfrOverImg( ignoreVar:* ):void{
+            _dataSet.modelGene.model.callInNext.putIn( refreshOverImg );
+        }
+
+        private function refreshOverImg():void{
+            var tmp:ArrayList = new ArrayList();
+            if( draggingOverImg != null ){
+                var idx:int = _dataSet.sectionImageList.getItemIndex( draggingOverImg );
+                if( idx < 0 ){
+                    idx = _dataSet.getClosestIndex( draggingOverImg.projectionPosition / _dataSet.modelGene.model.config.unitLength );
+                    tmp.addItem( _dataSet.sectionImageList.getItemAt( idx ) );
+                }
+                else{
+                    tmp.addItem( draggingOverImg )
+                }
+            }
+            imgLst.highLightImgs = tmp;
+            dispatchEvent( new Event( "highLightImgsChanged" ) );
+        }
+        ]]></fx:Script>
+    <fx:Binding source="draggingOverImg" destination="rfrOverImg"/>
+    <fx:Binding source="draggingOverStructure" destination="rfrStructure"/>
+</wd:TiBoTlePanel>

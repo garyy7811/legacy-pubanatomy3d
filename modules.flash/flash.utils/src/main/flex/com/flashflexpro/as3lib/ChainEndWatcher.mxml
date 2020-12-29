@@ -1,0 +1,94 @@
+<?xml version="1.0"?>
+<as3lib:MxmlEventDispatcher xmlns:fx="http://ns.adobe.com/mxml/2009"
+                            xmlns:as3lib="com.flashflexpro.as3lib.*">
+    <fx:Script><![CDATA[
+        private var _eventDispatcher:IEventDispatcher;
+        [Bindable(event="dispatcherChanged")]
+        public function get eventDispatcher():IEventDispatcher{
+            return _eventDispatcher;
+        }
+
+        public function set eventDispatcher( value:IEventDispatcher ):void{
+            if( _eventDispatcher != value ){
+                tryRemoveEventListener();
+                _eventDispatcher = value as IEventDispatcher;
+                tryAddEventListener();
+                dispatchEvent( new Event( "dispatcherChanged" ) );
+            }
+        }
+
+        private var _eventType:String;
+        [Bindable(event="eventTypeChanged")]
+        public function get eventType():String{
+            return _eventType;
+        }
+
+        public function set eventType( value:String ):void{
+            if( value != _eventType ){
+                tryRemoveEventListener();
+                _eventType = value;
+                tryAddEventListener();
+                dispatchEvent( new Event( "eventTypeChanged" ) );
+            }
+        }
+
+        private var _eventHandler:Function;
+        [Bindable(event="eventHandlerChanged")]
+        public function get eventHandler():Function{
+            return _eventHandler;
+        }
+
+        public function set eventHandler( value:Function ):void{
+            if( value != _eventHandler ){
+                tryRemoveEventListener();
+                _eventHandler = value;
+                tryAddEventListener();
+                dispatchEvent( new Event( "eventHandlerChanged" ) );
+            }
+        }
+
+
+        private var _destroyed:Boolean = false;
+
+        public function destroy():void{
+            tryRemoveEventListener();
+            _eventDispatcher = null;
+            _eventType = null;
+            eventHandler = null;
+            _destroyed = true;
+        }
+
+        [Bindable]
+        public var enabled:Boolean = true;
+
+        [Bindable]
+        public var trigerOnReady:Boolean = true;
+
+        private function eventHandleDelegate( ev:Event = null ):void{
+            if( _eventDispatcher == null || eventHandler == null ){
+                CONFIG::debugging{
+                    trace( this + ".eventHandleDelegate, oh this can happend really?!" );
+                }
+                return;
+            }
+            if( enabled ){
+                eventHandler.apply( null, [ ev ] );
+            }
+        }
+
+        private function tryAddEventListener():void{
+            if( _eventDispatcher != null && eventType != null && eventType != "" ){
+                _eventDispatcher.addEventListener( eventType, eventHandleDelegate );
+                if( trigerOnReady ){
+                    eventHandleDelegate();
+                }
+            }
+        }
+
+        private function tryRemoveEventListener():void{
+            if( _eventDispatcher != null && eventType != null && eventType != "" ){
+                _eventDispatcher.removeEventListener( eventType, eventHandleDelegate );
+            }
+        }
+        ]]></fx:Script>
+</as3lib:MxmlEventDispatcher>

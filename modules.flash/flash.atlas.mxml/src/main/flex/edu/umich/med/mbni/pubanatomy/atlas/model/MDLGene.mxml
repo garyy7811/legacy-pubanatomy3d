@@ -1,0 +1,84 @@
+<?xml version="1.0"?>
+<as3lib:MxmlEventDispatcher xmlns:fx="http://ns.adobe.com/mxml/2009"
+                            xmlns:as3lib="com.flashflexpro.as3lib.*" xmlns:s="library://ns.adobe.com/flex/spark">
+    <fx:Script><![CDATA[
+        import edu.umich.med.mbni.pubanatomy.flash.dto.DtoGene;
+
+        import mx.collections.XMLListCollection;
+
+        [Bindable]
+        public var dtoGene:DtoGene;
+
+        private var _rpc:GetGeneSectionDataSetImage;
+
+        private function set rfrSectionDataSet( v:* ):void{
+            refreshDataSetList();
+        }
+
+        public function refreshDataSetList():void{
+            if( xmlDataSets == null && _rpc == null && dtoGene != null ){
+                _rpc = new GetGeneSectionDataSetImage();
+                _rpc.gene = this;
+                _rpc.callRemote();
+            }
+        }
+
+        [Bindable]
+        public var xmlDataSets:XMLListCollection;
+
+        [Bindable]
+        public var model:RootModelAtlas;
+
+        ]]></fx:Script>
+    <fx:Binding source="dtoGene.geneId" destination="rfrSectionDataSet"/>
+    <fx:Script><![CDATA[
+        private function dsXml2Obj( x:XML ):MDLDataSet{
+            var ds:MDLDataSet = new MDLDataSet();
+
+            ds.modelGene = this;
+            ds.sectionDataSetId = x.id;
+            ds.dataSetXml = x;
+
+            model.geneDataSetModelList.addItem( ds );
+
+            return ds;
+        }
+        ]]></fx:Script>
+    <fx:Declarations>
+        <as3lib:Sync2Lists source="{xmlDataSets}" getDestInst="dsXml2Obj">
+            <as3lib:destination>
+                <s:ArrayList id="dataSets"/>
+            </as3lib:destination>
+        </as3lib:Sync2Lists>
+    </fx:Declarations>
+    <fx:Script><![CDATA[
+        public function destroy():void{
+
+            while( dataSets.length > 0 ){
+                var eds:MDLDataSet = dataSets.removeItemAt( 0 ) as MDLDataSet;
+                eds.destroy();
+            }
+        }
+        ]]></fx:Script>
+
+    <fx:Script><![CDATA[
+        [Bindable]
+        public var dataSetLength:uint;
+
+        [Bindable]
+        public var allDsExprAvailReady:Boolean = false;
+
+        public function checkDatasetExprAvail():void{
+            if( dataSets.length < dataSetLength ){
+                return;
+            }
+            for( var j:int = dataSets.length - 1; j >= 0; j-- ){
+                var ds:MDLDataSet = dataSets.getItemAt( j ) as MDLDataSet;
+                if( ds.exprLevelAvail == null ){
+                    return;
+                }
+            }
+            allDsExprAvailReady = true;
+        }
+        ]]></fx:Script>
+</as3lib:MxmlEventDispatcher>

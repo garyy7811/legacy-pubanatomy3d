@@ -1,0 +1,33 @@
+<?xml version="1.0"?>
+<s:HSlider xmlns:fx="http://ns.adobe.com/mxml/2009" xmlns:s="library://ns.adobe.com/flex/spark"
+           liveDragging="true" minimum="{_min}" maximum="{_max}" stepSize="{_step}" snapInterval="{_step}"
+           skinClass="edu.umich.med.mbni.pubanatomy.sectioninteract.view.ViewSectionPlanePerspSliderSkin"
+           focusEnabled="false">
+    <fx:Script><![CDATA[
+        import edu.umich.med.mbni.pubanatomy.voxel3d.model.Voxel3dPlane;
+
+        import mx.core.IDataRenderer;
+
+        [Bindable]
+        public var v3dPlane:Voxel3dPlane;
+
+        [Bindable]
+        protected var _min:int = int.MAX_VALUE;
+
+        [Bindable]
+        protected var _max:int = int.MIN_VALUE;
+
+        [Bindable]
+        protected var _step:uint = 0;
+
+        override protected function updateDataTip( dataTipInstance:IDataRenderer, initialPosition:Point ):void{
+            super.updateDataTip( dataTipInstance, initialPosition );
+            var t:ViewSectionPlanePerspDatatip = dataTipInstance as ViewSectionPlanePerspDatatip;
+            if( t != null ){
+                t.dir = v3dPlane.projectionDirection;
+                t.rootAtlas = v3dPlane.scene3d.rootModel3d.rootModelAtlas;
+                t.value = value;
+            }
+        }
+        ]]></fx:Script>
+</s:HSlider>

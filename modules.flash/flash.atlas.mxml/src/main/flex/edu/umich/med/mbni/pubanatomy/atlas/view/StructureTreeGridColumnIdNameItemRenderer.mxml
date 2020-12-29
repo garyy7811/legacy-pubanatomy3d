@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<v:StructureTreeGridColumnItemRenderer xmlns:fx="http://ns.adobe.com/mxml/2009"
+                                       xmlns:s="library://ns.adobe.com/flex/spark"
+                                       xmlns:v="edu.umich.med.mbni.pubanatomy.atlas.view.*"
+                                       xmlns:mx="library://ns.adobe.com/flex/mx">
+    <fx:Metadata>
+        [ResourceBundle("TextAtlas")]
+    </fx:Metadata>
+    <fx:Script><![CDATA[
+        [Bindable(event="cellDataChanged")]
+        public function get cellDataColIdName():StructureTreeGridDataCellIdName{
+            return cellData as StructureTreeGridDataCellIdName;
+        }
+        ]]></fx:Script>
+    <v:layout>
+        <s:HorizontalLayout gap="0" verticalAlign="middle"/>
+    </v:layout>
+    <mx:Label htmlText="{cellDataColIdName.label}"
+              toolTip="structure name |^|{rowData.name + '\r\n'} #t(msbrnstr0)p#"/>
+</v:StructureTreeGridColumnItemRenderer>

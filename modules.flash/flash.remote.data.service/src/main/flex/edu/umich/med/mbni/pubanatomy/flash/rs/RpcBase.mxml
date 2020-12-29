@@ -1,0 +1,169 @@
+<?xml version="1.0"?>
+<as3lib:MxmlEventDispatcher xmlns:as3lib="com.flashflexpro.as3lib.*" xmlns:fx="http://ns.adobe.com/mxml/2009">
+    <fx:Script><![CDATA[
+        import edu.umich.med.mbni.utils.RootModelModule;
+
+        [Bindable]
+        public var priority:int = 0;
+
+        [Bindable]
+        public var timeout:uint = 15000;
+
+        private var _timeOutStart:int = -1;
+
+        public function checkIfTimeOut():void{
+            if( getTimer() - _timeOutStart > timeout ){
+                onFault( new ErrorEvent( ErrorEvent.ERROR ) );
+            }
+        }
+
+
+        private var _model:RootModelModule;
+
+        [Bindable(event="modelChanged")]
+        public function get model():RootModelModule{
+            return _model;
+        }
+
+        public function set model( value:RootModelModule ):void{
+            if( value != _model ){
+                _model = value;
+                dispatchEvent( new Event( "modelChanged" ) );
+            }
+        }
+
+        protected function onRawResult( result:Object ):void{
+            CONFIG::debugging{
+                var tmp:int = getTimer() - _invoke;
+                trace( this + ".onRawResult: " + tmp );
+            }//debug
+        }
+
+        protected var _lastFault:ErrorEvent;
+        [Bindable(event="lastFaultChanged")]
+        public function get lastFault():ErrorEvent{
+            return _lastFault;
+        }
+
+        protected function onFault( event:ErrorEvent ):void{
+            _lastFault = event;
+            dispatchEvent( new Event( "lastFaultChanged" ) );
+        }
+
+        protected var _urlLoader:URLLoader;
+        [Bindable(event="urlLoaderChanged")]
+        public function get urlLoader():URLLoader{
+            return _urlLoader;
+        }
+
+
+        [Bindable]
+        public var requestHttpMethod:String = URLRequestMethod.POST;
+
+        [Bindable]
+        public var responseDataFormat:String = URLLoaderDataFormat.BINARY;
+
+        [Bindable]
+        public var requestContentType:String = REQUEST_CONTENT_TYPE_AMF;
+
+        public static const REQUEST_CONTENT_TYPE_AMF:String = "application/x-amf";
+
+        public static const REQUEST_CONTENT_TYPE_GET_BY_VARS:String = "application/x-www-form-urlencoded";
+
+        protected var _request:URLRequest;
+
+        protected function getRequestData():Object{
+            throw new Error( "I am abstract!!!" );
+        }
+
+        protected var _invoke:uint;
+
+        public function callRemote():Boolean{
+            _request.contentType = requestContentType;
+            _request.method = requestHttpMethod;
+            _request.data = getRequestData();
+
+            if( _urlLoader == null ){
+                initUrlLoader();
+            }
+            else{
+                _urlLoader.close();
+            }
+            bytesLoaded = -1;
+            bytesTotal = -1;
+            _urlLoader.load( _request );
+
+            _invoke = getTimer();
+
+            _timeOutStart = getTimer();
+            return true;
+        }
+
+
+        private function initUrlLoader():void{
+            _urlLoader = new URLLoader();
+            _urlLoader.dataFormat = responseDataFormat;
+
+            _urlLoader.addEventListener( Event.COMPLETE, onLoaderComplete );
+            _urlLoader.addEventListener( Event.OPEN, onOpen );
+            _urlLoader.addEventListener( ProgressEvent.PROGRESS, onProgress );
+            _urlLoader.addEventListener( SecurityErrorEvent.SECURITY_ERROR, onLoaderError );
+            _urlLoader.addEventListener( IOErrorEvent.IO_ERROR, onLoaderError );
+            dispatchEvent( new Event( "urlLoaderChanged" ) );
+        }
+
+        private function onLoaderError( event:ErrorEvent ):void{
+            onFault( event );
+
+            CONFIG::debugging{
+                var duration:int = getTimer() - _invoke;
+                trace( this + ".onLoaderError->" + getTimer() + ", duration->" + duration );
+            }
+        }
+
+        private function onLoaderComplete( event:Event ):void{
+            bytesTotal = _urlLoader.bytesTotal == 0 ? _urlLoader.data.length : _urlLoader.bytesTotal;
+            bytesLoaded = bytesTotal;
+            onRawResult( _urlLoader.data );
+        }
+
+        [Bindable]
+        public var bytesLoaded:Number = NaN;
+
+        [Bindable]
+        public var bytesTotal:Number = NaN;
+
+        /**
+         * not always happen
+         * @param event
+         */
+        protected function onOpen( event:Event ):void{
+            bytesLoaded = 0;
+            bytesTotal = _urlLoader.bytesTotal;
+            _timeOutStart = getTimer();
+        }
+
+        /**
+         * not always happen
+         * @param event
+         */
+        protected function onProgress( event:ProgressEvent ):void{
+            bytesLoaded = event.bytesLoaded;
+            _timeOutStart = getTimer();
+        }
+
+        public function destroy():void{
+            if( _urlLoader != null ){
+
+                _urlLoader.removeEventListener( Event.COMPLETE, onLoaderComplete );
+                _urlLoader.removeEventListener( Event.OPEN, onOpen );
+                _urlLoader.removeEventListener( ProgressEvent.PROGRESS, onProgress );
+                _urlLoader.removeEventListener( SecurityErrorEvent.SECURITY_ERROR, onLoaderError );
+                _urlLoader.removeEventListener( IOErrorEvent.IO_ERROR, onLoaderError );
+                _urlLoader.close();
+                _urlLoader = null;
+                dispatchEvent( new Event( "urlLoaderChanged" ) );
+            }
+        }
+        ]]></fx:Script>
+</as3lib:MxmlEventDispatcher>

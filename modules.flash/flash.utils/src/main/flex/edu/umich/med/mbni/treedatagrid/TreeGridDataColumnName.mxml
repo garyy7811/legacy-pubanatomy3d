@@ -1,0 +1,53 @@
+<?xml version="1.0"?>
+<v:TreeGridDataColumn xmlns:fx="http://ns.adobe.com/mxml/2009"
+                      xmlns:v="edu.umich.med.mbni.treedatagrid.*"
+        >
+    <fx:Script><![CDATA[
+        override public function compare2RowData( a:TreeGridDataRow, b:TreeGridDataRow ):int{
+            if( a.name > b.name ){
+                return sortDesc ? -1 : 1;
+            }
+            if( a.name < b.name ){
+                return sortDesc ? 1 : -1;
+            }
+            if( next != null ){
+                return next.compare2RowData( a, b );
+            }
+            return 0;
+        }
+
+        override public function isRowMatch( rowData:TreeGridDataRow ):Boolean{
+            var rt:Boolean = ( getTypeMatchIndex( rowData ) >= 0 );
+            if( !rt ){
+                rt = super.isRowMatch( rowData );
+            }
+            return rt;
+        }
+
+        public function getTypeMatchIndex( rowData:TreeGridDataRow ):int{
+            var nm:String = rowData.name;
+            var tp:String = quickFindTyping;
+            CONFIG::debugging{
+                if( nm == null ){
+                    throw new Error( this + ".getRowNameTypingIndex " );
+                }
+            }
+            if( tp == null || tp.length == 0 ){
+                return -1;
+            }
+            return nm.toLowerCase().indexOf( tp.toLowerCase() );
+        }
+
+        [Bindable]
+        public var quickFindTyping:String = "";
+
+        private function set rfrMatching( ignoreVar:* ):void{
+            treeGridData.rootModel.callInNext.putIn( refreshMatching );
+        }
+
+        private function refreshMatching():void{
+            treeGridData.refreshClosedMatches();
+        }
+        ]]></fx:Script>
+    <fx:Binding source="quickFindTyping" destination="rfrMatching"/>
+</v:TreeGridDataColumn>

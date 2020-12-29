@@ -1,0 +1,101 @@
+<?xml version="1.0"?>
+<as3lib:MxmlEventDispatcher xmlns:fx="http://ns.adobe.com/mxml/2009" xmlns:as3lib="com.flashflexpro.as3lib.*">
+    <fx:Script><![CDATA[
+        import mx.utils.StringUtil;
+
+        [Bindable]
+        public var toolTipId:String;
+
+        [Bindable]
+        public var rootModel:MDLIntegrationRootModel;
+
+        private var _editorTip:String;
+        public function get editorTip():String{
+            return _editorTip;
+        }
+
+        public function set editorTip( value:String ):void{
+            _editorTip = value;
+            if( _editorTip != null ){
+
+                var trr:Array = [];
+                var vrr:Array = [];
+
+                var arr:Array = _editorTip.split( "\r\n" );
+                const len:int = arr.length;
+                for( var j:int = 0; j < len; j++ ){
+                    var s:String = StringUtil.trim( arr[j] as String );
+                    if( s.length == 0 ){
+                        continue;
+                    }
+                    var dd:Array = s.split( "|^|" );
+                    trr[ j ] = StringUtil.trim( dd[ 0 ] );
+                    vrr[ j ] = StringUtil.trim( dd[ 1 ] );
+                }
+
+                dynamicTips = trr;
+                dynamicVals = vrr;
+            }
+        }
+
+        [Bindable]
+        public var dynamicVals:Array;
+
+        [Bindable]
+        public var dynamicTips:Array;
+
+
+        [Bindable]
+        public var shortTip:String;
+
+        public function onTipLoaded( s:String ):void{
+            if( s == null && dynamicVals != null ){
+                shortTip = dynamicVals.join( ";" );
+            }
+            else{
+                shortTip = ( s == null ? "" : s );
+            }
+        }
+
+        private function set rfrShortTip( ignoreVar:* ):void{
+            if( rootModel != null && toolTipId != null ){
+                var tmp:MDLTooltipRpc = new MDLTooltipRpc();
+                tmp.tipModel = this;
+                tmp.callRemote();
+            }
+        }
+
+        public static const TOOLTIP_MATCH:RegExp = /#t\(.+\d*\)p#$/;
+        ]]></fx:Script>
+    <fx:Binding source="toolTipId" destination="rfrShortTip"/>
+    <fx:Binding source="rootModel" destination="rfrShortTip"/>
+
+    <fx:Script><![CDATA[
+        [Bindable]
+        public var htmlHelp:String;
+
+        private function set rfrHtmlHelp( html:String ):void{
+            if( shortTip != null && shortTip.length > 3 ){
+                var moreHelpRpc:MDLTooltipHelpRpc = new MDLTooltipHelpRpc();
+                moreHelpRpc.tipModel = this;
+                moreHelpRpc.callRemote();
+            }
+        }
+
+        public function onHtmlHelp( s:String ):void{
+            htmlHelp = ( s == null ? "" : s );
+        }
+        ]]></fx:Script>
+    <fx:Binding source="shortTip" destination="rfrHtmlHelp"/>
+    <fx:Script><![CDATA[
+        [Bindable]
+        public var firstLevelDisplay:String;
+
+        private function set rfrFirstLevelDisplay( v:* ):void{
+            firstLevelDisplay = ( shortTip.length < 3 ) ? ""
+                    : StringUtil.substitute.apply( null, [ shortTip, dynamicVals ] );
+        }
+        ]]></fx:Script>
+    <fx:Binding source="shortTip" destination="rfrFirstLevelDisplay"/>
+    <fx:Binding source="dynamicVals" destination="rfrFirstLevelDisplay"/>
+</as3lib:MxmlEventDispatcher>

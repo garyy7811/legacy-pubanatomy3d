@@ -1,0 +1,162 @@
+<?xml version="1.0"?>
+<datadriven3dwindow:Dd3dModelMeshBase xmlns:fx="http://ns.adobe.com/mxml/2009"
+                                      xmlns:datadriven3dwindow="edu.umich.med.mbni.pubanatomy.datadriven3dwindow.*">
+    <fx:Script><![CDATA[
+        [Bindable]
+        public var width:Number;
+
+        [Bindable]
+        public var height:Number;
+
+        [Bindable]
+        public var thickness:uint = 1;
+
+        {
+            [Bindable]
+            public var projectionDirection:int = -1;
+
+            protected function set refreshDir( v:* ):void{
+                if( projectionDirection > 2 ){
+                    return;
+                }
+                if( projectionDirection == 2 ){
+                    setHorizontalDirection( 0 );
+                    setVerticalDirection( 1 );
+                }
+                else if( projectionDirection == 1 ){
+                    setHorizontalDirection( 0 );
+                    setVerticalDirection( 2 );
+                }
+                else if( projectionDirection == 0 ){
+                    setHorizontalDirection( 1 );
+                    setVerticalDirection( 2 );
+                }
+                setHorizontalTxt( axisNames[horizontalDirection] );
+                setVerticalTxt( axisNames[ verticalDirection ] );
+                setProjectionTxt( axisNames[ projectionDirection ] );
+            }
+
+            private var _horizontalTxt:String;
+            private var _verticalTxt:String;
+            private var _projectionTxt:String;
+
+            public static const projectionTxt_CHANGED:String = "projectionTxtChanged";
+
+            [Bindable(event="projectionTxtChanged")]
+            public function get projectionTxt():String{
+                return _projectionTxt;
+            }
+
+            protected function setProjectionTxt( value:String ):void{
+                if( value != _projectionTxt ){
+                    _projectionTxt = value;
+                    dispatchEvent( new Event( projectionTxt_CHANGED ) );
+                }
+            }
+
+            public static const verticalTxt_CHANGED:String = "verticalTxtChanged";
+
+            [Bindable(event="verticalTxtChanged")]
+            public function get verticalTxt():String{
+                return _verticalTxt;
+            }
+
+            protected function setVerticalTxt( value:String ):void{
+                if( value != _verticalTxt ){
+                    _verticalTxt = value;
+                    dispatchEvent( new Event( verticalTxt_CHANGED ) );
+                }
+            }
+
+            public static const horizontalTxt_CHANGED:String = "horizontalTxtChanged";
+
+            [Bindable(event="horizontalTxtChanged")]
+            public function get horizontalTxt():String{
+                return _horizontalTxt;
+            }
+
+            protected function setHorizontalTxt( value:String ):void{
+                if( value != _horizontalTxt ){
+                    _horizontalTxt = value;
+                    dispatchEvent( new Event( horizontalTxt_CHANGED ) );
+                }
+            }
+        }
+        public static const cutNames:Array = [ "Coronal", "Transverse", "Sagittal" ];
+        public static const axisNames:Array = [ "x", "y", "z" ];
+
+        [Bindable(event="bothSidesChanged")]
+        override public function get bothSides():Boolean{
+            return true;
+        }
+
+        [Bindable]
+        public var scaledWidth:Number;
+
+        [Bindable]
+        public var scaledHeight:Number;
+
+        private function set assScale( v:* ):void{
+            scaledWidth = width * scale;
+            scaledHeight = height * scale;
+            scaledProjectionPosition = projectionPosition * scale;
+        }
+
+        {
+            [Bindable]
+            public var scaledProjectionPosition:Number;
+
+            private var _horizontalDirection:uint;
+            [Bindable(event="horizontalDirectionChanged")]
+            public function get horizontalDirection():uint{
+                return _horizontalDirection;
+            }
+
+            private function setHorizontalDirection( value:uint ):void{
+                if( value != _horizontalDirection ){
+                    _horizontalDirection = value;
+                    dispatchEvent( new Event( "horizontalDirectionChanged" ) );
+                }
+            }
+
+            private var _verticalDirection:uint;
+            [Bindable(event="verticalDirectionChanged")]
+            public function get verticalDirection():uint{
+                return _verticalDirection;
+            }
+
+            private function setVerticalDirection( value:uint ):void{
+                if( value != _verticalDirection ){
+                    _verticalDirection = value;
+                    dispatchEvent( new Event( "verticalDirectionChanged" ) );
+                }
+            }
+        }
+
+        public function onPlanePointTo3d( p:Point ):Vector3D{
+            if( p == null ){
+                return null;
+            }
+            var rt:Vector3D = new Vector3D();
+            rt[ axisNames[ projectionDirection ]] = projectionPosition;
+            rt[ axisNames[ horizontalDirection ]] = p.x;
+            rt[ axisNames[ verticalDirection   ]] = p.y;
+            return rt;
+        }
+
+        ]]>
+	</fx:Script>
+    <fx:Binding source="scale" destination="assScale"/>
+    <fx:Binding source="width" destination="assScale"/>
+    <fx:Binding source="height" destination="assScale"/>
+    <fx:Binding source="projectionPosition" destination="assScale"/>
+
+    <fx:Binding source="projectionDirection" destination="refreshDir"/>
+    <fx:Binding source="projectionPosition" destination="refreshDir"/>
+
+    <fx:Declarations>
+        <fx:uint id="margin">20</fx:uint>
+        <!--Atlas position-->
+        <fx:int id="projectionPosition">100</fx:int>
+    </fx:Declarations>
+</datadriven3dwindow:Dd3dModelMeshBase>

@@ -1,0 +1,89 @@
+<?xml version="1.0"?>
+<view:WebWinBase xmlns:fx="http://ns.adobe.com/mxml/2009"
+                 xmlns:view="edu.umich.med.mbni.pubanatomy.integrate.view.*"
+                 xmlns:s="library://ns.adobe.com/flex/spark">
+    <fx:Script><![CDATA[
+        import edu.umich.med.mbni.pubanatomy.search.model.Result;
+        import edu.umich.med.mbni.pubanatomy.search.model.SearchWithFacet;
+
+
+        [Bindable]
+        private var _request:URLRequest;
+        private function onCall():void{
+            var staticRslt:Result = rootView.rootAppModel.staticQueryResult.resultModel;
+            staticRslt.discardResults();
+            staticRslt.getMoreResults();
+            var rpc:SearchWithFacet = staticRslt.rpc;
+
+            if( rpc.field2offsetLimitPrefixSort != null && rpc.caller.queryResult.resultModel.query.rootQueryStr != null ){
+                _request = new URLRequest( "http://localhost:8086/yanggang-test/api/medline/query.amf" );
+                _request.method = URLRequestMethod.POST;
+                _request.contentType = "application/x-amf";
+
+                var ba:ByteArray = new ByteArray();
+                ba.writeObject( [
+                                    rpc.caller.queryResult.resultModel.query.rootQueryStr,
+                                    rpc.startRow,
+                                    rpc.rowNum,
+                                    rpc.field2offsetLimitPrefixSort,
+                                    null,
+                                    rpc.desc
+                                ] );
+
+                _request.data = ba;
+
+                loader = new URLLoader();
+                configureListeners( loader );
+
+                try{
+                    loader.load( _request );
+                }
+                catch( error:Error ){
+                    trace( "Unable to load requested document." );
+                }
+            }
+            else{
+                _request = null;
+            }
+
+        }
+
+        private var loader:URLLoader;
+
+        private function configureListeners( dispatcher:IEventDispatcher ):void{
+            dispatcher.addEventListener( Event.COMPLETE, completeHandler );
+            dispatcher.addEventListener( Event.OPEN, openHandler );
+            dispatcher.addEventListener( ProgressEvent.PROGRESS, progressHandler );
+            dispatcher.addEventListener( SecurityErrorEvent.SECURITY_ERROR, securityErrorHandler );
+            dispatcher.addEventListener( HTTPStatusEvent.HTTP_STATUS, httpStatusHandler );
+            dispatcher.addEventListener( IOErrorEvent.IO_ERROR, ioErrorHandler );
+        }
+
+        private function completeHandler( event:Event ):void{
+            var loader:URLLoader = URLLoader( event.target );
+            trace( "completeHandler: " + loader.data );
+        }
+
+        private function openHandler( event:Event ):void{
+            trace( "openHandler: " + event );
+        }
+
+        private function progressHandler( event:ProgressEvent ):void{
+            trace( "progressHandler loaded:" + event.bytesLoaded + " total: " + event.bytesTotal );
+        }
+
+        private function securityErrorHandler( event:SecurityErrorEvent ):void{
+            trace( "securityErrorHandler: " + event );
+        }
+
+        private function httpStatusHandler( event:HTTPStatusEvent ):void{
+            trace( "httpStatusHandler: " + event );
+        }
+
+        private function ioErrorHandler( event:IOErrorEvent ):void{
+            trace( "ioErrorHandler: " + event );
+        }
+
+        ]]></fx:Script>
+    <s:Button click="onCall()"/>
+</view:WebWinBase>

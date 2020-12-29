@@ -1,0 +1,78 @@
+<?xml version="1.0"?>
+<as3lib:MxmlEventDispatcher xmlns:fx="http://ns.adobe.com/mxml/2009" xmlns:as3lib="com.flashflexpro.as3lib.*">
+    <fx:Script><![CDATA[
+        [Bindable]
+        public var type:String = "section_image_download";
+
+        [Bindable]
+        public var sectionImage:MDLISHImage;
+
+        [Bindable]
+        public var expression:Boolean;
+
+        [Bindable]
+        public var downSample:int = -1;
+
+        [Bindable]
+        public var quality:uint = 100;
+
+        [Bindable]
+        public var left:uint;
+
+        [Bindable]
+        public var top:uint;
+
+        [Bindable]
+        public var width:uint;
+
+        [Bindable]
+        public var height:uint;
+
+
+        protected function set rfrUrl( ignoreVar:* ):void{
+            if( sectionImage == null || sectionImage.sectionImageId < 0 || downSample <= 0 ){
+                return;
+            }
+            refreshUrl();
+        }
+
+        protected function refreshUrl():void{
+            var tmp:String;
+            if( downSample > 0 ){
+                CONFIG::debugging{
+                    if( left > 0 || top > 0 || width > 0 || height > 0 ){
+                        throw new Error( this + ".GEISectionImageBitmap " );
+                    }
+                }
+                tmp = URL_BASE + type + "/" + sectionImage.sectionImageId + "?expression=" + expression + "&downsample=" + downSample + "&quality=" + quality;
+            }
+            else{
+                if( width == 0 || height == 0 ){
+                    throw new Error( this + ".GEISectionImageBitmap " );
+                }
+                tmp = URL_BASE + type + "/" + sectionImage.sectionImageId + "?expression=" + expression + "&quality=" + quality + "&top=" + top + "&left=" + left + "&width=" + width + "&height=" + height;
+            }
+            if( _url != tmp ){
+                _url = tmp;
+                dispatchEvent( new Event( "urlChanged" ) );
+            }
+        }
+
+        public static const URL_BASE:String = "http://api.brain-map.org/api/v2/";
+
+        private var _url:String;
+        [Bindable(event="urlChanged")]
+        public function get url():String{
+            return _url;
+        }
+        ]]></fx:Script>
+    <fx:Binding source="type" destination="rfrUrl"/>
+    <fx:Binding source="sectionImage.sectionImageId" destination="rfrUrl"/>
+    <fx:Binding source="expression" destination="rfrUrl"/>
+    <fx:Binding source="downSample" destination="rfrUrl"/>
+    <fx:Binding source="quality" destination="rfrUrl"/>
+    <fx:Binding source="left" destination="rfrUrl"/>
+    <fx:Binding source="top" destination="rfrUrl"/>
+    <fx:Binding source="width" destination="rfrUrl"/>
+    <fx:Binding source="height" destination="rfrUrl"/>
+</as3lib:MxmlEventDispatcher>

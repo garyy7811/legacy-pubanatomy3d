@@ -1,0 +1,40 @@
+<?xml version="1.0"?>
+<model:MDLDividableWidget xmlns:fx="http://ns.adobe.com/mxml/2009"
+                            xmlns:model="edu.umich.med.mbni.pubanatomy.integrate.model.*">
+    <fx:Script><![CDATA[
+        import edu.umich.med.mbni.pubanatomy.atlas.model.MDLISHImage;
+        import edu.umich.med.mbni.pubanatomy.sectioninteract.model.ModelSectionPlane;
+        import edu.umich.med.mbni.pubanatomy.voxel3d.model.Voxel3dOperationAddPlaneFromImage;
+
+        public function onDrop( droppingInTarget:MDLDividableWidget, isVer:Boolean, newInFront:Boolean, dragging:Object ):void{
+            var droppingSectionPlane:ModelSectionPlane = dragging as ModelSectionPlane;
+            var img:MDLISHImage = dragging as MDLISHImage;
+            if( img != null ){
+                CONFIG::debugging{
+                    if( droppingSectionPlane != null ){
+                        throw new Error( this + ".onDrop " );
+                    }
+                }
+                var tmp:CMDAddPlaneFromImageIntoWidget = rootApp.instantiate( CMDAddPlaneFromImageIntoWidget ) as CMDAddPlaneFromImageIntoWidget;
+                tmp.rootModel = rootApp.rootModelVoxel3d;
+                tmp.image = img;
+                tmp.execute();
+                droppingSectionPlane = rootApp.rootModelSection2d.syncV3dPlanetoSectionPlane.getDestBySource( tmp.result ) as ModelSectionPlane;
+            }
+            else if( !rootApp.webWinModels.removeItem( droppingSectionPlane ) ){
+                var fromDiv:MDLDividableWidget = getChildBySection( droppingSectionPlane );
+                var bks:Vector.<MDLDividableWidget> = droppingInTarget.getParents();
+                fromDiv.parent.removeChild( fromDiv );
+                bks.push( droppingInTarget );
+                for( var j:int = bks.length - 1; j >= 0; j-- ){
+                    var bk:MDLDividableWidget = bks[ j ] as MDLDividableWidget;
+                    if( bk.modelCamera != null || bk.sectionPlane != null ){
+                        droppingInTarget = bk;
+                        break;
+                    }
+                }
+            }
+            droppingInTarget.duplicate( isVer, newInFront, droppingSectionPlane );
+        }
+        ]]></fx:Script>
+</model:MDLDividableWidget>

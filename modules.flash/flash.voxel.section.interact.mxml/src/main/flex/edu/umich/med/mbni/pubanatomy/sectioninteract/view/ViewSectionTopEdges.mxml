@@ -1,0 +1,46 @@
+<?xml version="1.0"?>
+<mx:UIComponent xmlns:fx="http://ns.adobe.com/mxml/2009"
+                xmlns:mx="library://ns.adobe.com/flex/mx"
+                mouseEnabled="false"
+                resize="rfr=null;">
+    <fx:Script><![CDATA[
+        import edu.umich.med.mbni.pubanatomy.sectioninteract.model.ModelSection2dPlaneStructureEdge;
+        import edu.umich.med.mbni.pubanatomy.sectioninteract.model.ModelSectionPlane;
+
+        [Bindable]
+        public var model:ModelSectionPlane;
+
+        private function set rfr( ignoreVar:* ):void{
+            if( model == null ){
+                return;
+            }
+            graphics.clear();
+
+            if( model.selectedStructureEdges != null ){
+                var selectedEdges:Vector.<IGraphicsData> = new Vector.<IGraphicsData>();
+                for( var j:int = model.selectedStructureEdges.length - 1; j >= 0; j-- ){
+                    var se:ModelSection2dPlaneStructureEdge = model.selectedStructureEdges[j] as ModelSection2dPlaneStructureEdge;
+                    if( se.graphicsEdges == null ){
+                        return;
+                    }
+                    selectedEdges = selectedEdges.concat( se.graphicsEdges );
+                }
+
+                graphics.lineStyle( 3, 0xFFFFFF, 1 );
+                graphics.drawGraphicsData( selectedEdges );
+            }
+
+
+            if( model.mouseOverStructureEdge != null ){
+                graphics.lineStyle( 4, 0x000000, 1 );
+                graphics.drawGraphicsData( model.mouseOverStructureEdge.graphicsEdges );
+            }
+        }
+        ]]></fx:Script>
+    <fx:Binding source="model.mouseOverStructureEdge.edgesShape" destination="rfr"/>
+    <fx:Binding source="model.selectedStructureEdges" destination="rfr"/>
+    <fx:Binding source="model.viewScale" destination="rfr"/>
+    <fx:Binding source="model.dirHor" destination="rfr"/>
+    <fx:Binding source="model.dirVer" destination="rfr"/>
+    <fx:Binding source="model.dirVerBigHor" destination="rfr"/>
+</mx:UIComponent>

@@ -1,0 +1,83 @@
+<?xml version="1.0"?>
+<ww:TiBoTlePanel xmlns:fx="http://ns.adobe.com/mxml/2009"
+                 xmlns:ww="edu.umich.med.mbni.webdesktop.*">
+    <fx:Script><![CDATA[
+        import spark.components.Group;
+
+        private var _parentGroup:WebWinContainer;
+
+        [Bindable(event="parentGroupChanged")]
+        public function get parentGroup():WebWinContainer{
+            return _parentGroup;
+        }
+
+        protected function setParentGroup( value:WebWinContainer ):void{
+            if( value != _parentGroup ){
+                _parentGroup = value;
+                dispatchEvent( new Event( "parentGroupChanged" ) );
+                if( _parentGroup != null ){
+                    maxWidth = _parentGroup.width;
+                    maxHeight = _parentGroup.height;
+                }
+            }
+        }
+
+        [SkinPart(required="true")]
+        public var topGroup:Group;
+
+        override protected function partAdded( partName:String, instance:Object ):void{
+            super.partAdded( partName, instance );
+            if( instance == topGroup ){
+                topGroup.addEventListener( MouseEvent.MOUSE_DOWN, onDragStart );
+            }
+        }
+
+        override protected function partRemoved( partName:String, instance:Object ):void{
+            super.partRemoved( partName, instance );
+            if( instance == topGroup ){
+                topGroup.removeEventListener( MouseEvent.MOUSE_DOWN, onDragStart );
+            }
+        }
+
+        override public function set owner( value:DisplayObjectContainer ):void{
+            super.owner = value;
+            setParentGroup( owner as WebWinContainer );
+        }
+
+        private function onMouseUp( event:MouseEvent ):void{
+            stage.removeEventListener( MouseEvent.MOUSE_MOVE, onMouseMove );
+            stage.removeEventListener( MouseEvent.MOUSE_UP, onMouseUp );
+        }
+
+        protected function onMouseMove( event:MouseEvent ):void{
+            var moveToX:int = _winReg.x + stage.mouseX - _mouseStageReg.x;
+            var moveToY:int = _winReg.y + stage.mouseY - _mouseStageReg.y;
+            if( moveToX + width / 3 < 0 ){
+                moveToX = -width / 3;
+            }
+            else if( moveToX + 2 * width / 3 > parentGroup.width ){
+                moveToX = parentGroup.width - 2 * width / 3;
+            }
+            if( moveToY < 0 ){
+                moveToY = 0;
+            }
+            else if( moveToY + topGroup.height > parentGroup.height ){
+                moveToY = parentGroup.height - topGroup.height;
+            }
+            move( moveToX, moveToY );
+        }
+
+        private var _winReg:Point;
+        private var _mouseStageReg:Point;
+
+        protected function onDragStart( event:MouseEvent ):void{
+            stage.addEventListener( MouseEvent.MOUSE_MOVE, onMouseMove );
+            stage.addEventListener( MouseEvent.MOUSE_UP, onMouseUp );
+            _mouseStageReg = new Point( stage.mouseX, stage.mouseY );
+            _winReg = new Point( x, y );
+        }
+
+        [Bindable]
+        internal var barButton:WebWinBarButton;
+        ]]></fx:Script>
+</ww:TiBoTlePanel>

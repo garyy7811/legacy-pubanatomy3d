@@ -1,0 +1,36 @@
+<?xml version="1.0"?>
+<webdesktop:WebWindow
+        xmlns:fx="http://ns.adobe.com/mxml/2009"
+        xmlns:webdesktop="edu.umich.med.mbni.webdesktop.*"
+        close="onClose();">
+    <fx:Script><![CDATA[
+        import edu.umich.med.mbni.pubanatomy.AppSkin;
+
+        private var _data:Object;
+        [Bindable(event="dataChanged")]
+        public function get data():Object{
+            return _data;
+        }
+
+        public function set data( value:Object ):void{
+            if( value != _data ){
+                _data = value;
+                dispatchEvent( new Event( "dataChanged" ) );
+            }
+        }
+
+        [Bindable]
+        public var rootView:AppSkin;
+
+        protected function onClose():void{
+            CONFIG::debugging{
+                throw new Error( this + ".onClose should change the model to drive this view change! " );
+            }
+        }
+
+        override public function onCloseButtonClicked():void{
+            rootView.rootAppModel.webWinModels.removeItem( data );
+            rootView.setFocus();
+        }
+        ]]></fx:Script>
+</webdesktop:WebWindow>

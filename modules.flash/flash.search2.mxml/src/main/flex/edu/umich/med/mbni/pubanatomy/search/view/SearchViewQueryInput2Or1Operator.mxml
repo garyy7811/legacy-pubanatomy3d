@@ -1,0 +1,48 @@
+<?xml version="1.0"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009"
+         xmlns:s="library://ns.adobe.com/flex/spark"
+         currentState="viewing"
+         stateChangeComplete="callLater(onStateChanged)">
+
+    <fx:Script><![CDATA[
+        import edu.umich.med.mbni.pubanatomy.search.model.QueryRelate2Terms;
+
+        [Bindable]
+        public var model:QueryRelate2Terms;
+
+        private function onStateChanged():void{
+            if( currentState == "editing" ){
+                stage.addEventListener( MouseEvent.MOUSE_DOWN, onMouseDownAnyWhere );
+                lst.setFocus();
+            }
+        }
+
+        private function onMouseDownAnyWhere( event:MouseEvent ):void{
+            currentState = 'viewing';
+            stage.removeEventListener( MouseEvent.MOUSE_DOWN, onMouseDownAnyWhere );
+        }
+        ]]></fx:Script>
+    <s:states>
+        <s:State name="viewing"/>
+        <s:State name="editing"/>
+    </s:states>
+    <s:Label includeIn="viewing" text="{model.operator}"
+             left="{model.isVertical?18:1}"
+             click="setCurrentState( 'editing' );" fontWeight="bold" fontStyle="italic"
+             toolTip="#t(clickToChangeBooleanOperator)p#"/>
+    <s:List includeIn="editing" id="lst" change="model.operator = lst.selectedItem as String;"
+            left="{model.isVertical?18:1}"
+            dataProvider="{QueryRelate2Terms.OPERATORS}" selectedItem="{model.operator}"
+            focusOut="currentState = 'viewing';"
+            horizontalScrollPolicy="off" verticalScrollPolicy="off"
+            width="40" height="55" allowMultipleSelection="false">
+        <s:itemRenderer>
+            <fx:Component>
+                <s:ItemRenderer toolTip="#t(search2termsOperator_{data})p#" width="100%" height="100%">
+                    <s:Label text="{data}" textAlign="center" width="100%" height="100%" fontWeight="bold"
+                             paddingTop="3" paddingBottom="3"/>
+                </s:ItemRenderer>
+            </fx:Component>
+        </s:itemRenderer>
+    </s:List>
+</s:Group>

@@ -1,0 +1,46 @@
+<?xml version="1.0"?>
+<s:ItemRenderer xmlns:fx="http://ns.adobe.com/mxml/2009"
+                xmlns:s="library://ns.adobe.com/flex/spark" width="100%" height="100%">
+
+    <fx:Script><![CDATA[
+        import edu.umich.med.mbni.pubanatomy.atlas.model.StructureItem;
+        import edu.umich.med.mbni.pubanatomy.atlas.model.StructureTreeGridDataRow;
+
+        override public function set data( value:Object ):void{
+            if( data != value ){
+                super.data = value;
+
+                if( data == null ){
+                    return;
+                }
+
+                if( data is StructureItem ){
+                    _structure = data as StructureItem;
+                }
+                else if( data is StructureTreeGridDataRow ){
+                    _row = ( data as StructureTreeGridDataRow );
+                    _structure = _row.structure;
+                }
+            }
+        }
+
+        [Bindable]
+        private var _structure:StructureItem = null;
+
+        [Bindable]
+        private var _row:StructureTreeGridDataRow = null;
+
+        private function onClick():void{
+            if( _row != null ){
+                _row.structureTreeGridData.ensureVisibleRow = _row;
+                _row.structureTreeGridData.selectedItems = new <Object>[ _row ];
+            }
+        }
+        ]]></fx:Script>
+    <s:Label text="{_structure.dtoStructure.depth}" width="100%" height="100%" textAlign="center"
+             mouseDown="event.stopImmediatePropagation()" maxDisplayedLines="1"
+             click="onClick();" color="{_row==null?0xaaaaaa:0x000000}"
+             toolTip="structure name|^|{_structure.dtoStructure.name + '\r\n' }
+             structure acronym|^|{_structure.dtoStructure.acronym + '\r\n'}
+             {_row==null?'#t(strtrclprt0notloaded)p#':'#t(strtrclprt0)p#'}"/>
+</s:ItemRenderer>

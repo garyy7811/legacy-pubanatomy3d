@@ -1,0 +1,61 @@
+<?xml version="1.0"?>
+<im:MDLTempAbaDatasetSearchRpc xmlns:fx="http://ns.adobe.com/mxml/2009"
+                               xmlns:im="edu.umich.med.mbni.pubanatomy.integrate.model.*">
+    <fx:Script><![CDATA[
+        import edu.umich.med.mbni.pubanatomy.atlas.model.StructureItem;
+
+        import mx.collections.IList;
+
+
+        [Bindable]
+        public var coronalOnly:Boolean = false;
+
+
+        override protected function onXMLResult( x:XML ):void{
+            super.onXMLResult( x );
+            var source:XMLList = _result.children()[0].children();
+
+            resultSectionDataSets.removeAll();
+            for( var j:int = source.length() - 1; j >= 0; j-- ){
+                var xg:XML = source[ j ] as XML;
+
+                var vo:MDLTempAllenBrainGeneSearchVO = new MDLTempAllenBrainGeneSearchVO();
+                vo.geneId = xg[ "gene-id" ].toString();
+                vo.geneEntrezId = xg[ "entrez-id" ].toString();
+                vo.geneSymbol = xg[ "gene-symbol" ].toString();
+                vo.geneName = xg[ "gene-name" ].toString();
+                vo.dsPlane = xg['plane-of-section'].toString();
+                vo.dsId = xg.id;
+                resultSectionDataSets.addItem( vo );
+            }
+        }
+
+        protected function structureToIdLst( structureLst:IList, tmp:String = "", threshold:Number = -1 ):String{
+            var strArr:Array = [];
+            var shrArr:Array = threshold>=0?[]:null;
+            if( structureLst.length == 0 ){
+                return "";
+            }
+            for( var j:int = structureLst.length - 1; j >= 0; j-- ){
+                var si:StructureItem = structureLst.getItemAt( j ) as StructureItem;
+                if( si != null ){
+                    strArr.push( si.dtoStructure.structureId );
+                    if( shrArr != null ){
+                        shrArr.push( threshold );
+                    }
+                }
+                else{
+                    structureLst.removeItemAt( j );
+                    return "";
+                }
+            }
+            strArr.sort();
+            var rt:String = "[structures"+ tmp +  "$in" + strArr.join( "," ) + "]";
+            if( shrArr != null ){
+                rt += "[threhold" + tmp + "$in" + shrArr.join( "," ) + "]";
+            }
+            return rt;
+        }
+
+        ]]></fx:Script>
+</im:MDLTempAbaDatasetSearchRpc>

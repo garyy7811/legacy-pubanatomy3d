@@ -1,0 +1,62 @@
+<?xml version="1.0"?>
+<view:StructureTreeGridDataCell xmlns:fx="http://ns.adobe.com/mxml/2009"
+                                xmlns:view="edu.umich.med.mbni.pubanatomy.atlas.view.*">
+    <fx:Script><![CDATA[
+        private function set rfr( ignoreVar:* ):void{
+            row.treeGridData.rootModel.callInNext.putIn( refresh );
+        }
+
+        private function refresh():void{
+            var nm:String = row.name;
+
+            var idx:int = -1;
+            var findTypingToLow:String = colIdName.quickFindTyping;
+            if( findTypingToLow != null && findTypingToLow.length > 0 ){
+                var l:String = nm;
+                idx = l.toLowerCase().indexOf( findTypingToLow.toLowerCase() );
+            }
+            if( idx >= 0 ){
+                var before:String = nm.substring( 0, idx );
+                var after:String = nm.substring( idx + findTypingToLow.length );
+                var match:String = nm.substr( idx, findTypingToLow.length );
+                nm = before + "<font color=\"#FF0000\" >" + match + "</font>" +
+                        after;
+            }
+            if( colIdName.nextFound == row ){
+                nm = "<b>" + nm + "</b>";
+            }
+            if( _mouseOver ){
+                nm = "<font color=\"#0000FF\" ><i>" + nm + "</i></font>"
+            }
+            assLabel = nm;
+        }
+
+        private var _label:String;
+
+        [Bindable(event="labelChanged")]
+        public function get label():String{
+            return _label;
+        }
+
+        protected function set assLabel( value:String ):void{
+            if( value != _label ){
+                _label = value;
+                dispatchEvent( new Event( "labelChanged" ) );
+            }
+        }
+        ]]></fx:Script>
+
+
+    <fx:Binding source="mouseOver" destination="rfr"/>
+    <fx:Binding source="row.name" destination="rfr"/>
+    <fx:Binding source="colIdName.nextFound" destination="rfr"/>
+    <fx:Binding source="colIdName.quickFindTyping" destination="rfr"/>
+    <fx:Script><![CDATA[
+        import edu.umich.med.mbni.pubanatomy.atlas.model.StructureTreeGridDataColumnIdName;
+
+        [Bindable(event="colChanged")]
+        public function get colIdName():StructureTreeGridDataColumnIdName{
+            return col as StructureTreeGridDataColumnIdName;
+        }
+        ]]></fx:Script>
+</view:StructureTreeGridDataCell>

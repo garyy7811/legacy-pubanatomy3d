@@ -1,0 +1,47 @@
+<?xml version="1.0"?>
+<as3lib:MxmlEventDispatcher xmlns:fx="http://ns.adobe.com/mxml/2009" xmlns:as3lib="com.flashflexpro.as3lib.*">
+    <fx:Script><![CDATA[
+        import edu.umich.med.mbni.pubanatomy.voxel3d.model.Voxel3dStructure;
+
+        [Bindable]
+        public var rootModel:RootModelSection2d;
+
+        [Bindable]
+        public var structure3d:Voxel3dStructure;
+
+        [Bindable]
+        public var onSection2d:Boolean = true;
+
+        [Bindable]
+        public var selected:Boolean;
+        ]]></fx:Script>
+    <fx:Binding source="structure3d.selected" destination="selected" twoWay="true"/>
+
+    <fx:Script><![CDATA[
+        private var _textBitMapData:BitmapData;
+
+        [Bindable(event="textBitMapDataChanged")]
+        public function get textBitMapData():BitmapData{
+            return _textBitMapData;
+        }
+
+        protected function setTextBitMapData( value:BitmapData ):void{
+            if( value != _textBitMapData ){
+                _textBitMapData = value;
+                dispatchEvent( new Event( "textBitMapDataChanged" ) );
+            }
+        }
+
+        private function set rfrTxtBt( v:* ):void{
+            if( _textBitMapData == null ){
+                var tf:TextField = new TextField();
+                tf.text = structure3d.atlasStructure.dtoStructure.acronym;
+                var _textBitMap:BitmapData = new BitmapData( tf.textWidth * 1.3, tf.textHeight * 1.2, false, structure3d.atlasStructure.color );
+                _textBitMap.draw( tf );
+                setTextBitMapData( _textBitMap );
+            }
+        }
+        ]]></fx:Script>
+    <fx:Binding source="structure3d.atlasStructure.color" destination="rfrTxtBt"/>
+    <fx:Binding source="structure3d.atlasStructure.dtoStructure.acronym" destination="rfrTxtBt"/>
+</as3lib:MxmlEventDispatcher>

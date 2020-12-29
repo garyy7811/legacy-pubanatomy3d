@@ -1,0 +1,58 @@
+<?xml version="1.0"?>
+<mx:DividedBox xmlns:fx="http://ns.adobe.com/mxml/2009"
+               xmlns:s="library://ns.adobe.com/flex/spark" xmlns:utils="edu.umich.med.mbni.utils.*"
+               direction="horizontal"
+               xmlns:v="edu.umich.med.mbni.pubanatomy.sectioninteract.view.*"
+               dividerSkin="edu.umich.med.mbni.utils.DividerSkin"
+
+               rollOver="onRoll( event );"
+               rollOut="onRoll( event );"
+
+               enabled="{!sectionPlane.loading}" currentState="noTree" xmlns:mx="library://ns.adobe.com/flex/mx">
+    <fx:Script><![CDATA[
+        import edu.umich.med.mbni.pubanatomy.atlas.model.MDLISHImage;
+        import edu.umich.med.mbni.pubanatomy.sectioninteract.model.ModelSectionPlane;
+        import edu.umich.med.mbni.pubanatomy.voxel3d.model.Voxel3dPlane;
+
+        [Bindable]
+        public var sectionPlane:ModelSectionPlane;
+
+        private function onRoll( ev:MouseEvent ):void{
+            if( sectionPlane != null && sectionPlane.v3dPlane.imageSectionMode != Voxel3dPlane.IMG_SECTION_MODE_XYZ ){
+                var tmp:MDLISHImage = null;
+                if( ev.type == MouseEvent.ROLL_OVER ){
+                    tmp = sectionPlane.v3dPlane.image;
+                }
+                sectionPlane.rootModelAtlas.mouseOverImg = tmp;
+            }
+        }
+        ]]></fx:Script>
+    <v:ViewSectionPlaneLeft minWidth="1" width="30%" height="100%" id="treeLeft"
+                            sectionPlane="{sectionPlane}"/>
+    <v:ViewSectionPlaneWithCtrls minWidth="1" width="70%" height="100%" sectionPlane="{sectionPlane}"/>
+    <fx:Script><![CDATA[
+        private function set rfrState( v:* ):void{
+            sectionPlane.rootModelSection2d.callInNext.putIn( refreshState );
+        }
+
+        private function refreshState():void{
+            if( sectionPlane.showSectionTree
+                    && sectionPlane.treeGridData.inputStructureItems != null
+                    && sectionPlane.treeGridData.inputStructureItems.length > 0 ){
+                currentState = "hasTree";
+            }
+            else{
+                currentState = "noTree";
+            }
+        }
+        ]]></fx:Script>
+    <fx:Binding source="sectionPlane.treeGridData.inputStructureItems" destination="rfrState"/>
+    <fx:Binding source="sectionPlane.showSectionTree" destination="rfrState"/>
+    <mx:states>
+        <s:State name="hasTree"/>
+        <s:State name="noTree"/>
+    </mx:states>
+    <mx:transitions>
+        <utils:CommonTransition target="{treeLeft}" fromState="noTree" toState="hasTree"  currentState="{currentState}"/>
+    </mx:transitions>
+</mx:DividedBox>

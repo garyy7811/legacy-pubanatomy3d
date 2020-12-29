@@ -1,0 +1,322 @@
+<?xml version="1.0"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009"
+         xmlns:s="library://ns.adobe.com/flex/spark" xmlns:v="edu.umich.med.mbni.pubanatomy.search.view.*"
+         currentState="tooShort">
+    <fx:Script><![CDATA[
+        import edu.umich.med.mbni.pubanatomy.search.model.QueryFieldT;
+        import edu.umich.med.mbni.pubanatomy.search.model.SearchModel;
+
+        import mx.events.FlexEvent;
+
+        public static const input_CHANGED:String = "inputChanged";
+
+        public function setInput( txt:ViewTermSuggestTextInput, singleWord:Boolean = true ):void{
+            if( _textInputCtrl != null ){
+                _textInputCtrl.removeEventListener( KeyboardEvent.KEY_DOWN, onTextInputKeyDownEarly, true );
+                _textInputCtrl.removeEventListener( KeyboardEvent.KEY_DOWN, onTextInputKeyDown );
+            }
+            _textInputCtrl = txt;
+            if( _textInputCtrl != null ){
+                _textInputCtrl.addEventListener( KeyboardEvent.KEY_DOWN, onTextInputKeyDownEarly, true );
+                _textInputCtrl.addEventListener( KeyboardEvent.KEY_DOWN, onTextInputKeyDown );
+            }
+            else if( containsElement( lst ) ){
+                lst.visible = false;
+                removeElement( lst );
+            }
+
+            _splitting = singleWord;
+            dispatchEvent( new Event( input_CHANGED ) );
+        }
+
+
+        public var _textInputCtrl:ViewTermSuggestTextInput;
+
+        [Bindable(event="inputChanged")]
+        public function get textInputCtrl():ViewTermSuggestTextInput{
+            return _textInputCtrl;
+        }
+
+        private var _splitting:Boolean = false;
+        [Bindable(event="inputChanged")]
+        public function get splitting():Boolean{
+            return _splitting;
+        }
+
+        private function onLstChanged():void{
+            if( lst.selectedItem is ViewTermSuggestCountVO ){
+                textInputCtrl.text = ( lst.selectedItem as ViewTermSuggestCountVO ).term;
+                return;
+            }
+
+            CONFIG::debugging{
+                trace( this + ".onLstChanged: lst.selectedItem:" + lst.selectedItem );
+            }
+        }
+
+        protected function onLstKeyDown( event:KeyboardEvent ):void{
+            if( ( event.keyCode == Keyboard.ENTER || event.keyCode == Keyboard.ESCAPE )
+                    && lst.selectedItem is ViewTermSuggestCountVO ){
+
+                textInputCtrl.setFocus();
+                var newWord:String = ( lst.selectedItem as ViewTermSuggestCountVO ).term;
+                textInputCtrl.text = newWord;
+                if( event.keyCode == Keyboard.ENTER ){
+                    textInputCtrl.selectRange( textInputCtrl.text.length, textInputCtrl.text.length );
+                    textInputCtrl.dispatchEvent( new FlexEvent( FlexEvent.ENTER ) );
+                }
+                else{
+                    var from:int = _beforePrefix.length;
+                    textInputCtrl.selectRange( from + rpcTermList.prefix.length, from + newWord.length );
+                }
+                lst.selectedItem = null;
+            }
+        }
+
+        private function set rfrState( ignoreVar:* ):void{
+            searchModel.callInNext.putIn( refreshState );
+        }
+
+        private function refreshState():void{
+            if( textInputCtrl == null ){
+                return;
+            }
+            var minimalChar:uint = ( textInputCtrl.queryTerm.field as QueryFieldT ).minimalChar;
+            if( Math.min( textInputCtrl.selectionActivePosition, textInputCtrl.selectionAnchorPosition ) < minimalChar ||
+                    _prefix.length < minimalChar ){
+                currentState = 'tooShort';
+            }
+            else{
+                if( rpcTermList.latestCompletingSuggestions != null ){
+                    if( rpcTermList.latestCompletingSuggestions.length > 0 ){
+                        currentState = 'lst';
+                    }
+                    else{
+                        currentState = 'noLuck';
+                    }
+                }
+                else if( rpcTermList.prefixPointingTo is ViewTermSuggestRpc ){
+                    currentState = 'loading';
+                }
+            }
+        }
+
+        private function onListLabel( i:* ):String{
+            var o:ViewTermSuggestCountVO = i as ViewTermSuggestCountVO;
+            if( o != null ){
+                if( o.count > 0 ){
+                    //return _beforePrefix.length > 0 ? o.term : ( o.term + "    ---- about " + o.count + " found" );
+                    return o.term + "    ---- around " + o.count + " found";
+                }
+                return o.term;
+            }
+            return i as String;
+        }
+
+        private function onEnterFrame():void{
+            if( textInputCtrl != null && textInputCtrl.parent != null && stage != null && containsElement( lst ) ){
+                var gp:Point = textInputCtrl.localToGlobal( new Point( 0, 0 ) );
+                gp = globalToLocal( gp );
+                lst.move( gp.x + textInputCtrl.measureText( _beforePrefix ).width + 3, gp.y + textInputCtrl.height + 1 );
+                lst.visible = true;
+            }
+        }
+
+        public static const prefix_CHANGED:String = "prefixChanged";
+        private var _prefix:String;
+        private var _beforePrefix:String;
+
+        [Bindable(event="prefixChanged")]
+        public function get prefix():String{
+            return _prefix;
+        }
+
+        [Bindable(event="prefixChanged")]
+        public function get beforePrefix():String{
+            return _beforePrefix;
+        }
+
+        private function setPrefix( value:String, before:String ):void{
+            CONFIG::debugging{
+                trace( this + ".setPrefix(" + value + "," + before + ")" );
+            }
+            if( value != _prefix ){
+                _prefix = value;
+                _beforePrefix = before;
+                dispatchEvent( new Event( prefix_CHANGED ) );
+            }
+        }
+
+
+        private var a_searchModel:SearchModel;
+
+        private function set rfrPrefix( ignoreVar:* ):void{
+            if( _rollBackActivePosition > 0 ){
+                return;
+            }
+
+            if( textInputCtrl == null ){
+                return;
+            }
+
+            if( textInputCtrl != null && !containsElement( lst ) ){
+                addElement( lst );
+            }
+
+            var splitter:String = " ";// ( rpcTermList.queryTerm.field as QueryFieldT ).termSplitter;
+            if( _splitting && textInputCtrl.text.indexOf( splitter ) == 0 ){
+                textInputCtrl.text = textInputCtrl.text.substr( 1 );
+                return;
+            }
+            textInputCtrl.text = textInputCtrl.text.replace( new RegExp( splitter + splitter, "g" ), splitter );
+
+            var position:int = Math.min( textInputCtrl.selectionActivePosition, textInputCtrl.selectionAnchorPosition );
+            if( position > 0 ){
+                var text:String = textInputCtrl.text;
+                var beforePositionStr:String = text.substring( 0, position );
+                if( !_splitting ){
+                    setPrefix( beforePositionStr, "" );
+                }
+                else{
+                    var beforePositionArr:Array = beforePositionStr.split( splitter );
+                    if( beforePositionArr.length == 0 ){
+                        setPrefix( beforePositionStr, "" );
+                    }
+                    else{
+                        var last:String = beforePositionArr[ beforePositionArr.length - 1 ];
+                        /*
+                         while( last == "" || last == splitter ){
+                         beforePositionArr.pop();
+                         last = beforePositionArr[ beforePositionArr.length - 1 ];
+                         }
+                         */
+                        var p:String = beforePositionArr.pop();
+                        var b:String = beforePositionArr.join( splitter );
+                        setPrefix( p, b.length == 0 ? b : (b + splitter) );
+                    }
+                }
+            }
+            else{
+                CONFIG::debugging{
+                    if( textInputCtrl.selectionActivePosition > 0 && textInputCtrl.selectionAnchorPosition == 0 &&
+                            textInputCtrl.selectionActivePosition == textInputCtrl.text.length ){
+                        trace( "all selected" );
+                    }
+                }
+                //                setPrefix( null, null )
+            }
+
+            if( _prefix != null && _prefix.length > 0 ){
+                rpcTermList.refreshSuggestions( _prefix );
+            }
+
+            if( isNaN( textInputCtrl.percentWidth ) ){
+                try{
+                    var mw:Number = textInputCtrl.measureText( textInputCtrl.text ).width + 5;
+                    textInputCtrl.width = mw > 55 ? mw : 55;
+                }
+                catch( e:Error ){
+                    CONFIG::debugging{
+                        throw e;
+                    }
+                }
+            }
+        }
+
+        private var _rollBackAnchorPosition:int = -1;
+        private var _rollBackActivePosition:int = -1;
+
+        private function onTextInputKeyDownEarly( event:KeyboardEvent ):void{
+            if( ( event.keyCode == Keyboard.DOWN && (
+                    _textInputCtrl.selectionAnchorPosition != _textInputCtrl.text.length ||
+                            _textInputCtrl.selectionActivePosition != _textInputCtrl.text.length
+                    ) )
+
+                    ||
+
+                    ( event.keyCode == Keyboard.UP && (
+                            _textInputCtrl.selectionAnchorPosition != 0 || _textInputCtrl.selectionActivePosition != 0
+                            ) ) ){
+                _rollBackAnchorPosition = _textInputCtrl.selectionAnchorPosition;
+                _rollBackActivePosition = _textInputCtrl.selectionActivePosition;
+                _textInputCtrl.selectRange( _rollBackAnchorPosition, _rollBackActivePosition );
+            }
+        }
+
+        private function onTextInputKeyDown( event:KeyboardEvent ):void{
+            if( event.keyCode == Keyboard.DOWN || event.keyCode == Keyboard.UP ){
+                if( _rollBackAnchorPosition > 0 ){
+                    _textInputCtrl.selectRange( _rollBackAnchorPosition, _rollBackActivePosition );
+                    _rollBackAnchorPosition = -1;
+                    _rollBackActivePosition = -1;
+                }
+
+                if( rpcTermList.latestCompletingSuggestions != null && rpcTermList.latestCompletingSuggestions.length > 0 ){
+                    lst.setFocus();
+                    if( lst.selectedIndex < 0 ){
+                        if( event.keyCode == Keyboard.DOWN ){
+                            lst.selectedIndex = 0;
+                        }
+                        else{
+                            lst.selectedIndex = rpcTermList.latestCompletingSuggestions.length - 1;
+                        }
+                        searchModel.callInNext.putIn( onLstChanged );
+                    }
+                }
+            }
+        }
+
+        [Bindable]
+        public var searchModel:SearchModel;
+        ]]></fx:Script>
+    <fx:Binding source="textInputCtrl.selectionActivePosition" destination="rfrState"/>
+    <fx:Binding source="rpcTermList.latestCompletingSuggestions.length" destination="rfrState"/>
+    <fx:Binding source="rpcTermList.prefixPointingTo" destination="rfrState"/>
+
+    <fx:Binding source="textInputCtrl.selectionAnchorPosition" destination="rfrPrefix"/>
+    <fx:Binding source="textInputCtrl.selectionActivePosition" destination="rfrPrefix"/>
+
+    <s:states>
+        <s:State name="tooShort"/>
+        <s:State name="loading"/>
+        <s:State name="noLuck"/>
+        <s:State name="lst"/>
+    </s:states>
+    <fx:Declarations>
+        <v:ViewTermSuggestModel id="rpcTermList" searchModel="{searchModel}" queryTerm="{textInputCtrl.queryTerm}"/>
+        <s:ArrayList id="tooShort">
+            <fx:String>Input to see suggestions</fx:String>
+        </s:ArrayList>
+        <s:ArrayList id="loading">
+            <fx:String>Loading ...</fx:String>
+        </s:ArrayList>
+        <s:ArrayList id="noLuck">
+            <fx:String>No record found</fx:String>
+        </s:ArrayList>
+        <v:ViewTermSuggestList id="lst" visible="false"
+                               allowMultipleSelection="false"
+
+                               dataProvider.lst="{rpcTermList.latestCompletingSuggestions}"
+                               dataProvider.tooShort="{tooShort}"
+                               dataProvider.loading="{loading}"
+                               dataProvider.noLuck="{noLuck}"
+
+                               mouseEnabled.lst="true"
+                               mouseEnabled.tooShort="false"
+                               mouseEnabled.loading="false"
+                               mouseEnabled.noLuck="false"
+
+                               focusEnabled.lst="true"
+                               focusEnabled.tooShort="false"
+                               focusEnabled.loading="false"
+                               focusEnabled.noLuck="false"
+
+                               labelFunction="onListLabel"
+                               enterFrame="onEnterFrame();"
+
+                               change.lst="onLstChanged();"
+                               keyDown.lst="onLstKeyDown( event )"
+
+                />
+    </fx:Declarations>
+</s:Group>

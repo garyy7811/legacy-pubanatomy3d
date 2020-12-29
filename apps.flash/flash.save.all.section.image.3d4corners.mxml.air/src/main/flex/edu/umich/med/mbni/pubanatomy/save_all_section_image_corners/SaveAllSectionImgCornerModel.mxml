@@ -1,0 +1,98 @@
+<?xml version="1.0"?>
+<model:RootModelAtlas xmlns:fx="http://ns.adobe.com/mxml/2009"
+                              xmlns:s="library://ns.adobe.com/flex/spark"
+                              xmlns:model="edu.umich.med.mbni.pubanatomy.atlas.model.*">
+    <fx:Script><![CDATA[
+        import edu.umich.med.mbni.pubanatomy.flash.dto.DtoGene;
+
+
+        [Bindable]
+        public var concurrentNum:uint = 3;
+
+        public function onEnterFrame():void{
+            if( waiting.length > 0 && working.length < concurrentNum ){
+                var geneImageWorker:GeneImageWorker = waiting.removeItemAt( 0 ) as GeneImageWorker;
+
+                for( var j:int = geneDtoList.length - 1; j >= 0; j-- ){
+                    var exDto:DtoGene = geneDtoList.getItemAt( j ) as DtoGene;
+                    if( exDto.geneId == geneImageWorker.dtoGene.geneId ){
+                        return;
+                    }
+                }
+
+                working.addItem( geneImageWorker );
+                geneImageWorker.start();
+                return;
+            }
+
+            if( _result != null && waiting.length == 0 && working.length == 0 ){
+                _result.addEventListener( Event.CLOSE, done );
+                _result.close();
+            }
+
+
+            if( chkWaiting.length > 0 && chkWorking.length < concurrentNum*3 ){
+                ( chkWaiting.removeItemAt( 0 ) as CheckSectionImgAvailInAtlas ).start();
+            }
+        }
+
+        private function done( ev:Event ):void{
+            trace( ev );
+        }
+
+        private var _result:FileStream;
+
+        private var _dic:Dictionary = new Dictionary();
+
+        public function onImageCorners( sectionImageId:uint, lr:Vector3D, rt:Vector3D, rb:Vector3D, lb:Vector3D ):void{
+            if( _dic[ sectionImageId ] != undefined ){
+                return;
+            }
+            if( _result == null ){
+                _result = new FileStream();
+                _result.openAsync( File.desktopDirectory.resolvePath( "section.img.3d.4corners/result.txt" ), FileMode.WRITE );
+            }
+            _result.writeUTFBytes( sectionImageId + "|" + lr + "|" + rt + "|" + rb + "|" + lb + "\r\n" );
+            _dic[ sectionImageId ] = 1;
+        }
+
+        [Embed(source="/atlas1And2.txt", mimeType="application/octet-stream")]
+        [Bindable]
+        private var atlas1And2Imgs:Class;
+
+        public function initAtlasImgs():void{
+            var ba:ByteArray = new atlas1And2Imgs();
+            var tst:String = ba.readUTFBytes( ba.length );
+            var lines:Array = tst.split( "\r\n" );
+
+            for( var j:int = lines.length - 1; j >= 0; j-- ){
+                var line:String = lines[j] as String;
+                _lines.push( line );
+            }
+        }
+
+        private var _lines:Vector.<String> = new Vector.<String>();
+
+        public function onAtlasId( s:String ):void{
+            if( _lines.length == 0 ){
+                initAtlasImgs();
+            }
+
+            for( var j:int = _lines.length - 1; j >= 0; j-- ){
+                var l:String = _lines[j] as String;
+                if( l.indexOf( s + "|" ) == 0 ){
+                    trace( "found->" + s );
+                    return;
+                }
+            }
+            trace( "not found" + s );
+        }
+        ]]></fx:Script>
+
+    <fx:Declarations>
+        <s:ArrayList id="waiting"/>
+        <s:ArrayList id="working"/>
+        <s:ArrayList id="chkWaiting"/>
+        <s:ArrayList id="chkWorking"/>
+    </fx:Declarations>
+</model:RootModelAtlas>

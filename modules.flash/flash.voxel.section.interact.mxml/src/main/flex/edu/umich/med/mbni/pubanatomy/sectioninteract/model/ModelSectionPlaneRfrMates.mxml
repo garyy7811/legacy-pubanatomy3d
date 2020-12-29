@@ -1,0 +1,148 @@
+<?xml version="1.0"?>
+<as3lib:MxmlEventDispatcher xmlns:fx="http://ns.adobe.com/mxml/2009" xmlns:as3lib="com.flashflexpro.as3lib.*"
+                            xmlns:s="library://ns.adobe.com/flex/spark"
+                            xmlns:free2dcoror="edu.umich.med.mbni.free2dcoror.*"
+                            xmlns:model="edu.umich.med.mbni.pubanatomy.sectioninteract.model.*">
+    <fx:Binding source="rootModelSection2d.rootModelVoxel3d.rootModelAtlas" destination="rootModelAtlas"/>
+    <fx:Script><![CDATA[
+        import edu.umich.med.mbni.pubanatomy.atlas.model.RootModelAtlas;
+        import edu.umich.med.mbni.pubanatomy.voxel3d.model.Voxel3dPlane;
+
+        [Bindable]
+        public var onSection2d:Boolean = true;
+
+        [Bindable]
+        public var v3dPlane:Voxel3dPlane;
+
+        [Bindable]
+        public var rootModelSection2d:RootModelSection2d;
+
+        [Bindable]
+        public var rootModelAtlas:RootModelAtlas;
+
+        public function destroy():void{
+            on2dStageMates.removeAll();
+            imgFull = null;
+            imgDetail = null;
+        }
+
+        private function v3dMateTo2dMate( v3d:Voxel3dPlane ):ModelSectionPlane{
+            var sp:ModelSectionPlane = rootModelSection2d.syncV3dPlanetoSectionPlane.getDestBySource( v3d ) as ModelSectionPlane;
+            if( sp.onSection2d && on2dStageMates.getItemIndex( sp ) < 0 ){
+                on2dStageMates.addItem( sp );
+            }
+            return sp;
+        }
+
+        private function remove2dMate( s2d:ModelSectionPlane ):void{
+            on2dStageMates.removeItem( s2d );
+        }
+        ]]></fx:Script>
+    <fx:Declarations>
+        <as3lib:Sync2Lists source="{v3dPlane.planeMateLst}"
+                           propertiesReplaceOnUpdate="{['onSection2d']}"
+                           getDestInst="v3dMateTo2dMate" destroyInst="remove2dMate">
+            <as3lib:destination>
+                <s:ArrayList id="__dummyOn2dStageMates"/>
+            </as3lib:destination>
+        </as3lib:Sync2Lists>
+        <s:ArrayList id="on2dStageMates"/>
+    </fx:Declarations>
+
+    <fx:Script><![CDATA[
+        [Bindable]
+        public var userScale:Number = 1;
+
+        [Bindable]
+        public var viewScale:Number;
+
+        public function model2view( modelPoint:Point ):Point{
+            var rt:Point = corMapMtrx.matrix.transformPoint( modelPoint );
+            return new Point( rt.x * viewScale, rt.y * viewScale );
+
+        }
+
+        public function view2model( pointOfView:Point ):Point{
+            return corMapMtrx.revMtrx.transformPoint( new Point( pointOfView.x / viewScale, pointOfView.y / viewScale ) );
+        }
+
+        [Bindable]
+        public var clipRect:Rectangle;
+
+        [Bindable]
+        public var loadingRatio:Number;
+
+        ]]></fx:Script>
+    <fx:Binding source="rootModelSection2d.rootModelVoxel3d.config.scaleSection*userScale" destination="viewScale"/>
+    <fx:Declarations>
+        <free2dcoror:FreeCorordinateMatrix id="corMapMtrx"
+                                           dirHorizontal="{dirHor}"
+                                           dirVertical="{dirVer}"
+                                           verBiggerThanHor="{dirVerBigHor}"
+                                           planeWidth="{v3dPlane.width}"
+                                           planeHeight="{v3dPlane.height}"/>
+        <!--v dir value normally bigger than h dir value-->
+        <fx:Boolean id="dirVerBigHor">true</fx:Boolean>
+        <fx:Boolean id="dirHor">true</fx:Boolean>
+        <fx:Boolean id="dirVer">true</fx:Boolean>
+
+        <fx:uint id="lineColor">0x000000</fx:uint>
+        <fx:uint id="lineWeight">0x000000</fx:uint>
+
+        <fx:uint id="textColor">0xFFFFFF</fx:uint>
+        <fx:String id="verTxt">v</fx:String>
+        <fx:String id="horTxt">h</fx:String>
+        <fx:String id="cornerTxt">c:p</fx:String>
+
+        <model:ViewSectionPlaneGeneImg id="imgFull" sectionPlane="{this as ModelSectionPlane}" downSample="3"/>
+        <model:ViewSectionPlaneGeneImgDetail id="imgDetail" sectionPlane="{imgFull.sectionPlane}"/>
+    </fx:Declarations>
+
+    <fx:Script><![CDATA[
+        private function set rfrDir( ignoreVar:* ):void{
+            rootModelSection2d.callInNext.putIn( refreshDir );
+        }
+
+        private function refreshDir():void{
+            var wm:Number;
+            var hm:Number;
+            if( v3dPlane.imageSectionMode != Voxel3dPlane.IMG_SECTION_MODE_XYZ ){
+                var ul:int = rootModelSection2d.rootModelVoxel3d.config.unitLength;
+                if( v3dPlane.image.svgSize != null ){
+                    wm = v3dPlane.image.svgSize.x / ul;
+                    hm = v3dPlane.image.svgSize.y / ul;
+                }
+                else{
+                    wm = v3dPlane.image.width / ul;
+                    hm = v3dPlane.image.height / ul;
+                }
+            }
+            else{
+                wm = v3dPlane.scaledWidth;
+                hm = v3dPlane.scaledHeight;
+            }
+
+            wm *= userScale;
+            hm *= userScale;
+
+            viewWidth = dirVerBigHor ? wm : hm;
+            viewHeight = dirVerBigHor ? hm : wm;
+        }
+
+        [Bindable]
+        public var viewWidth:uint;
+        [Bindable]
+        public var viewHeight:uint;
+        ]]></fx:Script>
+
+    <fx:Binding source="dirHor" destination="rfrDir"/>
+    <fx:Binding source="dirVer" destination="rfrDir"/>
+    <fx:Binding source="dirVerBigHor" destination="rfrDir"/>
+    <fx:Binding source="v3dPlane.scaledWidth" destination="rfrDir"/>
+    <fx:Binding source="v3dPlane.scaledHeight" destination="rfrDir"/>
+    <fx:Binding source="v3dPlane.imageSectionMode" destination="rfrDir"/>
+    <fx:Binding source="v3dPlane.image.width" destination="rfrDir"/>
+    <fx:Binding source="v3dPlane.image.height" destination="rfrDir"/>
+    <fx:Binding source="v3dPlane.image.svgImg" destination="rfrDir"/>
+    <fx:Binding source="userScale" destination="rfrDir"/>
+</as3lib:MxmlEventDispatcher>

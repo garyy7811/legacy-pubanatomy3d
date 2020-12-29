@@ -1,0 +1,123 @@
+<?xml version="1.0"?>
+<as3lib:MxmlEventDispatcher xmlns:fx="http://ns.adobe.com/mxml/2009" xmlns:as3lib="com.flashflexpro.as3lib.*">
+    <fx:Script><![CDATA[
+        import mx.events.PropertyChangeEvent;
+
+        public static const RESET_TILT:int = 12;
+        public static const RESET_PAN:int = 202;
+        public static const RESET_DIS:int = 1200;
+        public static const RESET_CUT:int = 500;
+
+        public function reset():void{
+            cameraCtrlTiltAngle = RESET_TILT;
+            cameraCtrlPanAngle = RESET_PAN;
+            cameraCtrlDistance = RESET_DIS;
+            cameraCutRadius = RESET_CUT;
+            aidAxis = true;
+            aidMouse = false;
+            aidCenter = false;
+            aidCamera = false;
+            aidTip = true;
+            autoRotate = 0;
+        }
+
+        [Bindable]
+        public var autoRotate:Number = 0;
+
+        [Bindable]
+        public var scene:DD3dModelScene3d;
+
+        [Bindable]
+        public var cameraPosition:Vector3D;
+
+        [Bindable]
+        public var cameraCtrlTiltAngle:int = 12;
+
+        [Bindable]
+        public var cameraCtrlPanAngle:Number = 202;
+
+        [Bindable]
+        public var cameraCtrlDistance:int = 1200;
+
+        [Bindable]
+        public var cameraCutRadius:int = 500;
+
+        [Bindable]
+        public var zoomRatio:uint = 10;
+
+        public var _mouseDiv:Point;
+
+        [Bindable(event="propertyChange")]
+        public function get mouseDiv():Point{
+            return _mouseDiv;
+        }
+
+        public function setMouseDiv( value:Point ):void{
+            if( value == _mouseDiv || ( value != null && _mouseDiv != null && value.equals( _mouseDiv )) ){
+                return;
+            }
+
+            var old:Point = _mouseDiv;
+            _mouseDiv = value;
+            dispatchEvent( PropertyChangeEvent.createUpdateEvent( this, "mouseDiv", old, _mouseDiv ) );
+            if( old == null && value != null ){
+                _rotateRegPoint = new Point( cameraCtrlPanAngle, cameraCtrlTiltAngle );
+            }
+            else if( old != null && value == null ){
+                _rotateRegPoint = null;
+            }
+            else{
+                cameraCtrlPanAngle = _rotateRegPoint.x + _mouseDiv.x / 3;
+                var tmp:int = _rotateRegPoint.y + _mouseDiv.y / 3;
+                if( tmp > 90 ){
+                    tmp = 90;
+                }
+                else if( tmp < -90 ){
+                    tmp = -90;
+                }
+                cameraCtrlTiltAngle = tmp;
+            }
+        }
+
+        private var _panRegPoint:Point;
+
+        private var _rotateRegPoint:Point;
+
+        public function onFocusIn():void{
+            scene.focusedCamera = this;
+        }
+
+        public function onFocusOut():void{
+            if( scene.focusedCamera == this ){
+                scene.focusedCamera = null;
+            }
+        }
+
+        [Bindable]
+        public var aidAxis:Boolean = true;
+
+        [Bindable]
+        public var aidMouse:Boolean = false;
+
+        [Bindable]
+        public var aidCenter:Boolean = false;
+
+        [Bindable]
+        public var aidCamera:Boolean = false;
+
+        [Bindable]
+        public var aidTip:Boolean = true;
+
+        /**
+         * 0 -- none
+         * 1 -- sync the div
+         * 2 -- sync value
+         */
+        [Bindable]
+        public var syncToFocused:uint = 0;
+
+        public function destroy():void{
+
+        }
+        ]]></fx:Script>
+</as3lib:MxmlEventDispatcher>

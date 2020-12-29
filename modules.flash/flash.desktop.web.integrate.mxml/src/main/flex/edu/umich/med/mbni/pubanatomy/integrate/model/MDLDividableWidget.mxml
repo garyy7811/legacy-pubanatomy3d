@@ -1,0 +1,233 @@
+<?xml version="1.0"?>
+<as3lib:MxmlEventDispatcher xmlns:fx="http://ns.adobe.com/mxml/2009"
+                            xmlns:as3lib="com.flashflexpro.as3lib.*">
+    <fx:Binding source="parent.rootApp" destination="rootApp"/>
+    <fx:Script><![CDATA[
+        import edu.umich.med.mbni.pubanatomy.datadriven3dwindow.Dd3dModelCamera;
+        import edu.umich.med.mbni.pubanatomy.sectioninteract.model.ModelSectionPlane;
+        import edu.umich.med.mbni.pubanatomy.voxel3d.model.Voxel3dOperationAidConfig;
+        import edu.umich.med.mbni.pubanatomy.voxel3d.model.Voxel3dOperationCameraSync;
+        import edu.umich.med.mbni.pubanatomy.voxel3d.model.Voxel3dOperationResetCamera;
+        import edu.umich.med.mbni.utils.ModelOperationMenuChildren;
+        import edu.umich.med.mbni.utils.ModelOperationMenuType;
+
+        import mx.collections.ArrayCollection;
+
+        import mx.events.PropertyChangeEvent;
+
+        [Bindable]
+        public var backgroundColor:uint = 0;
+
+        public function getAll3dChildren( rt:Vector.<MDLDividableWidget> ):Vector.<MDLDividableWidget>{
+            if( child1 == null && child2 == null ){
+                if( sectionPlane == null ){
+                    rt.push( this );
+                }
+            }
+            else{
+                child1.getAll3dChildren( rt );
+                child2.getAll3dChildren( rt );
+            }
+            return rt;
+        }
+
+        public function getChildBySection( dragging:ModelSectionPlane ):MDLDividableWidget{
+            if( sectionPlane == dragging ){
+                return this;
+            }
+            var cc:MDLDividableWidget;
+            if( child1 != null ){
+                cc = child1.getChildBySection( dragging );
+            }
+            if( cc == null && child2 != null ){
+                cc = child2.getChildBySection( dragging );
+            }
+            return cc;
+        }
+
+        public function getParents():Vector.<MDLDividableWidget>{
+            var rt:Vector.<MDLDividableWidget>;
+            if( parent == null ){
+                rt = new Vector.<MDLDividableWidget>();
+            }
+            else{
+                rt = parent.getParents();
+                rt.push( parent );
+            }
+            return rt;
+        }
+
+        [Bindable]
+        public var rootApp:MDLIntegrationRootModel;
+
+        [Bindable]
+        public var modelCamera:Dd3dModelCamera;
+
+        [Bindable]
+        public var sectionPlane:ModelSectionPlane;
+
+        [Bindable]
+        public var parent:MDLDividableWidget;
+
+        [Bindable]
+        public var child1:MDLDividableWidget;
+
+        [Bindable]
+        public var child2:MDLDividableWidget;
+
+        [Bindable]
+        public var isVerticalOrHorizontal:Boolean = false;
+
+
+        public function removeChild( target:MDLDividableWidget ):void{
+            var left:MDLDividableWidget = ( target == child1 ? child2 : child1 );
+
+            isVerticalOrHorizontal = left.isVerticalOrHorizontal;
+
+            child1 = left.child1;
+            if( child1 != null ){
+                child1.parent = this;
+            }
+            child2 = left.child2;
+            if( child2 != null ){
+                child2.parent = this;
+            }
+
+            modelCamera = left.modelCamera;
+            sectionPlane = left.sectionPlane;
+
+            left.destroy();
+            target.destroy();
+        }
+
+        public function duplicate( isVer:Boolean, newInFrontOfExist:Boolean = false, section:ModelSectionPlane = null ):void{
+            CONFIG::debugging{
+                if( child1 != null || child2 != null ){
+                    throw new Error( this + ".duplicate " );
+                }
+            }
+
+            var remain:MDLDividableWidget = new MDLDividableWidget();
+            remain.parent = this;
+            remain.modelCamera = modelCamera;
+            remain.sectionPlane = sectionPlane;
+
+            var created:MDLDividableWidget = new MDLDividableWidget();
+            created.parent = this;
+            var t:Dd3dModelCamera = new Dd3dModelCamera();
+            t.scene = modelCamera.scene;
+            t.cameraCtrlDistance = modelCamera.cameraCtrlDistance;
+            t.cameraCutRadius = modelCamera.cameraCutRadius;
+            t.cameraCtrlPanAngle = modelCamera.cameraCtrlPanAngle;
+            t.cameraCtrlTiltAngle = modelCamera.cameraCtrlTiltAngle;
+
+            t.aidAxis = modelCamera.aidAxis;
+            t.aidCamera = modelCamera.aidCamera;
+            t.aidCenter = modelCamera.aidCenter;
+            t.aidMouse = modelCamera.aidMouse;
+            t.aidTip = modelCamera.aidTip;
+            t.autoRotate = modelCamera.autoRotate;
+
+            created.modelCamera = t;
+            created.sectionPlane = section;
+            created.backgroundColor = backgroundColor;
+            remain.backgroundColor = backgroundColor;
+
+            isVerticalOrHorizontal = isVer;
+            child1 = newInFrontOfExist ? created : remain;
+            child2 = newInFrontOfExist ? remain : created;
+
+            modelCamera = null;
+            sectionPlane = null;
+        }
+
+        public function onMenu():void{
+            var tmp:ArrayCollection = new ArrayCollection();
+            if( rootApp.stage.stage3Ds.length > modelCamera.scene.allCameraModels.length ){
+                tmp.addItem( new CMDDividableWidget( CMDDividableWidget.HDiv, this ) );
+                tmp.addItem( new CMDDividableWidget( CMDDividableWidget.VDiv, this ) );
+            }
+            if( sectionPlane == null ){
+                tmp.addItem( new ModelOperationMenuType() );
+                tmp.addItem( new Voxel3dOperationResetCamera( modelCamera ) );
+
+                var config:ModelOperationMenuChildren = new ModelOperationMenuChildren(
+                        [
+                            new Voxel3dOperationAidConfig( modelCamera, Voxel3dOperationAidConfig.AXISES ),
+                            new Voxel3dOperationAidConfig( modelCamera, Voxel3dOperationAidConfig.CAMERA ),
+                            new Voxel3dOperationAidConfig( modelCamera, Voxel3dOperationAidConfig.CENTER ),
+                            new Voxel3dOperationAidConfig( modelCamera, Voxel3dOperationAidConfig.MOUSE ),
+                            new Voxel3dOperationAidConfig( modelCamera, Voxel3dOperationAidConfig.TIP )
+                        ],
+                        null,
+                        "3D View Aid Configuration" );
+                config.toolTip = "#t(3dViewAidConfig)p#";
+                tmp.addItem( config );
+
+                var sync:ModelOperationMenuChildren = new ModelOperationMenuChildren(
+                        [
+                            new Voxel3dOperationCameraSync( modelCamera, Voxel3dOperationCameraSync.SYNC_None ),
+                            new Voxel3dOperationCameraSync( modelCamera, Voxel3dOperationCameraSync.SYNC_DIV ),
+                            new Voxel3dOperationCameraSync( modelCamera, Voxel3dOperationCameraSync.SYNC_VAL )
+                        ],
+                        null,
+                        "Synchronized to Focused" );
+                sync.toolTip = "#t(sync2Focsd)p#";
+                tmp.addItem( sync );
+            }
+
+            if( parent != null ){
+                var lst:Vector.<MDLDividableWidget> = rootApp.cameraDiv.getAll3dChildren( new <MDLDividableWidget>[] );
+                if( lst.length != 1 || lst[ 0 ] != this ){
+                    if( tmp.length > 0 ){
+                        tmp.addItem( new ModelOperationMenuType() );
+                    }
+                    tmp.addItem( new CMDDividableWidget( CMDDividableWidget.CLOSE, this ) );
+                }
+            }
+
+            if( sectionPlane != null ){
+                if( tmp.length > 0 ){
+                    tmp.addItem( new ModelOperationMenuType() );
+                }
+                tmp.addItem( new CMDDividableWidget( CMDDividableWidget.POPUP, this ) );
+            }
+            rootApp.setMenuOperations( new ModelOperationMenuChildren( tmp.toArray() ) );
+        }
+
+        public function destroy():void{
+            child1 = null;
+            child2 = null;
+            modelCamera = null;
+            sectionPlane = null;
+            parent = null;
+        }
+        ]]></fx:Script>
+
+    <fx:Script><![CDATA[
+        private function refreshMouse( ev:PropertyChangeEvent ):void{
+            if( ev.property == "mouseDiv" ){
+                var camera:Dd3dModelCamera = modelCamera.scene.focusedCamera;
+                if( modelCamera.syncToFocused == 1 ){
+                    modelCamera.setMouseDiv( camera.mouseDiv );
+                }
+                else{
+                    modelCamera.cameraCtrlDistance = camera.cameraCtrlDistance;
+                    modelCamera.cameraCtrlPanAngle = camera.cameraCtrlPanAngle;
+                    modelCamera.cameraCtrlTiltAngle = camera.cameraCtrlTiltAngle;
+                }
+            }
+        }
+        ]]></fx:Script>
+    <fx:Declarations>
+        <as3lib:ChainEndWatcher
+                eventDispatcher="{
+                ( modelCamera.syncToFocused > 0 &amp;&amp; modelCamera != null
+                &amp;&amp; modelCamera.scene.focusedCamera != modelCamera )
+                ?modelCamera.scene.focusedCamera:null
+                }"
+                eventType="{PropertyChangeEvent.PROPERTY_CHANGE}"
+                eventHandler="refreshMouse"
+                />
+    </fx:Declarations>
+</as3lib:MxmlEventDispatcher>

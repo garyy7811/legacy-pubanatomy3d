@@ -1,0 +1,85 @@
+<?xml version="1.0"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009"
+         xmlns:s="library://ns.adobe.com/flex/spark"
+         xmlns:mx="library://ns.adobe.com/flex/mx"
+         initialize="showHideImageChk();"
+         currentState="{colGeneModel.dataSetState}">
+    <fx:Script><![CDATA[
+        import edu.umich.med.mbni.pubanatomy.atlas.model.StructureTreeGridDataColumnGene;
+
+        [Bindable]
+        public var colGeneModel:StructureTreeGridDataColumnGene;
+
+        private function showHideImageChk():void{
+            _hideImgChk = getQualifiedClassName( colGeneModel.treeGridData ).indexOf( "2d" ) > 0;
+        }
+
+        [Bindable]
+        private var _hideImgChk:Boolean = false;
+        ]]></fx:Script>
+    <s:states>
+        <s:State name="loadingDataSets"/>
+        <s:State name="checkingExpr"/>
+        <s:State name="loadingExpr" stateGroups="dataSetSelected"/>
+        <s:State name="readyNoExpr" stateGroups="ready,dataSetSelected"/>
+        <s:State name="readyWithExpr" stateGroups="ready,dataSetSelected"/>
+    </s:states>
+    <s:HGroup width="100%" gap="1" paddingLeft="2">
+        <s:ToggleButton selected="@{colGeneModel.sortDesc}" toolTip="#t(sort{getQualifiedClassName(this)})p#"
+                        visible.readyWithExpr="true" includeInLayout.readyWithExpr="true"
+                        visible="false" includeInLayout="false"
+                        skinClass="edu.umich.med.mbni.treedatagrid.TreeGridRendererHeaderSortOrder"/>
+        <s:Label textAlign="center" maxDisplayedLines="2" id="llabel"
+                 text.loadingDataSets="{colGeneModel.gene.dtoGene.acronym + ':' + colGeneModel.gene.dataSets.length + '/' + colGeneModel.gene.dataSetLength}"
+                 text.checkingExpr="{colGeneModel.gene.dtoGene.acronym}:checking expression"
+                 text.loadingExpr="{colGeneModel.gene.dtoGene.acronym}[{colGeneModel.selectedDataSet.label}]:loading expression"
+                 text.readyNoExpr="{colGeneModel.gene.dtoGene.acronym}[{colGeneModel.selectedDataSet.label}]:No Expression"
+                 text.readyWithExpr="Show {colGeneModel.gene.dtoGene.acronym}"
+
+
+                 toolTip.loadingDataSets="{colGeneModel.gene.dtoGene.acronym + ':' + colGeneModel.gene.dataSets.length + '/' + colGeneModel.gene.dataSetLength}"
+                 toolTip.checkingExpr="{colGeneModel.gene.dtoGene.acronym}:checking expression"
+                 toolTip.readyNoExpr="{colGeneModel.gene.dtoGene.acronym}[{colGeneModel.selectedDataSet.label}]:No Expression"
+                 toolTip.loadingExpr="{colGeneModel.gene.dtoGene.acronym}[{colGeneModel.selectedDataSet.label}]:loading expression"
+
+                 fontWeight.ready="bold" textAlignLast="left"
+
+                 toolTip.readyWithExpr="number of data sets this gene has|^|{colGeneModel.gene.dataSets.length + '\r\n'}
+                 selected data set label( made up name )|^|{ colGeneModel.selectedDataSet.label + '\r\n' }
+                 how many voxels selected data set has|^|{ colGeneModel.selectedDtoExpr.voxelLevels == null ? '0':colGeneModel.selectedDtoExpr.voxelLevels.length + '\r\n' }
+                 #t(strtreecolghdrldnds0)p#"
+
+                 rightClick="colGeneModel.dialogSortTypeCloseSelection();"
+                 color.readyNoExpr="0xbb0000"
+                 color.readyWithExpr="0x000000"
+                 width="100%"
+                />
+    </s:HGroup>
+
+    <mx:ColorPicker left="3" selectedColor="@{colGeneModel.selectedDataSet.color}" bottom="2" id="colorPicker"
+                    toolTip="#t(glvlclr)p#" includeIn="readyWithExpr"/>
+
+    <s:Group id="busyGroup" width="100%" height="100%" excludeFrom="ready" alpha="0.7">
+        <s:SWFLoader scaleContent="true"
+                     source="{styleManager.getStyleDeclaration( 'mx.managers.CursorManager' ).getStyle( 'busyCursor' )}"
+                     x="{busyGroup.height/2}" y="{busyGroup.height/2}" maintainAspectRatio="false"
+                     width="{busyGroup.height/2}" height="{busyGroup.height/2}"/>
+    </s:Group>
+
+    <s:CheckBox id="selectChk" label="Images"
+                visible="{colGeneModel.selectedDataSet!=null &amp;&amp; !_hideImgChk}"
+                toolTip="#t(strtrgimgslctr)p#"
+                change="onSelectChange();" bottom="2" right="2"
+                selected="{colGeneModel.structureTreeGridData.selectedGeneColumn == colGeneModel }">
+        <fx:Script><![CDATA[
+            private function onSelectChange():void{
+                if( selectChk.selected ){
+                    colGeneModel.structureTreeGridData.selectedGeneColumn = colGeneModel;
+                }
+                else if( colGeneModel.structureTreeGridData.selectedGeneColumn == colGeneModel ){
+                    colGeneModel.structureTreeGridData.selectedGeneColumn = null;
+                }
+            }
+            ]]></fx:Script>
+    </s:CheckBox>
+</s:Group>

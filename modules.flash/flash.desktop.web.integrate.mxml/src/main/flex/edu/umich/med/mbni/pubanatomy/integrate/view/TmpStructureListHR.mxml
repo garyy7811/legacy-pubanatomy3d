@@ -1,0 +1,44 @@
+<?xml version="1.0"?>
+<s:ItemRenderer xmlns:fx="http://ns.adobe.com/mxml/2009" xmlns:s="library://ns.adobe.com/flex/spark"
+                autoDrawBackground="true" enabled="{structure!=null}" stateChangeComplete="onStateChanged();"
+        >
+    <fx:Script><![CDATA[
+        import edu.umich.med.mbni.pubanatomy.atlas.model.StructureItem;
+        import mx.collections.IList;
+        import spark.components.List;
+
+        [Bindable("dataChange")]
+        public function get structure():StructureItem{
+            return data as StructureItem;
+        }
+
+        private function onRemove():void{
+            var dp:IList = ( owner as List ).dataProvider;
+            dp.removeItemAt( dp.getItemIndex( data ) );
+        }
+
+        private function onStateChanged():void{
+            if( structure == null ){
+                return;
+            }
+            if( currentState == "hovered" ){
+                structure.model.mouseOverStructure = structure;
+            }
+            else if( structure.model.mouseOverStructure == structure ){
+                structure.model.mouseOverStructure = null;
+            }
+        }
+        ]]></fx:Script>
+    <s:states>
+        <s:State name="normal"/>
+        <s:State name="hovered"/>
+        <s:State name="down"/>
+    </s:states>
+    <s:layout>
+        <s:HorizontalLayout verticalAlign="middle" paddingLeft="2" paddingRight="2" paddingBottom="2" paddingTop="2"/>
+    </s:layout>
+    <s:Label text="{structure.dtoStructure.acronym}" toolTip="{structure.dtoStructure.name}"
+             fontWeight="{structure.model.mouseOverStructure==structure?'bold':'normal'}"/>
+    <s:Button skinClass="spark.skins.spark.TitleWindowCloseButtonSkin" includeIn="hovered,down"
+              toolTip="Remove this structure from list" click="onRemove();" width="17" height="17"/>
+</s:ItemRenderer>

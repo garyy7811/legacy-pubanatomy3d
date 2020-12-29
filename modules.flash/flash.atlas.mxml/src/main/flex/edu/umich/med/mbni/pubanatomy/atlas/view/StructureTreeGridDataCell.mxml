@@ -1,0 +1,34 @@
+<?xml version="1.0"?>
+<treedatagrid:TreeGridDataCell xmlns:fx="http://ns.adobe.com/mxml/2009"
+                               xmlns:treedatagrid="edu.umich.med.mbni.treedatagrid.*">
+    <fx:Script><![CDATA[
+        import edu.umich.med.mbni.pubanatomy.atlas.model.StructureTreeGridDataRow;
+
+        [Bindable(event="rowChanged")]
+        public function get structureDataRow():StructureTreeGridDataRow{
+            return _row as StructureTreeGridDataRow;
+        }
+
+        protected var _mouseOver:Boolean;
+
+        [Bindable(event="mouseOverChanged")]
+        public function get mouseOver():Boolean{
+            return _mouseOver;
+        }
+
+        protected function set assMouseOver( value:Boolean ):void{
+            if( value != _mouseOver ){
+                _mouseOver = value;
+                dispatchEvent( new Event( "mouseOverChanged" ) );
+            }
+        }
+
+        public function setMouseOverFromCell( v:Boolean ):void{
+            if( structureDataRow != null ){
+                structureDataRow.structure.model.mouseOverStructure = ( v ? structureDataRow.structure : null );
+            }
+        }
+        ]]></fx:Script>
+    <fx:Binding source="structureDataRow.structure.model.mouseOverStructure == structureDataRow.structure"
+                destination="assMouseOver"/>
+</treedatagrid:TreeGridDataCell>

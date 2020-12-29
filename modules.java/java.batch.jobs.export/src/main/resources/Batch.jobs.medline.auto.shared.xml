@@ -1,0 +1,191 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:util="http://www.springframework.org/schema/util" xmlns:batch="http://www.springframework.org/schema/batch"
+
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://www.springframework.org/schema/util
+       http://www.springframework.org/schema/util/spring-util.xsd http://www.springframework.org/schema/batch http://www.springframework.org/schema/batch/spring-batch.xsd">
+
+    <bean id="passThroughLineMapper"
+          class="org.springframework.batch.item.file.mapping.PassThroughLineMapper"/>
+
+
+    <bean id="jobContext" class="edu.umich.med.mbni.pubanatomy.batch.medline.MedlineAutoUpdateJobContext">
+        <!---all.merge is remote-server-->
+        <constructor-arg>
+            <bean class="org.apache.solr.client.solrj.impl.HttpSolrServer">
+                <constructor-arg value="${solr.medline.merge.all.into}"/>
+            </bean>
+        </constructor-arg>
+        <constructor-arg value="file:${pmid.cui.split.folder}"/>
+
+        <property name="allMetas" ref="pm2conceptList"/>
+        <property name="allMergeSolrCommitPer" value="${all.merge.solr.commit.perNum}"/>
+        <!--NO!!! this is automatically detected!<property name="initializingMedlineFrom0" value="${batch.search.data.initFrom0}"/>-->
+    </bean>
+
+    <bean id="lineMapper" class="org.springframework.batch.item.file.mapping.DefaultLineMapper">
+        <property name="lineTokenizer">
+            <bean class="org.springframework.batch.item.file.transform.DelimitedLineTokenizer">
+                <property name="delimiter">
+                    <util:constant
+                            static-field="org.springframework.batch.item.file.transform.DelimitedLineTokenizer.DELIMITER_TAB"/>
+                </property>
+            </bean>
+        </property>
+        <property name="fieldSetMapper">
+            <bean class="org.springframework.batch.item.file.mapping.ArrayFieldSetMapper"/>
+        </property>
+    </bean>
+
+    <bean id="pmid2Chemicals" class="edu.umich.med.mbni.pubanatomy.batch.medline.PMID2ConceptMeta">
+        <property name="file" value="file:${pmid.cui.chemical.file}"/>
+        <property name="pmidIndex" value="0"/>
+        <property name="propertyIndex" value="2"/>
+        <property name="propertyName" value="chemicalNameOfSubstances"/>
+        <property name="solrServer">
+            <bean class="org.apache.solr.client.solrj.impl.HttpSolrServer">
+                <constructor-arg value="${solr.pmid2concept.chemical}"/>
+            </bean>
+        </property>
+    </bean>
+    <bean id="pmid2Diseases" class="edu.umich.med.mbni.pubanatomy.batch.medline.PMID2ConceptMeta">
+        <property name="file" value="file:${pmid.cui.disease.file}"/>
+        <property name="pmidIndex" value="0"/>
+        <property name="propertyIndex" value="2"/>
+        <property name="propertyName" value="diseases"/>
+        <property name="solrServer">
+            <bean class="org.apache.solr.client.solrj.impl.HttpSolrServer">
+                <constructor-arg value="${solr.pmid2concept.diseases}"/>
+            </bean>
+        </property>
+    </bean>
+    <bean id="pmid2Functions" class="edu.umich.med.mbni.pubanatomy.batch.medline.PMID2ConceptMeta">
+        <property name="file" value="file:${pmid.cui.function.file}"/>
+        <property name="pmidIndex" value="0"/>
+        <property name="propertyIndex" value="2"/>
+        <property name="propertyName" value="functions"/>
+        <property name="solrServer">
+            <bean class="org.apache.solr.client.solrj.impl.HttpSolrServer">
+                <constructor-arg value="${solr.pmid2concept.functions}"/>
+            </bean>
+        </property>
+    </bean>
+
+    <bean id="pmid2BrainStructures" class="edu.umich.med.mbni.pubanatomy.batch.medline.PMID2ConceptMetaStructure">
+        <property name="file" value="file:${pmid.cui.abasid.file}"/>
+        <property name="pmidIndex" value="0"/>
+        <property name="propertyIndex" value="1"/>
+        <property name="propertyName" value="brainStructureIds"/>
+        <property name="solrServer">
+            <bean class="org.apache.solr.client.solrj.impl.HttpSolrServer">
+                <constructor-arg value="${solr.pmid2concept.structures}"/>
+            </bean>
+        </property>
+    </bean>
+
+    <bean id="pmid2Genes" class="edu.umich.med.mbni.pubanatomy.batch.medline.PMID2ConceptMetaGene">
+        <property name="file" value="file:${pmid.cui.gene.file}"/>
+        <property name="pmidIndex" value="2"/>
+        <property name="propertyIndex" value="1"/>
+        <property name="propertyName" value="geneIds"/>
+        <property name="solrServer">
+            <bean class="org.apache.solr.client.solrj.impl.HttpSolrServer">
+                <constructor-arg value="${solr.pmid2concept.genes}"/>
+            </bean>
+        </property>
+    </bean>
+
+    <util:list id="pm2conceptList">
+        <ref bean="pmid2Chemicals"/>
+        <ref bean="pmid2Diseases"/>
+        <ref bean="pmid2Functions"/>
+        <ref bean="pmid2BrainStructures"/>
+        <ref bean="pmid2Genes"/>
+    </util:list>
+
+    <bean id="processOrSkipDecider" class="edu.umich.med.mbni.pubanatomy.batch.medline.BatchDeciderIfProcessConcept"/>
+
+    <batch:flow id="updateConcept">
+        <batch:decision id="processOrSkip" decider="processOrSkipDecider">
+            <batch:next on="process" to="cleanConcept"/>
+            <batch:next on="*" to="doNothing"/>
+        </batch:decision>
+        <batch:step id="cleanConcept" next="splitConceptFile">
+            <batch:tasklet ref="batchTaskletCleanCuiSplitFolder"/>
+        </batch:step>
+        <batch:step id="splitConceptFile" next="parallelUpdateConceptSolr">
+            <batch:tasklet>
+                <batch:chunk commit-interval="${pmid.cui.split.commitInterval}">
+                    <batch:reader>
+                        <bean class="org.springframework.batch.item.file.FlatFileItemReader" scope="step">
+                            <property name="resource"
+                                      value="file:#{jobExecutionContext['currentPmid2ConceptfileName']}"/>
+                            <property name="lineMapper" ref="passThroughLineMapper"/>
+                        </bean>
+                    </batch:reader>
+                    <batch:writer>
+                        <bean class="org.springframework.batch.item.file.MultiResourceItemWriter">
+                            <property name="resource" value="file:${pmid.cui.split.folder}/tmp"/>
+                            <property name="itemCountLimitPerResource"
+                                      value="${pmid.cui.split.itemCountLimitPerResource}"/>
+                            <property name="delegate">
+                                <bean class="org.springframework.batch.item.file.FlatFileItemWriter">
+                                    <property name="lineAggregator">
+                                        <bean class="org.springframework.batch.item.file.transform.PassThroughLineAggregator"/>
+                                    </property>
+                                </bean>
+                            </property>
+                        </bean>
+                    </batch:writer>
+                </batch:chunk>
+            </batch:tasklet>
+        </batch:step>
+        <batch:step id="parallelUpdateConceptSolr" next="saveAndCleanConcept">
+            <batch:partition partitioner="batchPartitionerCuiSplitFiles">
+                <batch:step>
+                    <batch:tasklet>
+                        <batch:chunk commit-interval="${pmid.cui.solr.commitInterval}"
+                                     retry-limit="9">
+                            <batch:reader>
+                                <bean scope="step" class="edu.umich.med.mbni.pubanatomy.batch.medline.BatchReaderFlatFileToConceptBeanPage">
+                                    <property name="flatFileItemReader">
+                                        <bean id="flatFileItemReaderInStep"
+                                              class="org.springframework.batch.item.file.FlatFileItemReader">
+                                            <property name="resource" value="#{stepExecutionContext[fileName]}"/>
+                                            <property name="lineMapper" ref="lineMapper"/>
+                                        </bean>
+                                    </property>
+                                </bean>
+                            </batch:reader>
+                            <batch:writer>
+                                <bean scope="step" class="edu.umich.med.mbni.pubanatomy.batch.medline.BatchWirterSolrBeanConcept"/>
+                            </batch:writer>
+                            <batch:retryable-exception-classes>
+                                <batch:include class="org.apache.solr.common.SolrException"/>
+                                <batch:include class="org.springframework.dao.DataRetrievalFailureException"/>
+                            </batch:retryable-exception-classes>
+                        </batch:chunk>
+                    </batch:tasklet>
+                </batch:step>
+                <batch:handler grid-size="${batch.exe.thread.num}" task-executor="taskExecutor"/>
+            </batch:partition>
+        </batch:step>
+        <batch:step id="saveAndCleanConcept">
+            <batch:tasklet>
+                <bean class="edu.umich.med.mbni.pubanatomy.batch.medline.BatchTaskletSaveConceptStatus"/>
+            </batch:tasklet>
+        </batch:step>
+        <batch:step id="doNothing">
+            <batch:tasklet>
+                <bean class="org.springframework.batch.core.step.tasklet.SystemCommandTasklet">
+                    <property name="command" value="java -version"/>
+                    <property name="timeout" value="1"/>
+                </bean>
+            </batch:tasklet>
+        </batch:step>
+
+    </batch:flow>
+
+</beans>

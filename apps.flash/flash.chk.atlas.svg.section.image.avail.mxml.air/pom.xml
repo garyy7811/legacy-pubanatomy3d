@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>edu.umich.med.mbni</groupId>
+    <artifactId>pubanatomy.chk.atlas.svg.section.image.available.mxml.air</artifactId>
+    <version>0.1</version>
+    <packaging>swf</packaging>
+
+    <parent>
+        <groupId>edu.umich.med.mbni</groupId>
+        <artifactId>pubanatomy.parent.flash.air</artifactId>
+        <version>0.1-SNAPSHOT</version>
+        <relativePath>../../mvn.parent.flash.air/pom.xml</relativePath>
+    </parent>
+
+
+    <properties>
+        <!-- the application name which must match the main mxml file
+      and application descriptor file names
+        <application.name>Entry</application.name>
+        -->
+        <keystore.file>${basedir}/src/main/resources/yanggang.mbni.med.umich.1234.p12</keystore.file>
+        <keystore.password>1234</keystore.password>
+    </properties>
+
+
+    <build>
+        <sourceDirectory>src/main/flex/</sourceDirectory>
+        <resources>
+            <resource>
+                <directory>${basedir}/src/main/resources</directory>
+                <includes>
+                    <include>**/*.xml</include>
+                </includes>
+                <filtering>true</filtering>
+            </resource>
+        </resources>
+        <plugins>
+            <plugin>
+                <groupId>org.sonatype.flexmojos</groupId>
+                <artifactId>flexmojos-maven-plugin</artifactId>
+                <version>${flexmojo.version}</version>
+                <extensions>true</extensions>
+                <configuration>
+                    <sourceFile>AirEntry.mxml</sourceFile>
+                    <!--<descriptorTemplate>${basedir}/src/main/resources/main-app.xml</descriptorTemplate>-->
+                    <descriptorTemplate>${project.build.outputDirectory}/desc.xml</descriptorTemplate>
+
+                    <keystore>${keystore.file}</keystore>
+                    <storepass>${keystore.password}</storepass>
+
+                    <!--optionally include files in the AIR package -->
+                    <includeFileSets>
+                        <fileSet>
+                            <directory>${basedir}/src/main/resources/embedded</directory>
+                            <includes>
+                                <include>*.*</include>
+                            </includes>
+                        </fileSet>
+                    </includeFileSets>
+                    <timestampURL>none</timestampURL>
+                    <configFiles>
+                        <configFile>flex.config.swf.version.xml</configFile>
+                    </configFiles>
+                </configuration>
+
+                <dependencies>
+                    <dependency>
+                        <groupId>com.adobe.flex</groupId>
+                        <artifactId>compiler</artifactId>
+                        <version>${flex.sdk.version}</version>
+                        <type>pom</type>
+                    </dependency>
+                </dependencies>
+
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>sign-air</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+
+    <dependencies>
+        <dependency>
+            <groupId>edu.umich.med.mbni</groupId>
+            <artifactId>pubanatomy.module.flash.utils</artifactId>
+            <version>0.1-SNAPSHOT</version>
+            <type>swc</type>
+        </dependency>
+        <dependency>
+            <groupId>edu.umich.med.mbni</groupId>
+            <artifactId>pubanatomy.module.flash.atlas.mxml</artifactId>
+            <version>0.1-SNAPSHOT</version>
+            <type>swc</type>
+        </dependency>
+        <dependency>
+            <groupId>edu.umich.med.mbni</groupId>
+            <artifactId>pubanatomy.module.gene.expression.section.mxml</artifactId>
+            <version>0.1-SNAPSHOT</version>
+            <type>swc</type>
+        </dependency>
+    </dependencies>
+</project>

@@ -1,0 +1,45 @@
+<?xml version="1.0"?>
+<webdesktop:TiBoTlePanel xmlns:fx="http://ns.adobe.com/mxml/2009" xmlns:webdesktop="edu.umich.med.mbni.webdesktop.*"
+                         xmlns:s="library://ns.adobe.com/flex/spark"
+                         xmlns:view="edu.umich.med.mbni.pubanatomy.search.view.*"
+                         xmlns:utils="edu.umich.med.mbni.utils.*">
+    <fx:Script><![CDATA[
+        import edu.umich.med.mbni.pubanatomy.search.model.Result;
+
+        [Bindable]
+        public var modelResult:Result;
+
+        private function set rfrTitle( v:* ):void{
+            modelResult.queryResult.searchModel.callInNext.putIn( refreshTitle );
+        }
+
+        private function refreshTitle():void{
+            if( modelResult.numFound > 0 ){
+                var vEnd:uint = ( modelResult.numFound < rsltGrid.visibleRowEnd - rsltGrid.visibleRowBegin + 1 ) ? modelResult.numFound : rsltGrid.visibleRowEnd;
+                title = modelResult.numFound + " hits(" + rsltGrid.visibleRowBegin + " - " + vEnd + ")";
+            }
+            else{
+                title = "No result found";
+            }
+        }
+        ]]></fx:Script>
+    <fx:Binding source="modelResult.queryResult.searchModel.callInNext" destination="rfrTitle"/>
+    <fx:Binding source="modelResult.numFound" destination="rfrTitle"/>
+    <fx:Binding source="modelResult.resultList.length" destination="rfrTitle"/>
+    <fx:Binding source="rsltGrid.visibleRowBegin" destination="rfrTitle"/>
+    <fx:Binding source="rsltGrid.visibleRowEnd" destination="rfrTitle"/>
+
+    <webdesktop:layout>
+        <s:VerticalLayout paddingRight="1" paddingTop="1" paddingBottom="1" paddingLeft="1"/>
+    </webdesktop:layout>
+    <view:SearchViewRecordGrid modelResult="{modelResult}" id="rsltGrid" width="100%" height="100%"/>
+
+    <webdesktop:titleGroupContent>
+        <s:HGroup width="100%" verticalAlign="middle">
+            <s:Label text="Search result({title}):" width="100%" fontWeight="bold" toolTip="#t(searchResultLitTitle)p#"
+                     maxDisplayedLines="1"/>
+            <utils:MoreOptionsButton width="18" height="16" toolTip="#t(searchResultLitTitleCloseBtn)p#"
+                                     click="modelResult.showColumnsMenu();"/>
+        </s:HGroup>
+    </webdesktop:titleGroupContent>
+</webdesktop:TiBoTlePanel>

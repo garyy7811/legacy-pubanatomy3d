@@ -1,0 +1,70 @@
+<?xml version="1.0"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009"
+         xmlns:s="library://ns.adobe.com/flex/spark"
+         xmlns:v="edu.umich.med.mbni.pubanatomy.integrate.view.*"
+         xmlns:mx="library://ns.adobe.com/flex/mx"
+         xmlns:utils="edu.umich.med.mbni.utils.*"
+        >
+    <fx:Script><![CDATA[
+        import edu.umich.med.mbni.pubanatomy.integrate.model.MDLIntegrationRootModel;
+
+        import spark.components.Application;
+
+        [Bindable]
+        public var rootAppModel:MDLIntegrationRootModel;
+
+        [Bindable]
+        public var searchAutoCompleteGroup:Group;
+
+        private function set rfrState( ignoreVar:* ):void{
+            if( rootAppModel != null ){
+                rootAppModel.callInNext.putIn( refreshState );
+            }
+        }
+
+        private function refreshState():void{
+            if( rootAppModel.showMainMedlineSearch && rootAppModel.showAllBrainStructures ){
+                currentState = "lrc";
+            }
+            else if( rootAppModel.showMainMedlineSearch ){
+                currentState = "lc";
+            }
+            else if( rootAppModel.showAllBrainStructures ){
+                currentState = "rc";
+            }
+            else{
+                currentState = "n";
+            }
+        }
+        ]]></fx:Script>
+    <fx:Binding source="rootAppModel.showMainMedlineSearch" destination="rfrState"/>
+    <fx:Binding source="rootAppModel.showAllBrainStructures" destination="rfrState"/>
+    <s:states>
+        <s:State name="n"/>
+        <s:State name="lc" stateGroups="l,c"/>
+        <s:State name="rc" stateGroups="r,c"/>
+        <s:State name="lrc" stateGroups="l,r,c"/>
+    </s:states>
+    <mx:HDividedBox width="100%" height="100%" liveDragging="true" id="dvddbx"
+                    dividerSkin="edu.umich.med.mbni.utils.DividerSkin">
+        <v:LeftSearchPanel width="70%" height="100%" cornerRadius="5" backgroundColor="0xeeeeee"
+                           rootAppModel="{rootAppModel}" id="searchPanel"
+                           searchAutoCompleteGroup="{searchAutoCompleteGroup}"/>
+        <v:AllStructures width="17%" height="100%" rootAppModel="{rootAppModel}" id="allStructures"
+                         cornerRadius="5"/>
+        <v:Widget3dTreeScene width="30%" height="100%" id="centralTreeScene" cornerRadius="5"
+                             rootAppModel="{rootAppModel}"/>
+    </mx:HDividedBox>
+    <s:transitions>
+        <utils:CommonTransition fromState="rc" toState="lrc" target="{searchPanel}" currentState="{currentState}"
+                                playing="@{rootAppModel.rootModelAtlas.allStructuresTreeGridData.animating}"/>
+
+        <utils:CommonTransition fromState="n" toState="lc" target="{searchPanel}" currentState="{currentState}"
+                                playing="@{rootAppModel.rootModelAtlas.allStructuresTreeGridData.animating}"/>
+
+        <utils:CommonTransition fromState="n" toState="rc" target="{allStructures}" currentState="{currentState}"
+                                playing="@{rootAppModel.rootModelAtlas.allStructuresTreeGridData.animating}"/>
+        <utils:CommonTransition fromState="lc" toState="lrc" target="{allStructures}" currentState="{currentState}"
+                                playing="@{rootAppModel.rootModelAtlas.allStructuresTreeGridData.animating}"/>
+    </s:transitions>
+</s:Group>

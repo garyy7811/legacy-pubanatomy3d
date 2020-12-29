@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<dd3d:Dd3dViewMeshPlane xmlns:fx="http://ns.adobe.com/mxml/2009"
+                        xmlns:dd3d="edu.umich.med.mbni.pubanatomy.datadriven3dwindow.*">
+
+    <fx:Script><![CDATA[
+        import edu.umich.med.mbni.pubanatomy.voxel3d.model.Voxel3dPlane;
+
+        [Bindable(event="modelChanged")]
+        public function get planeVoxel3dModel():Voxel3dPlane{
+            return model as Voxel3dPlane;
+        }
+
+        CONFIG::debugging{
+            override protected function set assPosition( ignore:* ):void{
+                if( planeVoxel3dModel.scale != planeVoxel3dModel.scene3d.rootModel3d.config.scale3d ){
+                    throw new Error();
+                }
+                super.assPosition = ignore;
+            }
+        }
+        ]]></fx:Script>
+</dd3d:Dd3dViewMeshPlane>

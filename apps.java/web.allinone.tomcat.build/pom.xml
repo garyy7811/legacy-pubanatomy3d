@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>edu.umich.med.mbni</groupId>
+    <artifactId>pubanatomy.apps.web.allinone.tomcat.build</artifactId>
+    <version>0.1-SNAPSHOT</version>
+    <packaging>pom</packaging>
+    <modules>
+        <module>../../mvn.parent.java</module>
+        <module>../../mvn.parent.solr</module>
+        <module>../../mvn.parent.spring.mvc</module>
+        <module>../../modules.java/java.utils</module>
+        <module>../../modules.java/java.dto</module>
+        <module>../../modules.java/java.solr.common</module>
+        <module>../../modules.java/java.solr.medline</module>
+        <module>../../modules.java/java.web.service.solr</module>
+        <module>../../modules.java/java.web.service.mongo</module>
+
+        <module>../../modules.java/java.ncbi.pubmed.proxy</module>
+
+
+        <!--<module>../../mvn.parent.flash.web</module>-->
+
+        <module>../../modules.flash/flash.utils</module>
+
+        <module>../../modules.flash/flash.remote.data.service</module>
+        <module>../../modules.flash/flash.webdesktop</module>
+
+        <!--<module>../../apps.flash/flash.save.all.section.image.3d4corners.mxml.air</module>-->
+
+        <module>../../modules.flash/flash.atlas.mxml</module>
+
+        <module>../../3rd-party/away3d-core-fp11-4.1.4-gold</module>
+        <module>../../modules.flash/flash.interface.away3d</module>
+
+        <module>../../modules.flash/flash.voxel.interact.mxml</module>
+
+        <module>../../modules.flash/flash.voxel.section.interact.mxml</module>
+
+        <module>../../modules.flash/flash.search2.mxml</module>
+        <module>../../modules.flash/flash.search.pubmed.mxml</module>
+
+        <module>../../modules.flash/flash.user.mxml</module>
+        <module>../../apps.flash/flash.user.swf.mxml</module>
+
+
+        <module>../../modules.flash/flash.desktop.web.integrate.mxml</module>
+        <module>../../apps.flash/flash.desktop.web.integrate.swf.mxml</module>
+
+        <module>../../modules.flash/flash.desktop.web.gene.image.section.mxml</module>
+
+        <module>../../modules.flash/flash.desktop.web.integrate.yanggang.mxml</module>
+        <module>../../apps.flash/flash.desktop.web.integrate.yanggang.swf.mxml</module>
+
+        <module>../../modules.flash/flash.oauth.callback.as</module>
+        <module>../../apps.flash/flash.oauth.callback.swf.as</module>
+        <module>../web.allinone.tomcat</module>
+    </modules>
+</project>

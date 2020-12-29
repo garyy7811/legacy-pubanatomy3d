@@ -1,0 +1,192 @@
+<?xml version="1.0"?>
+<containers:View3D xmlns:fx="http://ns.adobe.com/mxml/2009"
+                   xmlns:containers="away3d.containers.*"
+
+                   mouseEnabled="{dd3dScene.mouseEnabled}"
+
+                   rightClick="dd3dScene.model.showMenu( model );"
+
+                   mouseDown="onMouseDown( );"
+                   mouseWheel="onMouseWheel( event );"
+
+                   enterFrame="onEnterFrame();"
+                   removedFromStage="dispose();"
+
+                   rollOver="if( !event.buttonDown ){model.onFocusIn();}"
+                   rollOut="if( !event.buttonDown ){model.onFocusOut();}"
+                   backgroundColor="0x000000"
+        >
+    <fx:Metadata>
+        [Event(name="resourceOverLoad", type="flash.events.Event")]
+    </fx:Metadata>
+    <fx:Binding source="model.cameraCtrlDistance" destination="cameraCtrl.distance"/>
+    <fx:Binding source="model.cameraCtrlPanAngle" destination="cameraCtrl.panAngle"/>
+    <fx:Binding source="model.cameraCtrlTiltAngle" destination="cameraCtrl.tiltAngle"/>
+    <fx:Binding source="cameraCtrl.updatedTargetPosition" destination="model.cameraPosition"/>
+    <fx:Binding source="cameraCtrl == null?null:dd3dScene.model.centralPosition"
+                destination="cameraCtrl.lookAtPosition"/>
+    <fx:Script><![CDATA[
+        import away3d.containers.Scene3D;
+        import away3d.cameras.Camera3D;
+
+        override protected function onAddedToStage( event:Event ):void{
+            super.onAddedToStage( event );
+            mousePicker = PickingType.RAYCAST_BEST_HIT;
+            if( dd3dScene.model.allCameraModels.getItemIndex( model ) < 0 ){
+                CONFIG::debugging{
+                    if( model == null ){
+                        throw new Error( this + ".onAddedToStage " );
+                    }
+                }
+                dd3dScene.model.allCameraModels.addItem( model );
+            }
+        }
+
+        [Bindable(event="dd3dSceneChanged")]
+        public function get dd3dScene():Dd3dViewScene3d{
+            return _scene as Dd3dViewScene3d;
+        }
+
+        [Bindable]
+        public var model:Dd3dModelCamera;
+
+        override public function set scene( scene:Scene3D ):void{
+            super.scene = scene;
+            dispatchEvent( new Event( "dd3dSceneChanged" ) );
+        }
+
+        private function onEnterFrame():void{
+            if( stage != null && camera != null && _stage3DProxy != null
+                    && width > 35 && height > 35 ){
+                dd3dScene.cameraLight.direction = dd3dScene.model.centralPosition.subtract( camera.position );
+                dd3dScene.trident.visible = model.aidAxis;
+                if( dd3dScene.aidCamera != null ){
+                    dd3dScene.aidCamera.visible = model.aidCamera;
+                }
+                if( dd3dScene.aidCenter != null ){
+                    dd3dScene.aidCenter.visible = model.aidCenter;
+                }
+                if( dd3dScene.lastMouse != null ){
+                    dd3dScene.lastMouse.visible = model.aidMouse;
+                }
+                model.cameraCtrlPanAngle += model.autoRotate;
+                try{
+                    render();
+                }
+                catch( e:Error ){
+                    CONFIG::debugging{
+                        trace( this + ".onEnterFrame:" + e.getStackTrace() );
+                    }//debug
+                    dispatchEvent( new Event( RESOURCE_OVER_LOAD ) );
+                }
+            }
+        }
+
+        public static const RESOURCE_OVER_LOAD:String = "resourceOverLoad";
+
+        [Bindable(event="cameraChanged")]
+        override public function get camera():Camera3D{
+            return super.camera;
+        }
+
+        override public function set camera( camera:Camera3D ):void{
+            throw new Error( "I'll do it myself" )
+        }
+
+        private var _cameraCtrl:Dd3dViewCameraController;
+
+        [Bindable(event="cameraCtrlChanged")]
+        public function get cameraCtrl():Dd3dViewCameraController{
+            return _cameraCtrl;
+        }
+
+        private function set rfrScene( v:* ):void{
+            if( _cameraCtrl == null && dd3dScene != null ){
+
+                camera.lens.far = 50000;
+                _cameraCtrl = new Dd3dViewCameraController(
+                        _camera, dd3dScene.trident, 44, 10, 1200, -89.99, 89.99, NaN, NaN, 0, 1 );
+                dispatchEvent( new Event( "cameraCtrlChanged" ) );
+            }
+        }
+
+        override public function dispose():void{
+            super.dispose();
+            dd3dScene.model.allCameraModels.removeItem( model );
+            camera.dispose();
+
+            model.destroy();
+            _cameraCtrl = null;
+            _scene = null;
+        }
+        ]]></fx:Script>
+    <fx:Binding source="dd3dScene" destination="rfrScene"/>
+
+    <fx:Script><![CDATA[
+        import away3d.core.pick.PickingType;
+
+        private var _mouseDownPoint:Point;
+
+
+        protected function onMouseDown():void{
+            if( mouseX > 0 && mouseX < width
+                    && mouseY > 0 && mouseY < height ){
+
+                _mouseDownPoint = new Point( stage.mouseX, stage.mouseY );
+
+                dd3dScene.mouseEnabled = false;
+
+                systemManager.stage.addEventListener( MouseEvent.MOUSE_MOVE, onMouseDownMoving );
+                systemManager.stage.addEventListener( MouseEvent.MOUSE_UP, onMouseUp );
+                systemManager.stage.addEventListener( Event.MOUSE_LEAVE, onMouseUp );
+            }
+        }
+
+
+        protected function onMouseDownMoving( event:MouseEvent ):void{
+            model.setMouseDiv( new Point( stage.mouseX - _mouseDownPoint.x, stage.mouseY - _mouseDownPoint.y ) );
+        }
+
+        private function onMouseUp( event:* = null ):void{
+            dd3dScene.mouseEnabled = true;
+
+            model.setMouseDiv( null );
+
+            systemManager.stage.removeEventListener( MouseEvent.MOUSE_MOVE, onMouseDownMoving );
+            systemManager.stage.removeEventListener( MouseEvent.MOUSE_UP, onMouseUp );
+            systemManager.stage.removeEventListener( Event.MOUSE_LEAVE, onMouseUp );
+        }
+
+        private function onMouseWheel( event:MouseEvent ):void{
+
+            var d:Number = cameraCtrl.distance;
+            d = d - event.delta * model.zoomRatio;// > 0 ? d * 4 / 5 : d * 5 / 4;
+            if( d > 5000 ){
+                d = 5000;
+            }
+            if( d < 5 ){
+                d = 5;
+            }
+            model.cameraCtrlDistance = d;
+        }
+
+
+        private function onClick( event:TimerEvent ):void{
+            if( dd3dScene.model.mouseOverObj != null ){
+                dd3dScene.model.mouseOverObj.selected = !dd3dScene.model.mouseOverObj.selected;
+            }
+        }
+        ]]></fx:Script>
+
+    <fx:Script><![CDATA[
+        private function set rfrLensNear( ignoreVar:* ):void{
+            if( camera != null && camera.lens != null ){
+                var tmp:int = model.cameraCtrlDistance - model.cameraCutRadius;
+                camera.lens.near = ( tmp <= 0 ? 1 : tmp );
+            }
+        }
+        ]]></fx:Script>
+    <fx:Binding source="model.cameraCtrlDistance" destination="rfrLensNear"/>
+    <fx:Binding source="model.cameraCutRadius" destination="rfrLensNear"/>
+    <fx:Binding source="camera.lens" destination="rfrLensNear"/>
+</containers:View3D>

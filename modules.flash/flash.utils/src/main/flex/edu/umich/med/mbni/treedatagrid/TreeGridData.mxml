@@ -1,0 +1,439 @@
+<?xml version="1.0"?>
+<as3lib:MxmlEventDispatcher xmlns:fx="http://ns.adobe.com/mxml/2009"
+                            xmlns:s="library://ns.adobe.com/flex/spark"
+                            xmlns:as3lib="com.flashflexpro.as3lib.*">
+    <fx:Script><![CDATA[
+        import edu.umich.med.mbni.treemodel.TreeBranchItem;
+        import edu.umich.med.mbni.utils.RootModelModule;
+
+        import mx.events.CollectionEvent;
+        import mx.events.CollectionEventKind;
+        import mx.events.PropertyChangeEvent;
+
+        [Bindable]
+        public var animating:Boolean = false;
+
+        [Bindable]
+        public var selectedItems:Vector.<Object> = new Vector.<Object>();
+
+        public function reverseSelection():void{
+
+            var newselection:Vector.<Object> = new <Object>[];
+            for( var j:int = dataGridDataProvider.length - 1; j >= 0; j-- ){
+                var tmp:* = dataGridDataProvider.getItemAt( j );
+                if( selectedItems != null && selectedItems.length > 0 ){
+                    if( selectedItems.indexOf( tmp ) >= 0 ){
+                        continue
+                    }
+                }
+                newselection.push( tmp );
+            }
+            selectedItems = newselection;
+        }
+
+        [Bindable]
+        public var ensureVisibleRow:TreeGridDataRow;
+
+        private var _rootModel:RootModelModule;
+
+        public static const rootModel_CHANGED:String = "rootModelChanged";
+
+        [Bindable(event="rootModelChanged")]
+        public function get rootModel():RootModelModule{
+            return _rootModel;
+        }
+
+        public function set rootModel( value:RootModelModule ):void{
+            if( value != _rootModel ){
+                _rootModel = value;
+                dispatchEvent( new Event( rootModel_CHANGED ) );
+            }
+        }
+
+        protected function initStaticColumns():void{
+            throw new Error();
+        }
+
+        private var _inputRowDataList:Vector.<TreeGridDataRow>;
+        [Bindable(event="inputRowDataListChanged")]
+        public function get inputRowDataList():Vector.<TreeGridDataRow>{
+            return _inputRowDataList;
+        }
+
+        public function setInputRowDataList( value:Vector.<TreeGridDataRow>, initOpenDepth:uint = 4 ):void{
+            if( value != _inputRowDataList ){
+                if( value != null && initOpenDepth > 0 ){
+                    for( var j:int = value.length - 1; j >= 0; j-- ){
+                        var tgdrd:TreeGridDataRow = value[j] as TreeGridDataRow;
+                        tgdrd.setOpenOrClose( tgdrd.depth <= initOpenDepth );
+                    }
+                }
+                _inputRowDataList = value;
+                dispatchEvent( new Event( "inputRowDataListChanged" ) );
+            }
+        }
+
+        private function set rfrInitCols( ignoreVar:* ):void{
+            if( rootModel != null && rootModel.rootApp != null
+                    && columns.length == 0 ){
+                initStaticColumns();
+            }
+        }
+        ]]></fx:Script>
+    <fx:Binding source="rootModel.rootApp" destination="rfrInitCols"/>
+    <fx:Script><![CDATA[
+        private function onColsChanged( event:CollectionEvent ):void{
+
+            if( event.kind == CollectionEventKind.UPDATE ){
+                var sortOrderChanged:Boolean = false;
+                for( var i:int = event.items.length - 1; i >= 0; i-- ){
+                    var p:PropertyChangeEvent = event.items[i] as PropertyChangeEvent;
+
+                    CONFIG::debugging{
+                        if( !Debugger.checkPropertyExist( p.target, "sortDesc" ) ){
+                            throw new Error();
+                        }
+                    }
+                    if( p.property == "sortDesc" ){
+                        sortOrderChanged = true;
+                        break;
+                    }
+                }
+                if( !sortOrderChanged ){
+                    return;
+                }
+            }
+            rfrReload = null;
+        }
+
+        private function set rfrReload( ignoreVar:* ):void{
+            if( rootModel != null ){
+                rootModel.callInNext.putIn( loadIntoDataGrid, this,
+                                            [
+                                                dataGridDataProvider.toArray(),
+                                                selectedItems == null ? null : selectedItems.concat( new Vector.<Object>() )
+                                            ] );
+            }
+        }
+
+        protected function loadIntoDataGrid( preDataGridDataProvider:Array = null, preSelected:Vector.<Object> = null ):void{
+            var rowData:TreeGridDataRow;
+            var preDisplayedList:Vector.<TreeGridDataRow>;
+
+            if( dataGridDataProvider.length > 0 ){
+
+                if( preSelected != null ){
+                    preDisplayedList = new Vector.<TreeGridDataRow>();
+                    for( var kk:int = preDataGridDataProvider.length - 1; kk >= 0; kk-- ){
+                        var tmpPR:TreeGridDataRow = preDataGridDataProvider[kk] as TreeGridDataRow;
+                        if( preDisplayedList.indexOf( tmpPR ) < 0 ){
+                            preDisplayedList.push( tmpPR );
+                        }
+                    }
+                }
+                dataGridDataProvider.removeAll();
+            }
+
+            var tmpMaxDepth:uint = 0;
+
+            //get opened
+            var displayedRowsList:Vector.<TreeGridDataRow> = new <TreeGridDataRow>[];
+            esi:
+                    for each( rowData in _inputRowDataList ){
+                        CONFIG::debugging{
+                            if( rowData.treeGridData == null ){
+                                throw new Error( this + ".reload " );
+                            }
+                        }
+
+                        tmpMaxDepth = Math.max( tmpMaxDepth, rowData.depth );
+
+                        if( displayedRowsList.indexOf( rowData ) < 0 ){
+                            if( preDisplayedList != null ){
+                                for each( var preO:TreeGridDataRow in preDisplayedList ){
+                                    if( preO.equals( rowData ) ){
+                                        displayedRowsList.push( rowData );
+                                    }
+                                }
+                            }
+                            else{
+                                var tmp:Vector.<TreeBranchItem> = rowData.getAllParents();
+                                for each( var anyParent:TreeGridDataRow in tmp ){
+                                    if( !anyParent.openOrClose ){
+                                        continue esi;
+                                    }
+                                }
+
+                                CONFIG::debugging{
+                                    if( displayedRowsList.indexOf( rowData ) >= 0 ){
+                                        throw new Error( this + ".loadIntoDataGrid " );
+                                    }
+                                }
+                                displayedRowsList.push( rowData );
+                            }
+                        }
+                    }
+
+            _maxDepth = tmpMaxDepth;
+            dispatchEvent( new Event( "maxDepthChanged" ) );
+
+            //sort
+            if( colOrderList.length > 0 ){
+                ( colOrderList.getItemAt( colOrderList.length - 1 ) as TreeGridDataColumn ).next = null;
+                if( columns.length > 1 ){
+                    for( var j:int = colOrderList.length - 2; j >= 0; j-- ){
+                        var scol:TreeGridDataColumn = colOrderList.getItemAt( j ) as TreeGridDataColumn;
+                        scol.next = colOrderList.getItemAt( j + 1 ) as TreeGridDataColumn;
+                    }
+                }
+
+                displayedRowsList.sort( ( colOrderList.getItemAt( 0 ) as TreeGridDataColumn ).compare2RowData );
+            }
+
+            //add open rows to datagrid
+            const len:int = displayedRowsList.length;
+            for( var i:int = 0; i < len; i++ ){
+                rowData = displayedRowsList[i] as TreeGridDataRow;
+                dataGridDataProvider.addItem( rowData );
+                rowData.isInDataGrid = true;
+            }
+
+            refreshMaxVisibleDepth();
+
+            if( preDataGridDataProvider != null ){
+                var toSelect:Vector.<Object> = new <Object>[];
+                for( var p:int = dataGridDataProvider.length - 1; p >= 0; p-- ){
+                    rowData = dataGridDataProvider.getItemAt( p ) as TreeGridDataRow;
+                    for each( var preRow:TreeGridDataRow in preDataGridDataProvider ){
+                        if( preRow.equals( rowData ) && rowData.parent != null ){
+                            rowData.parentRow.setOpenOrClose( true );
+                        }
+                    }
+
+                    if( preSelected != null ){
+                        for each( var preSlctRow:TreeGridDataRow in preSelected ){
+                            if( preSlctRow.equals( rowData ) ){
+                                toSelect.push( rowData );
+                            }
+                        }
+                    }
+                }
+                selectedItems = toSelect;
+                toSelect = null;
+                preDataGridDataProvider = null;
+            }
+        }
+        ]]></fx:Script>
+    <fx:Binding source="inputRowDataList" destination="rfrReload"/>
+
+    <!--open and close -->
+    <fx:Script><![CDATA[
+        {
+            private function onViewListChanged( event:CollectionEvent ):void{
+                if( event.kind == CollectionEventKind.UPDATE ){
+                    for( var i:int = event.items.length - 1; i >= 0; i-- ){
+                        var iEv:PropertyChangeEvent = event.items[i] as PropertyChangeEvent;
+                        CONFIG::debugging{
+                            if( !Debugger.checkPropertyExist( iEv.source, "openOrClose" ) ){
+                                throw new Error( this + ".onViewListChanged " );
+                            }
+
+                            if( !( iEv.source is TreeGridDataRow ) ){
+                                throw new Error( "wrong source " );
+                            }
+                        }
+                        if( iEv.property == "openOrClose" ){
+                            /**
+                             * when filter by typing, data provider would be null
+                             */
+                            if( dataGridDataProvider != null ){
+                                onRowOpenOrClose( iEv.source as TreeGridDataRow );
+                            }
+                        }
+                    }
+                }
+            }
+
+            private function onRowOpenOrClose( rowData:TreeGridDataRow ):void{
+                var firstCol:TreeGridDataColumn = columns.getItemAt( 0 ) as TreeGridDataColumn;
+                if( rowData.openOrClose ){
+                    var rowAllOpenChildren:Vector.<TreeGridDataRow> = rowData.getAllOpenChildren();
+                    for( var i:int = rowAllOpenChildren.length - 1; i >= 0; i-- ){
+                        var inserting:TreeGridDataRow = rowAllOpenChildren[ i ];
+                        if( dataGridDataProvider.getItemIndex( inserting ) < 0 ){
+                            var insertPosition:uint = 0;
+                            var dgdparr:Array = dataGridDataProvider.toArray();
+                            for( var j:int = dgdparr.length - 1; j >= 0; j-- ){
+                                var si:TreeGridDataRow = dgdparr[j] as TreeGridDataRow;
+                                if( inserting != si && firstCol.compare2RowData( inserting, si ) >= 0 ){
+                                    insertPosition = j + 1;
+                                    break;
+                                }
+                            }
+                            dataGridDataProvider.addItemAt( inserting, insertPosition );
+                            inserting.isInDataGrid = true;
+                        }
+                    }
+                }
+                else{
+                    var tmpSelectionChanged:Boolean = false;
+                    for( var k:int = dataGridDataProvider.length - 1; k >= 0; k-- ){
+                        var itemAt:TreeGridDataRow = dataGridDataProvider.getItemAt( k ) as TreeGridDataRow;
+                        if( itemAt.isInDataGrid ){
+                            var tmpIndex:int = rowData.allChildren.getItemIndex( itemAt );
+                            if( tmpIndex >= 0 ){
+                                itemAt.isInDataGrid = false;
+                                dataGridDataProvider.removeItemAt( k );
+
+                                if( selectedItems != null ){
+                                    var itmIdxInslctn:Number = selectedItems.indexOf( itemAt );
+                                    if( itmIdxInslctn >= 0 ){
+                                        tmpSelectionChanged = true;
+                                        selectedItems.splice( itmIdxInslctn, 1 );
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    if( tmpSelectionChanged ){
+                        selectedItems = selectedItems.concat();
+                    }
+                }
+                rootModel.callInNext.putIn( refreshMaxVisibleDepth );
+                rootModel.callInNext.putIn( refreshClosedMatches );
+            }
+        }
+
+        [Bindable]
+        public var depthRollOver:int = -1;
+
+        {
+
+            private var _depthArr:Vector.<uint>;
+            public static const depthArr_CHANGED:String = "depthArrChanged";
+
+            [Bindable(event="depthArrChanged")]
+            public function get depthArr():Vector.<uint>{
+                return _depthArr;
+            }
+
+            private var _maxDepth:uint = 0;
+
+            [Bindable(event="maxDepthChanged")]
+            public function get maxDepth():uint{
+                return _maxDepth;
+            }
+
+            private var _maxVisibleDepth:int = -1;
+            public static const maxDepth_CHANGED:String = "maxDepthChanged";
+
+            [Bindable(event="maxDepthChanged")]
+            public function get maxVisibleDepth():int{
+                return _maxVisibleDepth;
+            }
+
+            private function refreshMaxVisibleDepth():void{
+
+                var darr:Vector.<uint> = new <uint>[];
+
+                var dgArr:Array = dataGridDataProvider.toArray();
+                dgArr.forEach( function ( ele:TreeGridDataRow, idx:int, o:Array ):void{
+                    if( darr.indexOf( ele.depth ) < 0 ){
+                        darr.push( ele.depth );
+                    }
+                } );
+
+                darr.sort( Array.NUMERIC | Array.DESCENDING );
+                _depthArr = darr;
+                dispatchEvent( new Event( depthArr_CHANGED ) );
+
+                var max:int = ( darr.length == 0 ) ? -1 : darr[0];
+                if( max != _maxVisibleDepth ){
+                    _maxVisibleDepth = max;
+                    dispatchEvent( new Event( maxDepth_CHANGED ) );
+                }
+            }
+        }
+
+
+        public function selectDeselectByDepth( d:uint ):void{
+            var depthAlreadySelected:Boolean = true;
+            var slctd:Vector.<Object> = rootModel.pressedKeys.getItemIndex( Keyboard.CONTROL ) >= 0 ? selectedItems.concat( new <Object>[] ) : new <Object>[];
+            for( var j:int = dataGridDataProvider.length - 1; j >= 0; j-- ){
+                var rd:TreeGridDataRow = dataGridDataProvider.getItemAt( j ) as TreeGridDataRow;
+                if( rd.depth == d ){
+                    slctd.push( rd );
+                    if( depthAlreadySelected && ( selectedItems == null || selectedItems.indexOf( rd ) < 0 ) ){
+                        depthAlreadySelected = false;
+                    }
+                }
+            }
+            if( depthAlreadySelected && slctd.length == selectedItems.length ){
+                selectedItems = new Vector.<Object>();
+            }
+            else{
+                selectedItems = slctd;
+            }
+        }
+
+        [Bindable]
+        public var depthIndent:uint = 22;
+        ]]></fx:Script>
+
+    <!--find matching-->
+    <fx:Script><![CDATA[
+        public function refreshClosedMatches():void{
+            var firsCol:TreeGridDataColumn = colOrderList.getItemAt( 0 ) as TreeGridDataColumn;
+            for( var j:int = dataGridDataProvider.length - 1; j >= 0; j-- ){
+                var visibleRow:TreeGridDataRow = dataGridDataProvider.getItemAt( j ) as TreeGridDataRow;
+                if( !visibleRow.openOrClose ){
+                    var mc:Vector.<TreeGridDataRow> = new Vector.<TreeGridDataRow>();
+                    for( var k:int = visibleRow.allChildren.length - 1; k >= 0; k-- ){
+                        var r:TreeGridDataRow = visibleRow.allChildren.getItemAt( k ) as TreeGridDataRow;
+                        if( firsCol.isRowMatch( r ) ){
+                            mc.push( r );
+                        }
+                    }
+                    visibleRow.matchingChildren = mc;
+                }
+                else{
+                    visibleRow.matchingChildren = null;
+                }
+            }
+        }
+        ]]></fx:Script>
+    <fx:Declarations>
+        <s:ArrayList id="columns" collectionChange="onColsChanged( event );"/>
+        <s:ArrayList id="colOrderList" collectionChange="onColsChanged( event );"/>
+        <s:ArrayList id="dataGridDataProvider" collectionChange="onViewListChanged( event );"/>
+    </fx:Declarations>
+
+    <fx:Script><![CDATA[
+        import edu.umich.med.mbni.utils.ModelOperation;
+
+        public function set rfrMultiSelectionOperation( v:* ):void{
+            availMultiOperations.removeAll();
+            rootModel.callInNext.putIn( refreshMultiSelectionOperation, this, null, 3 );
+        }
+
+        protected function refreshMultiSelectionOperation():void{
+            if( selectedItems != null && selectedItems.length > 0 && columns.length > 0 ){
+                for( var j:int = columns.length - 1; j >= 0; j-- ){
+                    var col:TreeGridDataColumn = columns.getItemAt( j ) as TreeGridDataColumn;
+                    var amos:Vector.<ModelOperation> = col.getAvailMultiOperations( selectedItems ) as Vector.<ModelOperation>;
+                    if( amos != null ){
+                        for( var k:int = amos.length - 1; k >= 0; k-- ){
+                            var mo:ModelOperation = amos[k] as ModelOperation;
+                            availMultiOperations.addItem( mo );
+                        }
+                    }
+                }
+            }
+        }
+        ]]></fx:Script>
+    <fx:Binding source="selectedItems" destination="rfrMultiSelectionOperation"/>
+    <fx:Binding source="columns.length" destination="rfrMultiSelectionOperation"/>
+    <fx:Declarations>
+        <s:ArrayList id="availMultiOperations"/>
+    </fx:Declarations>
+</as3lib:MxmlEventDispatcher>

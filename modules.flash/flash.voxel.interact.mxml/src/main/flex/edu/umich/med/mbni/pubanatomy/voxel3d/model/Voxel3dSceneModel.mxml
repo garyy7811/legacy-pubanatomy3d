@@ -1,0 +1,171 @@
+<?xml version="1.0"?>
+<dd3d:DD3dModelScene3d xmlns:fx="http://ns.adobe.com/mxml/2009"
+                       xmlns:dd3d="edu.umich.med.mbni.pubanatomy.datadriven3dwindow.*"
+                       xmlns:as3lib="com.flashflexpro.as3lib.*" xmlns:s="library://ns.adobe.com/flex/spark">
+    <fx:Metadata>
+        [ResourceBundle("Text3d")]
+    </fx:Metadata>
+    <fx:Script><![CDATA[
+        [Bindable(event="parentChanged")]
+        public function get rootModel3d():RootModelVoxel3d{
+            return parent as RootModelVoxel3d;
+        }
+
+        private function addStructureTo3dScene( s:Voxel3dStructureModel ):Voxel3dStructureModel{
+            if( s.dtoModelMeshArr != null && meshDataProvider.getItemIndex( s ) < 0 ){
+                meshDataProvider.addItem( s );
+            }
+            return s;
+        }
+
+        private function removeStructureFrom3dScene( s:Voxel3dStructureModel ):void{
+            meshDataProvider.removeItem( s );
+        }
+
+        private function addPlaneTo3dScene( p:Voxel3dPlane ):Voxel3dPlane{
+            return p;
+        }
+        ]]></fx:Script>
+    <fx:Binding source="rootModel3d.on3dStageGeneLevelSets" destination="particleDataProvider"/>
+
+    <fx:Declarations>
+        <as3lib:Sync2Lists source="{rootModel3d.on3dStageStructureModels}"
+                           getDestInst="addStructureTo3dScene"
+                           propertiesReplaceOnUpdate="{[ 'dtoModelMeshArr' ]}"
+                           destroyInst="removeStructureFrom3dScene">
+            <as3lib:destination>
+                <s:ArrayList id="__meshArrDummy"/>
+            </as3lib:destination>
+        </as3lib:Sync2Lists>
+        <as3lib:Sync2Lists source="{rootModel3d.planeLst}"
+                           getDestInst="addPlaneTo3dScene"
+                           destination="{planeDataProvider}"/>
+    </fx:Declarations>
+    <fx:Script><![CDATA[
+        import edu.umich.med.mbni.pubanatomy.datadriven3dwindow.Dd3dModelCamera;
+        import edu.umich.med.mbni.utils.ModelOperationMenuChildren;
+        import edu.umich.med.mbni.utils.ModelOperationMenuItem;
+        import edu.umich.med.mbni.utils.ModelOperationMenuType;
+
+        import mx.resources.ResourceManager;
+
+        private function set atlas2v3d( v:* ):void{
+            if( _v3d2AtlasOnGoing ){
+                return;
+            }
+            if( rootModel3d.rootModelAtlas.mouseOverStructure != null ){
+                var tmp:Voxel3dStructure = rootModel3d.syncAllStructuresToVoxels.getDestBySource( rootModel3d.rootModelAtlas.mouseOverStructure ) as Voxel3dStructure;
+                setMouseOverObj( tmp.structure3dModel );
+            }
+            else{
+                setMouseOverObj( null );
+            }
+        }
+
+        private var _v3d2AtlasOnGoing:Boolean = false;
+
+        private function set v3d2atlas( v:* ):void{
+            _v3d2AtlasOnGoing = true;
+            if( mouseOverObj != null ){
+                if( mouseOverObj is Voxel3dStructureModel ){
+                    rootModel3d.rootModelAtlas.mouseOverStructure = ( mouseOverObj as Voxel3dStructureModel).structureItem.atlasStructure;
+                }
+                else if( mouseOverObj is Voxel3dStructureGeneExprType ){
+                    rootModel3d.rootModelAtlas.mouseOverStructure = ( mouseOverObj as Voxel3dStructureGeneExprType).v3dStructureGeneExpr.structureGene.structure;
+                }
+                else{
+                    CONFIG::debugging{
+                        throw new Error( this + ".v3d2atlas " );
+                    }
+                }
+            }
+            else{
+                rootModel3d.rootModelAtlas.mouseOverStructure = null;
+            }
+            _v3d2AtlasOnGoing = false;
+        }
+
+        override public function showMenu( from:Dd3dModelCamera = null ):void{
+            if( rootModel3d.rootModelAtlas.mouseOverStructure != null ){
+
+                var p:Vector3D = mouseLastPosition.clone();
+                var move3dCenterP:Voxel3dOperationMove3dCenter = new Voxel3dOperationMove3dCenter();
+                move3dCenterP.newCenter = p;
+                move3dCenterP.v3dSceneModel = this;
+
+                var positionMM:String = ("(" +
+                        rootModel3d.rootModelAtlas.format( mouseLastPosition.x ) + ","
+                        + rootModel3d.rootModelAtlas.format( mouseLastPosition.y ) + ","
+                        + rootModel3d.rootModelAtlas.format( mouseLastPosition.z )
+                        + ")");
+                var mPPlanes:ModelOperationMenuChildren = new ModelOperationMenuChildren( [
+                                                                                              move3dCenterP,
+                                                                                              new ModelOperationMenuType(),
+
+                                                                                              rootModel3d.getOpPlaneInDirFromV3d( 0, p ),
+                                                                                              rootModel3d.getOpPlaneInDirFromV3d( 1, p ),
+                                                                                              rootModel3d.getOpPlaneInDirFromV3d( 2, p )
+                                                                                          ],
+                                                                                          from,
+
+                                                                                          ResourceManager.getInstance().getString(
+                                                                                                  'Text3d',
+                                                                                                  'v3dMouseHitPositionMenuLabel',
+                                                                                                  [
+                                                                                                      positionMM
+                                                                                                  ]
+                                                                                          )
+                );
+
+                mPPlanes.toolTip = "cursor hit position|^|" + positionMM + "\r\n#t(v3dMouseHitPositionMenuTip)p#";
+
+
+                var mStr:ModelOperationMenuItem;
+
+                var structureRow:Voxel3dStructureTreeGridDataRow = rootModel3d.on3dStageStructureTreeGridData.getRowByStructure( rootModel3d.rootModelAtlas.mouseOverStructure ) as Voxel3dStructureTreeGridDataRow;
+                if( structureRow != null ){
+                    mStr = structureRow.getMenuItems();
+                    mStr.toolTip = " cursor hit structor name|^|" + rootModel3d.rootModelAtlas.mouseOverStructure.dtoStructure.name
+                            + "\r\n#t(v3dMouseHitStrMenuTip)p#";
+                    mStr.label = "Hit structure: " + rootModel3d.rootModelAtlas.mouseOverStructure.dtoStructure.name;
+                }
+                else{
+                    mStr = new ModelOperationMenuItem();
+                    mStr.toolTip = "cursor hit structor name|^|" + rootModel3d.rootModelAtlas.mouseOverStructure.dtoStructure.name
+                            + "\r\n#t(v3dMouseLoadHitStrMenuTip)p#";
+                    var voxel3dStructure:Voxel3dStructure = ( rootModel3d.syncAllStructuresToVoxels.getDestBySource( rootModel3d.rootModelAtlas.mouseOverStructure ) as Voxel3dStructure );
+                    mStr.toExe = function ():void{
+                        voxel3dStructure.on3dStage = true;
+                    }
+                    mStr.label = "Load " + rootModel3d.rootModelAtlas.mouseOverStructure.dtoStructure.name + "'s model into 3D View";
+                }
+
+                setMenuOperations( new ModelOperationMenuChildren( [
+                                                                       mPPlanes,
+                                                                       new ModelOperationMenuType(),
+                                                                       mStr
+                                                                   ], from ) );
+            }
+        }
+        ]]></fx:Script>
+    <fx:Binding source="rootModel3d.rootModelAtlas.mouseOverStructure" destination="atlas2v3d"/>
+    <fx:Binding source="mouseOverObj" destination="v3d2atlas"/>
+    <fx:Script><![CDATA[
+        [Bindable]
+        public var centralStructure:Voxel3dStructureModel;
+
+
+        private function set rfrCentral( ignoreVar:* ):void{
+            rootApp.callInNext.putIn( refreshCentral );
+        }
+
+        private function refreshCentral():void{
+            if( centralStructure != null ){
+                var max:Array = centralStructure.structureItem.atlasStructure.dtoStructure.max;
+                var min:Array = centralStructure.structureItem.atlasStructure.dtoStructure.min;
+                centralPosition = new Vector3D( ( max[0 ] + min[ 0 ]) / 2, ( max[ 1 ] + min[ 1 ]) / 2, ( max[ 2 ] + min[ 2 ] ) / 2 );
+            }
+        }
+        ]]></fx:Script>
+    <fx:Binding source="centralStructure" destination="rfrCentral"/>
+</dd3d:DD3dModelScene3d>

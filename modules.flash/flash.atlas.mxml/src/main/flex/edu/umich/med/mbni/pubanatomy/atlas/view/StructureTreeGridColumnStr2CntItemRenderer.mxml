@@ -1,0 +1,35 @@
+<?xml version="1.0"?>
+<v:StructureTreeGridColumnItemRenderer xmlns:fx="http://ns.adobe.com/mxml/2009"
+                                       xmlns:s="library://ns.adobe.com/flex/spark"
+                                       xmlns:v="edu.umich.med.mbni.pubanatomy.atlas.view.*">
+    <v:layout>
+        <s:HorizontalLayout verticalAlign="middle" gap="1"/>
+    </v:layout>
+    <fx:Binding source="( treeGridColumn.data as StructureTreeGridDataColumnStrCount )" destination="_treeColGene"/>
+    <fx:Script><![CDATA[
+        import edu.umich.med.mbni.pubanatomy.atlas.model.StructureTreeGridDataColumnStrCount;
+
+        [Bindable]
+        public var _treeColGene:StructureTreeGridDataColumnStrCount;
+
+        private function set rfrCount( ignoreVar:* ):void{
+            treeGrid.treeGridData.rootModel.callInNext.putIn( refreshStrCnt );
+        }
+
+        private function refreshStrCnt():void{
+            if( _treeColGene == null || _treeColGene.structureSymbol2CountDic == null || !visible ){
+                return;
+            }
+            _count = _treeColGene.structureSymbol2CountDic[ structureRowData.structure.dtoStructure.acronym.toLowerCase() ];
+        }
+
+        [Bindable]
+        private var _count:uint = 0;
+
+        ]]></fx:Script>
+    <fx:Binding source="_treeColGene.structureSymbol2CountDic" destination="rfrCount"/>
+    <fx:Binding source="structureRowData.structure" destination="rfrCount"/>
+    <fx:Binding source="visible" destination="rfrCount"/>
+    <fx:Binding source="treeGrid.treeGridData.rootModel.callInNext" destination="rfrCount"/>
+    <s:Label text="{_count}" toolTip="{_count} citations found" click="trace( '' );"/>
+</v:StructureTreeGridColumnItemRenderer>

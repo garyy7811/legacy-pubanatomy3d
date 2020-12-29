@@ -1,0 +1,72 @@
+<?xml version="1.0"?>
+<s:Application xmlns:fx="http://ns.adobe.com/mxml/2009"
+                       xmlns:s="library://ns.adobe.com/flex/spark"
+                       xmlns:searchView="edu.umich.med.mbni.pubanatomy.search.view.*"
+                       xmlns:m="edu.umich.med.mbni.pubanatomy.search.model.*"
+                       xmlns:as3lib="com.flashflexpro.as3lib.*"
+                       xmlns:utils="edu.umich.med.mbni.utils.*" xmlns:mx="library://ns.adobe.com/flex/mx"
+                       preinitialize="onPreInit();"
+                       enterFrame="callOnceInNextFrame.onEnterFrame();">
+    <fx:Script><![CDATA[
+        import edu.umich.med.mbni.webdesktop.WebWindow;
+
+        protected function onPreInit():void{
+            rootApp.restUrl = "http://172.20.187.127:8080/yanggang-test/blazedsmessagebroker/amf";
+            rootApp.stage = systemManager.stage;
+            rootApp.appInit();
+        }
+
+        private function removeWin( w:WebWindow ):void{
+            w.close();
+        }
+
+        private static var _v3dDummy:ArrayList = new ArrayList();
+        private static var _searchDummy:ArrayList = new ArrayList();
+        ]]></fx:Script>
+    <fx:Declarations>
+        <s:ArrayList id="pressedKeys"/>
+        <m:SearchModel id="searchModel">
+            <m:parent>
+                <utils:RootModelApp id="rootApp">
+                    <utils:callInNext>
+                        <as3lib:CallOnceInNextFrame id="callOnceInNextFrame"/>
+                    </utils:callInNext>
+                    <utils:pressedKeys>
+                        <s:ArrayList/>
+                    </utils:pressedKeys>
+                    <utils:rpcOnAir>
+                        <s:ArrayList/>
+                    </utils:rpcOnAir>
+                    <utils:rpcWaitQue>
+                        <s:ArrayList/>
+                    </utils:rpcWaitQue>
+                </utils:RootModelApp>
+            </m:parent>
+        </m:SearchModel>
+        <m:QueryResult id="staticQueryResult" searchModel="{searchModel}">
+            <m:queryModel>
+                <m:Query queryResult="{staticQueryResult}">
+                    <m:rootTerm>
+                        <m:QueryRelate2Terms query="{staticQueryResult.queryModel}" isVertical="true">
+                            <m:term>
+                                <m:QueryTermT field="{searchModel.query_fullText}"/>
+                            </m:term>
+                        </m:QueryRelate2Terms>
+                    </m:rootTerm>
+                </m:Query>
+            </m:queryModel>
+        </m:QueryResult>
+        <utils:ViewMenuHandler rootApp="{rootApp}"/>
+    </fx:Declarations>
+    <s:VGroup width="100%" height="100%">
+        <s:Button click="staticQueryResult.sendQuery();"/>
+        <searchView:SearchViewQueryInput termSuggestGroup="{searchAutoCompleteGroup}"
+                                         queryResult="{staticQueryResult}"/>
+        <mx:HDividedBox width="100%" height="100%">
+            <searchView:SearchViewResultHits modelResult="{staticQueryResult.resultModel}" width="100%" height="100%"/>
+            <searchView:SearchViewResultStatics modelResult="{staticQueryResult.resultModel}" width="100%" height="100%"/>
+        </mx:HDividedBox>
+    </s:VGroup>
+    <searchView:ViewTermSuggestGroup id="searchAutoCompleteGroup" includeInLayout="false"
+                                     searchModel="{searchModel}"/>
+</s:Application>

@@ -1,0 +1,97 @@
+<?xml version="1.0"?>
+<utils:TiBoTlePanel xmlns:fx="http://ns.adobe.com/mxml/2009" xmlns:mx="library://ns.adobe.com/flex/mx"
+                    xmlns:view="edu.umich.med.mbni.pubanatomy.integrate.view.*"
+                    xmlns:s="library://ns.adobe.com/flex/spark"
+                    borderColor="0xC0C0C0"
+                    borderWeight="{( model.modelCamera.scene.focusedCamera == model.modelCamera &amp;&amp; model.modelCamera.scene.allCameraModels.length > 1 )?2:1}"
+                    backgroundAlpha="0" cornerRadius="3" resize="fit3dView();" addedToStage="callLater( onMajiaAdded );"
+                    removedFromStage="onMajiaRemoved();" xmlns:utils="edu.umich.med.mbni.webdesktop.*">
+    <fx:Script><![CDATA[
+        import edu.umich.med.mbni.pubanatomy.datadriven3dwindow.Dd3dViewCamera;
+        import edu.umich.med.mbni.pubanatomy.integrate.model.MDLDividableWidget;
+        import edu.umich.med.mbni.pubanatomy.voxel3d.view.V3dScene;
+        import edu.umich.med.mbni.pubanatomy.voxel3d.view.V3dViewCamera;
+
+        [Bindable]
+        public var model:MDLDividableWidget;
+
+        private var _v3dViewCamera:V3dViewCamera;
+
+        private function fit3dView():void{
+            if( _v3dViewCamera != null ){
+                _v3dViewCamera.width = width;
+                _v3dViewCamera.height = height;
+            }
+        }
+
+        [Bindable]
+        public var scene:V3dScene;
+
+        private function onMajiaAdded():void{
+            CONFIG::debugging{
+                if( _v3dViewCamera != null ){
+                    trace( this + ".onMajiaAdded _v3dViewCamera != null !!!" );
+                }
+            }
+
+            if( parent is WidgetDividable && (
+                    parent as WidgetDividable ).model != null && _v3dViewCamera == null && model.modelCamera != null ){
+                _v3dViewCamera = new V3dViewCamera();
+                _v3dViewCamera.scene = scene;
+                _v3dViewCamera.model = model.modelCamera;
+                _v3dViewCamera.backgroundColor = model.backgroundColor;
+
+                _v3dViewCamera.addEventListener( Dd3dViewCamera.RESOURCE_OVER_LOAD, onViewOverLoaded );
+                CONFIG::debugging{
+                    var tmp:* = model.modelCamera.scene.allCameraModels;
+                    trace( this + ".onMajiaAdded: tmp:" + tmp );
+                }
+
+                v3dViewMajia.addChild( _v3dViewCamera );
+                fit3dView();
+            }
+            if( model != null && model.rootApp != null ){
+                model.rootApp.log( "WidgetCamera.onViwOverLoaded" );
+            }
+        }
+
+        private function onViewOverLoaded( ev:Event ):void{
+            onMajiaRemoved();
+            onMajiaAdded();
+            model.rootApp.log( "WidgetCamera.onMajiaAdded" );
+        }
+
+        private function onMajiaRemoved():void{
+            CONFIG::debugging{
+                try{
+                    if( _v3dViewCamera != null ){
+                        _v3dViewCamera.removeEventListener( Dd3dViewCamera.RESOURCE_OVER_LOAD, onViewOverLoaded );
+                        v3dViewMajia.removeChild( _v3dViewCamera );
+                        _v3dViewCamera = null;
+                    }
+                }
+                catch( e:Error ){
+                    trace( e.getStackTrace() );
+                }
+                return;
+            }
+
+            if( _v3dViewCamera != null ){
+                v3dViewMajia.removeChild( _v3dViewCamera );
+                _v3dViewCamera = null;
+            }
+        }
+        ]]></fx:Script>
+    <fx:Binding source="model.backgroundColor" destination="_v3dViewCamera.backgroundColor"/>
+    <utils:titleGroupContent>
+        <view:WidgetCameraCtrls width="100%" model="{model}"/>
+    </utils:titleGroupContent>
+    <mx:UIComponent id="v3dViewMajia"/>
+    <s:Button right="3" top="3" click="onResetClick();" label="Reset">
+        <fx:Script><![CDATA[
+            private function onResetClick():void{
+                model.modelCamera.reset();
+            }
+            ]]></fx:Script>
+    </s:Button>
+</utils:TiBoTlePanel>

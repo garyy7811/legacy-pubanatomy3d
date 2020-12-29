@@ -1,0 +1,64 @@
+<?xml version="1.0"?>
+<rs:RpcInList xmlns:fx="http://ns.adobe.com/mxml/2009" xmlns:rs="edu.umich.med.mbni.pubanatomy.flash.rs.*">
+    <fx:Script><![CDATA[
+        [Bindable]
+        public var path:String = null;
+
+        [Bindable]
+        public var remoteMethodName:String;
+
+        protected function set rfrRequestUrl( ignoreVar:* ):void{
+            if( model != null && path != null ){
+                CONFIG::debugging{
+                    if( _request != null ){
+                        throw new Error( this + ".rfrRequestUrl " );
+                    }//debug
+                }
+
+                if( remoteMethodName == null ){
+                    var myclsName:String = getQualifiedClassName( this ).split( "::" )[ 1 ];
+                    remoteMethodName = myclsName.charAt( 0 ).toLowerCase() + myclsName.substr( 1 );
+                }
+                _request = new URLRequest( model.restUrl + "/" + path + "/" + remoteMethodName + ".amf" );
+            }
+        }
+
+        override public function callRemote():Boolean{
+            CONFIG::debugging{
+                if( path == null ){
+                    throw new Error( this + ".callRemote path is null !!!!" );
+                }//debug
+            }
+            return super.callRemote();
+        }
+        ]]></fx:Script>
+    <fx:Binding source="model.restUrl" destination="rfrRequestUrl"/>
+    <fx:Binding source="path" destination="rfrRequestUrl"/>
+    <fx:Binding source="remoteMethodName" destination="rfrRequestUrl"/>
+    <fx:Script><![CDATA[
+        import edu.umich.med.mbni.pubanatomy.flash.dto.DtoException;
+
+        [Bindable]
+        public var args:Array;
+
+        override protected function onRawResult( result:Object ):void{
+            super.onRawResult( result );
+            var byteArray:ByteArray = ( result as ByteArray );
+            var asObj:* = byteArray.length == 0 ? null : byteArray.readObject();
+            if( asObj is DtoException ){
+                onServerException( asObj as DtoException );
+            }
+            else{
+                onObjResult( asObj );
+            }
+        }
+
+        protected function onServerException( dtoException:DtoException ):void{
+            trace( dtoException.stack );
+        }
+
+        protected function onObjResult( asObj:* = null ):void{
+            throw new Error( "I am abstract!" );
+        }
+        ]]></fx:Script>
+</rs:RpcInList>

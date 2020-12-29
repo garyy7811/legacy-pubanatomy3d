@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:SkinnableContainer xmlns:fx="http://ns.adobe.com/mxml/2009"
+                      xmlns:s="library://ns.adobe.com/flex/spark"
+                      xmlns:utils="edu.umich.med.mbni.utils.*"
+        >
+    <fx:Script><![CDATA[
+        import edu.umich.med.mbni.pubanatomy.search.model.QueryRelate2Terms;
+
+        [Bindable]
+        public var model:QueryRelate2Terms;
+
+
+        private function set rfrState( ignoreVar:* ):void{
+            model.query.queryResult.searchModel.callInNext.putIn( refreshState, this, null, 7 );
+        }
+
+        private function refreshState():void{
+            if( model == null ){
+                return;
+            }
+            var tmp:String = "uniqueFieldNameOff";
+            if( model.parent == null || model.parent.field == null ){
+                if( model.field != null ){
+                    tmp = "uniqueFieldNameOn";
+                }
+            }
+
+            if( model.query.queryResult.mouseOverTerm == model ){
+                tmp += "MouseOver";
+            }
+            else{
+                tmp += "MouseOut";
+            }
+            currentState = tmp;
+        }
+        ]]></fx:Script>
+    <s:states>
+        <s:State name="uniqueFieldNameOnMouseOver" stateGroups="uniqueFieldNameOn,mouseOver"/>
+        <s:State name="uniqueFieldNameOffMouseOver" stateGroups="uniqueFieldNameOff,mouseOver"/>
+        <s:State name="uniqueFieldNameOnMouseOut" stateGroups="uniqueFieldNameOn,mouseOut"/>
+        <s:State name="uniqueFieldNameOffMouseOut" stateGroups="uniqueFieldNameOff,mouseOut"/>
+    </s:states>
+    <fx:Binding source="model.query.queryResult.mouseOverTerm" destination="rfrState"/>
+    <fx:Binding source="model.query.queryResult.searchModel.draggingTerm" destination="rfrState"/>
+    <fx:Binding source="model.parent.field" destination="rfrState"/>
+    <fx:Binding source="model.field" destination="rfrState"/>
+
+    <s:Rect id="tbFill" left="0" right="0" top="0" bottom="1">
+        <s:fill>
+            <s:LinearGradient rotation="90">
+                <s:GradientEntry color="0xE2E2E2"/>
+                <s:GradientEntry color="0xD9D9D9"/>
+            </s:LinearGradient>
+        </s:fill>
+    </s:Rect>
+    <s:Rect id="tbHilite" left="0" right="0" top="0" bottom="0">
+        <s:stroke>
+            <s:LinearGradientStroke rotation="90" weight="1">
+                <s:GradientEntry color="0xEAEAEA"/>
+                <s:GradientEntry color="0xD9D9D9"/>
+            </s:LinearGradientStroke>
+        </s:stroke>
+    </s:Rect>
+    <s:Rect id="tbDiv" left="0" right="0" height="1" bottom="0">
+        <s:fill>
+            <s:SolidColor color="0xC0C0C0"/>
+        </s:fill>
+    </s:Rect>
+
+    <s:Label text.uniqueFieldNameOn="{model.field.label}"
+             text.uniqueFieldNameOff=
+                     "{( model.term==null&amp;&amp;model.child1.field != model.child2.field)
+                     ?'-_-':''}"
+
+             textAlign="center" left="5" right="5" top="2" bottom="2"
+             width="100%" fontWeight="bold" id="lbl" toolTip="#t(searchField_{model.field.toolTip})p#"
+             fontStyle="{model.queryStr==null?'italic':'normal'}"
+             color="{model.queryStr==null?0x770000:0}"
+            />
+    <s:HGroup right="0" top="0" gap="3">
+        <s:BorderContainer minHeight="1" minWidth="1" borderVisible="true" backgroundColor="0xffffff"
+                           includeIn="mouseOver"
+                           visible="{model.child1!=null&amp;&amp;model.child2!=null}"
+                           includeInLayout="{model.child1!=null&amp;&amp;model.child2!=null}"
+                           click="model.isVertical = !model.isVertical;"
+                           toolTip="Click change layout direction">
+            <s:Label text="{model.isVertical?'Ｖ':'Ｈ'}" width="12" height="12" textAlign="center"/>
+        </s:BorderContainer>
+        <utils:MoreOptionsButton id="menuButton" includeIn="mouseOver"
+                                 click="model.showMenu()" toolTip="#t(eachTermClickToSeeMenus)p#"
+                                 width="16" height="14"/>
+
+    </s:HGroup>
+</s:SkinnableContainer>

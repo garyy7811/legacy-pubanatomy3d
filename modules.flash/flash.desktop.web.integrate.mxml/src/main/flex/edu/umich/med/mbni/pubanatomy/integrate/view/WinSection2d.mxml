@@ -1,0 +1,53 @@
+<?xml version="1.0"?>
+<iv:WebWinBase xmlns:fx="http://ns.adobe.com/mxml/2009"
+               xmlns:iv="edu.umich.med.mbni.pubanatomy.integrate.view.*"
+               xmlns:sec2="edu.umich.med.mbni.pubanatomy.sectioninteract.view.*"
+               xmlns:s="library://ns.adobe.com/flex/spark" title="Section:{titleCtrl.txtTitle}"
+               borderColor="0x0000ff" borderWeight="1"
+               borderVisible="{sectionPlane.v3dPlane.imageSectionMode != Voxel3dPlane.IMG_SECTION_MODE_XYZ
+               &amp;&amp;sectionPlane.rootModelAtlas.mouseOverImg !=null
+               &amp;&amp;sectionPlane.rootModelAtlas.mouseOverImg == sectionPlane.v3dPlane.image}">
+    <fx:Script><![CDATA[
+        import edu.umich.med.mbni.pubanatomy.sectioninteract.model.ModelSectionPlane;
+        import edu.umich.med.mbni.pubanatomy.voxel3d.model.Voxel3dPlane;
+
+        import spark.components.Button;
+
+        [Bindable(event="dataChanged")]
+        public function get sectionPlane():ModelSectionPlane{
+            return data as ModelSectionPlane;
+        }
+
+        override public function onCloseButtonClicked():void{
+            sectionPlane.rootModelSection2d.rootModelVoxel3d.planeLst.removeItem( sectionPlane.v3dPlane );
+        }
+
+        override protected function partAdded( partName:String, instance:Object ):void{
+            super.partAdded( partName, instance );
+            if( instance == titleGroup ){
+                titleGroup.addElementAt( sectionPlaneTitle, 0 );
+                overrideLabel.visible = false;
+                overrideLabel.includeInLayout = false;
+            }
+        }
+
+        override protected function onDragStart( event:MouseEvent ):void{
+            if( event.target is Button ){
+                return;
+            }
+            super.onDragStart( event );
+        }
+        ]]></fx:Script>
+    <sec2:ViewSectionPlane sectionPlane="{sectionPlane}" width="100%" height="100%"/>
+    <fx:Declarations>
+        <s:SkinnableContainer width="100%" id="sectionPlaneTitle" minHeight="24">
+            <s:layout>
+                <s:HorizontalLayout verticalAlign="middle"/>
+            </s:layout>
+            <sec2:ViewSectionPlaneTitle sectionPlane="{sectionPlane}" width="100%" id="titleCtrl"/>
+        </s:SkinnableContainer>
+    </fx:Declarations>
+    <iv:botleGroupContent>
+        <sec2:ViewSectionPlaneBotile sectionPlane="{sectionPlane}" width="100%"/>
+    </iv:botleGroupContent>
+</iv:WebWinBase>

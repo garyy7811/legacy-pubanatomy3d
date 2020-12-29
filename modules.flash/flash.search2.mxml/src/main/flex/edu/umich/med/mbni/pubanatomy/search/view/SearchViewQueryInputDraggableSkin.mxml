@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:SparkSkin xmlns:fx="http://ns.adobe.com/mxml/2009"
+             xmlns:s="library://ns.adobe.com/flex/spark"
+             xmlns:view="edu.umich.med.mbni.pubanatomy.search.view.*"
+             minWidth="1" minHeight="1" alpha.disabled="0.5"
+        >
+    <fx:Metadata>[HostComponent("edu.umich.med.mbni.pubanatomy.search.view.SearchViewQueryInputDraggable")]</fx:Metadata>
+    <fx:Script>
+        <![CDATA[
+        import edu.umich.med.mbni.pubanatomy.search.model.QueryRelate2Terms;
+
+        private static var _cornerRadius:uint = 5;
+
+        override protected function updateDisplayList( unscaledWidth:Number, unscaledHeight:Number ):void{
+            setPartCornerRadii( topMaskRect );
+            setPartCornerRadii( background );
+            setPartCornerRadii( bottomMaskRect );
+            setPartCornerRadii( border.rect );
+
+            super.updateDisplayList( unscaledWidth, unscaledHeight );
+        }
+
+        /**
+         * @private
+         */
+        private function setPartCornerRadii( target:Rect ):void{
+            target.topLeftRadiusX = _cornerRadius;
+            target.topRightRadiusX = _cornerRadius;
+            target.bottomLeftRadiusX = _cornerRadius;
+            target.bottomRightRadiusX = _cornerRadius;
+        }
+
+        [Bindable]
+        private var _model:QueryRelate2Terms;
+        ]]>
+    </fx:Script>
+    <fx:Binding source="hostComponent.drdr.model" destination="_model"/>
+
+    <s:states>
+        <s:State name="normal"/>
+        <s:State name="disabled"/>
+    </s:states>
+
+
+    <s:Group left="0" right="0" top="0" bottom="0">
+        <!-- top group mask -->
+        <!--- @private -->
+        <s:Group left="1" top="1" right="1" bottom="1" id="topGroupMask">
+            <!--- @private -->
+            <s:Rect id="topMaskRect" left="0" top="0" right="0" bottom="0">
+                <s:fill>
+                    <s:SolidColor alpha="0"/>
+                </s:fill>
+            </s:Rect>
+        </s:Group>
+
+        <!-- bottom group mask -->
+        <!--- @private -->
+        <s:Group left="1" top="1" right="1" bottom="1" id="bottomGroupMask">
+            <!--- @private -->
+            <s:Rect id="bottomMaskRect" left="0" top="0" right="0" bottom="0">
+                <s:fill>
+                    <s:SolidColor alpha="0"/>
+                </s:fill>
+            </s:Rect>
+        </s:Group>
+        <view:SearchViewQueryInputDraggableSkinBorder model="{_model}" id="border" left="0" right="0" top="0"
+                                                      bottom="0"/>
+
+        <!-- layer 2: background fill -->
+        <!--- Defines the appearance of the PanelSkin class's background. -->
+        <s:Rect id="background" left="1" top="1" right="1" bottom="1">
+            <s:fill>
+                <!--- @private
+             Defines the  PanelSkin class's background fill. The default color is 0xFFFFFF. -->
+                <s:SolidColor color="#FFFFFF"/>
+            </s:fill>
+        </s:Rect>
+
+        <!-- layer 3: contents -->
+        <!--- Contains the vertical stack of titlebar content and controlbar. -->
+        <s:Group left="1" right="1" top="1" bottom="1" id="contents">
+            <s:layout>
+                <s:VerticalLayout gap="0" horizontalAlign="justify"/>
+            </s:layout>
+
+            <view:SearchViewQueryInputDraggableSkinTopGroup id="topGroup" mask="{topGroupMask}" model="{_model}"
+                                                            left="0" right="0" top="0" bottom="0"/>
+            <s:Group id="contentGroup" minWidth="0" minHeight="0"
+                     clipAndEnableScrolling="true"/>
+
+            <s:Group id="bottomGroup" minWidth="0" minHeight="0">
+
+                <s:Group left="0" right="0" top="0" bottom="0" mask="{bottomGroupMask}">
+
+                    <!-- layer 0: control bar divider line -->
+                    <s:Rect left="0" right="0" top="0" height="1" alpha="0.22">
+                        <s:fill>
+                            <s:SolidColor color="0x000000"/>
+                        </s:fill>
+                    </s:Rect>
+
+                    <!-- layer 1: control bar highlight -->
+                    <s:Rect left="0" right="0" top="1" bottom="0">
+                        <s:stroke>
+                            <s:LinearGradientStroke rotation="90" weight="1">
+                                <s:GradientEntry color="0xE5E5E5"/>
+                                <s:GradientEntry color="0xD8D8D8"/>
+                            </s:LinearGradientStroke>
+                        </s:stroke>
+                    </s:Rect>
+
+                    <!-- layer 2: control bar fill -->
+                    <s:Rect left="1" right="1" top="2" bottom="1">
+                        <s:fill>
+                            <s:LinearGradient rotation="90">
+                                <s:GradientEntry color="0xDADADA"/>
+                                <s:GradientEntry color="0xC5C5C5"/>
+                            </s:LinearGradient>
+                        </s:fill>
+                    </s:Rect>
+                </s:Group>
+                <!-- layer 3: control bar -->
+                <!--- @copy spark.components.Panel#controlBarGroup -->
+                <s:Group id="botleGroup" left="0" right="0" top="1" bottom="1" minWidth="0" minHeight="0">
+                    <s:Label text="{_model.queryStr==null?'n/a':_model.count+'hits'}"
+                             toolTip="#t(searchTermHitsNum)p#"/>
+                </s:Group>
+            </s:Group>
+        </s:Group>
+    </s:Group>
+</s:SparkSkin>

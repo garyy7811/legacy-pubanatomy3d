@@ -1,0 +1,5 @@
+<?xml version="1.0"?>
+<treedatagrid:TreeGridDataColumnTree xmlns:fx="http://ns.adobe.com/mxml/2009"
+                                     xmlns:treedatagrid="edu.umich.med.mbni.treedatagrid.*"
+                                     cellDataClass="edu.umich.med.mbni.pubanatomy.atlas.view.StructureTreeGridDataCellTree">
+</treedatagrid:TreeGridDataColumnTree>

@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<schema name="example" version="1.5">
+    <types>
+        <!-- The StrField type is not analyzed, but indexed/stored verbatim. -->
+        <fieldType name="string" class="solr.StrField" sortMissingLast="true"/>
+
+        <!-- boolean type: "true" or "false" -->
+        <fieldType name="boolean" class="solr.BoolField" sortMissingLast="true"/>
+        <!--Binary data type. The data should be sent/retrieved in as Base64 encoded Strings -->
+        <fieldtype name="binary" class="solr.BinaryField"/>
+
+        <fieldType name="int" class="solr.TrieIntField" precisionStep="0" positionIncrementGap="0"/>
+        <fieldType name="float" class="solr.TrieFloatField" precisionStep="0" positionIncrementGap="0"/>
+        <fieldType name="long" class="solr.TrieLongField" precisionStep="0" positionIncrementGap="0"/>
+        <fieldType name="double" class="solr.TrieDoubleField" precisionStep="0" positionIncrementGap="0"/>
+
+        <fieldType name="tint" class="solr.TrieIntField" precisionStep="8" positionIncrementGap="0"/>
+        <fieldType name="tfloat" class="solr.TrieFloatField" precisionStep="8" positionIncrementGap="0"/>
+        <fieldType name="tlong" class="solr.TrieLongField" precisionStep="8" positionIncrementGap="0"/>
+        <fieldType name="tdouble" class="solr.TrieDoubleField" precisionStep="8" positionIncrementGap="0"/>
+
+        <fieldType name="date" class="solr.TrieDateField" precisionStep="0" positionIncrementGap="0"/>
+
+        <fieldType name="tdate" class="solr.TrieDateField" precisionStep="6" positionIncrementGap="0"/>
+
+        <fieldType name="random" class="solr.RandomSortField" indexed="true"/>
+
+        <fieldType class="solr.TextField" name="single_id" positionIncrementGap="100">
+            <analyzer>
+                <tokenizer class="solr.KeywordTokenizerFactory"/>
+                <filter class="solr.TrimFilterFactory"/>
+                <filter class="solr.LowerCaseFilterFactory"/>
+            </analyzer>
+        </fieldType>
+        <fieldType class="solr.TextField" name="single_word" positionIncrementGap="100">
+            <analyzer type="index">
+                <tokenizer class="solr.KeywordTokenizerFactory"/>
+                <filter class="solr.ClassicFilterFactory"/>
+                <filter class="solr.WordDelimiterFilterFactory"
+                        generateWordParts="1"
+                        generateNumberParts="0"
+                        catenateWords="0"
+                        catenateNumbers="0"
+                        catenateAll="0"
+                        preserveOriginal="1"
+                        />
+                <filter class="solr.LowerCaseFilterFactory"/>
+                <filter class="solr.TrimFilterFactory"/>
+                <filter class="solr.StopFilterFactory" words="lang/stopwords_en_06112013.txt" ignoreCase="true"/>
+                <filter class="solr.KeywordRepeatFilterFactory"/>
+                <filter class="solr.HunspellStemFilterFactory"
+                        dictionary="hunspell/en_US.dic"
+                        affix="hunspell/en_US.aff"
+                        ignoreCase="true"/>
+                <filter class="solr.RemoveDuplicatesTokenFilterFactory"/>
+            </analyzer>
+            <analyzer type="query">
+                <tokenizer class="solr.KeywordTokenizerFactory"/>
+                <filter class="solr.TrimFilterFactory"/>
+                <filter class="solr.LowerCaseFilterFactory"/>
+            </analyzer>
+        </fieldType>
+
+        <fieldType class="solr.TextField" name="sentences" positionIncrementGap="100">
+            <analyzer type="index">
+                <tokenizer class="solr.ClassicTokenizerFactory"/>
+                <filter class="solr.ClassicFilterFactory"/>
+                <filter class="solr.WordDelimiterFilterFactory"
+                        generateWordParts="1"
+                        generateNumberParts="0"
+                        catenateWords="0"
+                        catenateNumbers="0"
+                        catenateAll="0"
+                        preserveOriginal="1"
+                        />
+                <filter class="solr.LowerCaseFilterFactory"/>
+                <filter class="solr.TrimFilterFactory"/>
+                <filter class="solr.StopFilterFactory" words="lang/stopwords_en_06112013.txt" ignoreCase="true"/>
+                <filter class="solr.KeywordRepeatFilterFactory"/>
+                <filter class="solr.HunspellStemFilterFactory"
+                        dictionary="hunspell/en_US.dic"
+                        affix="hunspell/en_US.aff"
+                        ignoreCase="true"/>
+                <filter class="solr.RemoveDuplicatesTokenFilterFactory"/>
+            </analyzer>
+            <analyzer type="query">
+                <tokenizer class="solr.KeywordTokenizerFactory"/>
+                <filter class="solr.TrimFilterFactory"/>
+                <filter class="solr.LowerCaseFilterFactory"/>
+            </analyzer>
+        </fieldType>
+    </types>
+
+    <fields>
+        <field name="_version_" type="long" indexed="true" stored="true"/>
+        <field name="text" type="sentences" indexed="true" stored="false" multiValued="true"/>
+
+        <field name="abstractTexts" type="sentences" indexed="true"  stored="true" multiValued="true"/>
+        <field name="articleAffiliation" type="sentences" indexed="true"  stored="true" multiValued="false"/>
+        <field name="articleAuthorFullNames" type="single_id" indexed="true"  stored="true" multiValued="true"/>
+        <field name="articleAuthorListCollectives" type="single_word" indexed="true"  stored="true" multiValued="true"/>
+        <field name="articleAuthorListForeNames" type="single_word" indexed="true"  stored="true" multiValued="true"/>
+        <field name="articleAuthorListInitials" type="single_word" indexed="true"  stored="true" multiValued="true"/>
+        <field name="articleAuthorListLastNames" type="single_word" indexed="true"  stored="true" multiValued="true"/>
+        <field name="articleAuthorListSuffixs" type="single_word" indexed="true"  stored="true" multiValued="true"/>
+        <field name="articleJournalIsoAbbrev" type="single_word" indexed="true"  stored="true" multiValued="false"/>
+        <field name="articleJournalIssn" type="single_word" indexed="true"  stored="true" multiValued="false"/>
+        <field name="articleJournalIssueIssue" type="single_word" indexed="true"  stored="true" multiValued="false"/>
+        <field name="articleJournalIssueVolume" type="single_word" indexed="true"  stored="true" multiValued="false"/>
+        <field name="articleJournalPubDateMedlineDate" type="sentences" indexed="true"  stored="true" multiValued="false"/>
+        <field name="articleJournalPubDateYear" type="long" indexed="true"  stored="true" multiValued="false"/>
+        <field name="articleJournalTitle" type="sentences" indexed="true"  stored="true" multiValued="false"/>
+        <field name="articleLangs" type="single_word" indexed="true"  stored="true" multiValued="true"/>
+        <field name="articlePaginationMedlinePgn" type="single_word" indexed="true"  stored="true" multiValued="true"/>
+        <field name="articlePublicationTypeList" type="single_id" indexed="true"  stored="true" multiValued="true"/>
+        <field name="articleTitle" type="sentences" indexed="true"  stored="true" multiValued="false"/>
+        <field name="brainStructureIds" type="long" indexed="true"  stored="true" multiValued="true"/>
+        <field name="brainStructureNames" type="single_id" indexed="true"  stored="true" multiValued="true"/>
+        <field name="brainStructureSymbols" type="single_id" indexed="true"  stored="true" multiValued="true"/>
+        <field name="chemicalNameOfSubstances" type="single_id" indexed="true"  stored="true" multiValued="true"/>
+        <field name="chemicalRegistryNumbers" type="single_word" indexed="true"  stored="true" multiValued="true"/>
+        <field name="diseases" type="single_id" indexed="true"  stored="true" multiValued="true"/>
+        <field name="functions" type="single_id" indexed="true"  stored="true" multiValued="true"/>
+        <field name="geneIds" type="long" indexed="true"  stored="true" multiValued="true"/>
+        <field name="geneNames" type="single_id" indexed="true"  stored="true" multiValued="true"/>
+        <field name="geneSymbols" type="single_id" indexed="true"  stored="true" multiValued="true"/>
+        <field name="grantAcronyms" type="single_word" indexed="true"  stored="true" multiValued="true"/>
+        <field name="grantAgencis" type="single_id" indexed="true"  stored="true" multiValued="true"/>
+        <field name="grantCountries" type="single_word" indexed="true"  stored="true" multiValued="true"/>
+        <field name="grantIds" type="single_word" indexed="true"  stored="true" multiValued="true"/>
+        <field name="investigatorList" type="single_id" indexed="true"  stored="true" multiValued="true"/>
+        <field name="journalCountry" type="single_word" indexed="true"  stored="true" multiValued="false"/>
+        <field name="journalMedlineTa" type="single_word" indexed="true"  stored="true" multiValued="false"/>
+        <field name="journalNlmUniqueId" type="single_word" indexed="true"  stored="true" multiValued="false"/>
+        <field name="keywordList_majorTopic_n" type="single_word" indexed="true"  stored="true" multiValued="true"/>
+        <field name="keywordList_majorTopic_y" type="single_word" indexed="true"  stored="true" multiValued="true"/>
+        <field name="keywords" type="single_id" indexed="true"  stored="true" multiValued="true"/>
+        <field name="meshHeadingDescNames" type="single_id" indexed="true"  stored="true" multiValued="true"/>
+        <field name="meshHeadingDescNames_majorTopic_n" type="single_word" indexed="true"  stored="true" multiValued="true"/>
+        <field name="meshHeadingDescNames_majorTopic_y" type="single_word" indexed="true"  stored="true" multiValued="true"/>
+        <field name="meshHeadingQualifierNames" type="single_word" indexed="true"  stored="true" multiValued="true"/>
+        <field name="meshHeadingQualifierNames_majorTopic_n" type="single_word" indexed="true"  stored="true" multiValued="true"/>
+        <field name="meshHeadingQualifierNames_majorTopic_y" type="single_word" indexed="true"  stored="true" multiValued="true"/>
+        <field name="otherAbstractTexts" type="sentences" indexed="true"  stored="true" multiValued="true"/>
+        <field name="pmid" type="long" indexed="true"  stored="true" multiValued="false"/>
+        <field name="protocols" type="single_id" indexed="true"  stored="true" multiValued="true"/>
+        <field name="query_brainStructureNames" type="single_word" indexed="true"  stored="false" multiValued="true"/>
+        <field name="query_chemicalNameOfSubstances" type="single_word" indexed="true"  stored="false" multiValued="true"/>
+        <field name="query_diseases" type="single_word" indexed="true"  stored="false" multiValued="true"/>
+        <field name="query_fullText" type="single_word" indexed="true"  stored="false" multiValued="true"/>
+        <field name="query_functions" type="single_word" indexed="true"  stored="false" multiValued="true"/>
+        <field name="query_geneNames" type="single_word" indexed="true"  stored="false" multiValued="true"/>
+        <field name="query_keywords" type="single_word" indexed="true"  stored="false" multiValued="true"/>
+        <field name="query_meshHeadingDescNames" type="single_word" indexed="true"  stored="false" multiValued="true"/>
+
+        <field name="title_abstract" type="single_word" indexed="true" stored="false" multiValued="true"/>
+    </fields>
+
+    <uniqueKey>pmid</uniqueKey>
+
+</schema>

@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<rs:RpcSpringMvcGet xmlns:fx="http://ns.adobe.com/mxml/2009"
+                    xmlns:rs="edu.umich.med.mbni.pubanatomy.flash.rs.*"
+                    path="allen-inst" singletonByUrl="true">
+    <fx:Script><![CDATA[
+        override protected function onObjResult( result:* = null ):void{
+            var r:Array = result as Array;
+            var d:Dictionary = new Dictionary();
+            d[ MDLDataSet.EXPR_Types.getItemAt( 0 ) ] = r[ 0 ];
+            d[ MDLDataSet.EXPR_Types.getItemAt( 1 ) ] = r[ 1 ];
+            d[ MDLDataSet.EXPR_Types.getItemAt( 2 ) ] = r[ 2 ];
+            sectionDataSet.onExprLevelAvail( d );
+        }
+
+        [Bindable]
+        public var sectionDataSet:MDLDataSet;
+
+        override public function callRemote():Boolean{
+            args = [
+                sectionDataSet.sectionDataSetId,
+                MDLDataSet.EXPR_Types.getItemAt( 0 ),
+                MDLDataSet.EXPR_Types.getItemAt( 1 ),
+                MDLDataSet.EXPR_Types.getItemAt( 2 )
+            ];
+            return super.callRemote();
+        }
+        ]]></fx:Script>
+    <fx:Binding source="sectionDataSet.modelGene.model" destination="model"/>
+</rs:RpcSpringMvcGet>

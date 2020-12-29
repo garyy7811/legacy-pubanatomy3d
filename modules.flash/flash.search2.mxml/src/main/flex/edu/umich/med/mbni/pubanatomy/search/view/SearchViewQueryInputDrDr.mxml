@@ -1,0 +1,89 @@
+<?xml version="1.0"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009"
+         xmlns:s="library://ns.adobe.com/flex/spark"
+         xmlns:view="edu.umich.med.mbni.pubanatomy.search.view.*"
+
+         currentState="normal"
+         mouseMove="rfrState=null;"
+        >
+    <fx:Script><![CDATA[
+        import edu.umich.med.mbni.pubanatomy.search.model.QueryRelate2Terms;
+
+        import mx.core.UIComponent;
+
+        [Bindable]
+        public var drdrParent:SearchViewQueryInputDrDr;
+
+        [Bindable]
+        public var model:QueryRelate2Terms;
+
+        [Bindable]
+        public var termSuggestGroup:ViewTermSuggestGroup;
+
+        internal function findMouseOverLeaf():QueryRelate2Terms{
+            if( model == null ){
+                return null;
+            }
+            var mouseTarget:UIComponent = ( currentState == "draggingOver" ? this : draggable );
+            if( mouseTarget.getBounds( mouseTarget ).contains( mouseTarget.mouseX, mouseTarget.mouseY ) ){
+                if( draggable.drdr.model.term != null
+                        || draggable.relate2.child1 == null//not ready yet just ignore and wait for next time.
+                        || draggable.relate2.child2 == null
+                        ){
+                    return model;
+                }
+
+                var rt:QueryRelate2Terms = draggable.relate2.child1.findMouseOverLeaf();
+                if( rt == null ){
+                    rt = draggable.relate2.child2.findMouseOverLeaf();
+                }
+                if( rt != null ){
+                    return rt;
+                }
+                return model;
+            }
+            return null;
+        }
+
+        private function set rfrState( ignoreVar:* ):void{
+            if( model != null && model.query != null && model.query.queryResult != null
+                    && model.query.queryResult.draggingOverTerm == model ){
+                currentState = "draggingOver";
+                return;
+            }
+
+            currentState = "normal";
+        }
+
+        public static const DROPPING_IN_WIDTH:uint = 12;
+        ]]></fx:Script>
+    <fx:Binding source="model.query.queryResult.draggingOverTerm" destination="rfrState"/>
+    <s:states>
+        <s:State name="normal"/>
+        <s:State name="draggingOver"/>
+    </s:states>
+
+    <view:SearchViewQueryInputDraggable id="draggable" drdr="{this}" termSuggestGroup="{termSuggestGroup}"
+                                        left="{DROPPING_IN_WIDTH}" right="{DROPPING_IN_WIDTH}" top="3" bottom="3"/>
+
+    <s:VGroup height="{draggable.height}" left="1" top="3"
+              visible="false" visible.draggingOver="true" id="lll" gap="0">
+        <view:SearchViewQueryInputDrDrIdctr model="{model}" before="true"
+                                            relation="{QueryRelate2Terms.OPERATOR_AND}"/>
+        <view:SearchViewQueryInputDrDrIdctr model="{model}" before="true"
+                                            relation="{QueryRelate2Terms.OPERATOR_OR}"/>
+        <view:SearchViewQueryInputDrDrIdctr model="{model}" before="true"
+                                            relation="{QueryRelate2Terms.OPERATOR_NOT}"/>
+    </s:VGroup>
+
+    <s:VGroup height="{draggable.height}" right="1" top="3"
+              visible="false" visible.draggingOver="true" id="rrr" gap="0">
+        <view:SearchViewQueryInputDrDrIdctr model="{model}" before="false"
+                                            relation="{QueryRelate2Terms.OPERATOR_AND}"/>
+        <view:SearchViewQueryInputDrDrIdctr model="{model}" before="false"
+                                            relation="{QueryRelate2Terms.OPERATOR_OR}"/>
+        <view:SearchViewQueryInputDrDrIdctr model="{model}" before="false"
+                                            relation="{QueryRelate2Terms.OPERATOR_NOT}"/>
+    </s:VGroup>
+
+</s:Group>

@@ -1,0 +1,36 @@
+<?xml version="1.0"?>
+<rs:RpcSpringMvcGet xmlns:fx="http://ns.adobe.com/mxml/2009"
+                    xmlns:rs="edu.umich.med.mbni.pubanatomy.flash.rs.*"
+                    singletonByUrl="true" path="allen-inst">
+    <fx:Script><![CDATA[
+        import edu.umich.med.mbni.pubanatomy.flash.dto.DtoModelMeshArray;
+        import edu.umich.med.mbni.pubanatomy.voxel3d.model.RootModelVoxel3d;
+        import edu.umich.med.mbni.pubanatomy.voxel3d.model.Voxel3dStructureModel;
+
+        [Bindable(event="modelChanged")]
+        public function get model3d():RootModelVoxel3d{
+            return model as RootModelVoxel3d;
+        }
+
+        [Bindable]
+        public var structureModelItem:Voxel3dStructureModel;
+
+        [Bindable]
+        public var force:Boolean;
+
+        override protected function onObjResult( result:* = null ):void{
+            structureModelItem.onDtoModelMeshArr( result as DtoModelMeshArray );
+            CONFIG::debugging{
+                if( !force && !structureModelItem.dtoModelMeshArr.model.equals( structureModelItem.dtoModel ) ){
+                    throw new Error();
+                }
+            }
+        }
+
+        override public function callRemote():Boolean{
+            args = [ structureModelItem.dtoModel.structureId, structureModelItem.dtoModel.dividedBy ];
+            return super.callRemote();
+        }
+        ]]></fx:Script>
+    <fx:Binding source="structureModelItem.structureItem.model" destination="model"/>
+</rs:RpcSpringMvcGet>

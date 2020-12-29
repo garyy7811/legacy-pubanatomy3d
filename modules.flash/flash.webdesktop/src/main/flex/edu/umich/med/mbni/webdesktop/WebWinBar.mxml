@@ -1,0 +1,63 @@
+<?xml version="1.0"?>
+<s:DataGroup xmlns:fx="http://ns.adobe.com/mxml/2009"
+             xmlns:s="library://ns.adobe.com/flex/spark"
+             itemRenderer="edu.umich.med.mbni.webdesktop.WebWinBarButton">
+    <fx:Script><![CDATA[
+        import mx.collections.ArrayCollection;
+        import mx.core.IVisualElement;
+
+        import spark.events.ElementExistenceEvent;
+
+        private var _windowsGroup:WebWinContainer;
+        public static const windowsGroup_CHANGED:String = "windowsGroupChanged";
+
+        [Bindable(event="windowsGroupChanged")]
+        public function get windowsGroup():WebWinContainer{
+            return _windowsGroup;
+        }
+
+        public function set windowsGroup( value:WebWinContainer ):void{
+            if( value != _windowsGroup ){
+                if( _windowsGroup != null ){
+                    throw new Error();
+                }
+                _windowsGroup = value;
+                dispatchEvent( new Event( windowsGroup_CHANGED ) );
+                /*
+                 for( var i:int = 0; i < _windowsGroup.numElements; i ++ ){
+                 onWinAdded( _windowsGroup.getElementAt( i ) );
+                 }*/
+                _windowsGroup.addEventListener( ElementExistenceEvent.ELEMENT_ADD, onWinEvent );
+                _windowsGroup.addEventListener( ElementExistenceEvent.ELEMENT_REMOVE, onWinEvent );
+            }
+        }
+
+        private function onWinEvent( event:ElementExistenceEvent ):void{
+            if( _windowsGroup.swapping ){
+                return;
+            }
+            if( event.type == ElementExistenceEvent.ELEMENT_ADD ){
+                onWinAdded( event.element );
+            }
+            else{
+                onWinRemoved( event.element );
+            }
+        }
+
+        private function onWinAdded( win:IVisualElement ):void{
+            _windows.addItem( win );
+
+        }
+
+        private function onWinRemoved( win:IVisualElement ):void{
+            _windows.removeItemAt( _windows.getItemIndex( win ) );
+        }
+
+        [Bindable]
+        private var _windows:ArrayCollection = new ArrayCollection();
+        ]]></fx:Script>
+    <s:dataProvider>{_windows}</s:dataProvider>
+    <s:layout>
+        <s:HorizontalLayout gap="1"/>
+    </s:layout>
+</s:DataGroup>

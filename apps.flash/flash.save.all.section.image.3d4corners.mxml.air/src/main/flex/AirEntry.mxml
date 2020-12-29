@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:WindowedApplication xmlns:fx="http://ns.adobe.com/mxml/2009"
+                       xmlns:s="library://ns.adobe.com/flex/spark"
+                       xmlns:save_all_section_image_corners="edu.umich.med.mbni.pubanatomy.save_all_section_image_corners.*"
+                       xmlns:as3lib="com.flashflexpro.as3lib.*"
+                       enterFrame="callOnceInNextFrame.onEnterFrame();rootModel.onEnterFrame();"
+                       creationComplete="onCreated();">
+    <fx:Script><![CDATA[
+        import edu.umich.med.mbni.pubanatomy.save_all_section_image_corners.GetAllSectionDataSets;
+
+        private function onCreated():void{
+            var getAllSectionDataSets:GetAllSectionDataSets = new GetAllSectionDataSets();
+            getAllSectionDataSets.model = rootModel;
+//            getAllSectionDataSets.ssss( 12092 );
+            getAllSectionDataSets.callRemote();
+        }
+        ]]></fx:Script>
+    <fx:Declarations>
+        <save_all_section_image_corners:SaveAllSectionImgCornerModel id="rootModel">
+            <save_all_section_image_corners:callInNext>
+                <as3lib:CallOnceInNextFrame id="callOnceInNextFrame"/>
+            </save_all_section_image_corners:callInNext>
+        </save_all_section_image_corners:SaveAllSectionImgCornerModel>
+    </fx:Declarations>
+    <s:layout>
+        <s:VerticalLayout/>
+    </s:layout>
+    <s:FormItem label="waiting:">
+        <s:Label text="{rootModel.waiting.length}"/>
+    </s:FormItem>
+    <s:FormItem label="working:">
+        <s:Label text="{rootModel.working.length}"/>
+    </s:FormItem>
+    <s:FormItem label="chk waiting:">
+        <s:Label text="{rootModel.chkWaiting.length}"/>
+    </s:FormItem>
+    <s:FormItem label="chk working:">
+        <s:Label text="{rootModel.chkWorking.length}"/>
+    </s:FormItem>
+</s:WindowedApplication>

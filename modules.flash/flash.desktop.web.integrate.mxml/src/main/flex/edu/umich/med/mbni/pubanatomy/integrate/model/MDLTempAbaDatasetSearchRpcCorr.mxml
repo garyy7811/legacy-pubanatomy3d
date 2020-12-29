@@ -1,0 +1,33 @@
+<?xml version="1.0"?>
+<im:MDLTempAbaDatasetSearchRpcSvc xmlns:fx="http://ns.adobe.com/mxml/2009"
+                                  xmlns:im="edu.umich.med.mbni.pubanatomy.integrate.model.*">
+    <fx:Script><![CDATA[
+        import mx.collections.ArrayList;
+        import mx.collections.IList;
+
+        [Bindable]
+        public var dataSet:MDLTempAllenBrainGeneSearchVO;
+
+        [Bindable]
+        public var structureIdLst:IList = new ArrayList();
+
+        protected function set rfrUrl( ignoreVar:* ):void{
+            var idLst:String = structureToIdLst( structureIdLst );
+            if( idLst.length > 0 && dataSet != null ){
+                paramStrAfterQ = (
+                        "criteria=service::mouse_correlation[set$eq"
+                        + ( coronalOnly ? "mouse_coronal" : "mouse" ) + "]"
+                        + idLst
+                        + "[row$eq" + dataSet.dsId + "]"
+                );
+            }
+            else{
+                paramStrAfterQ = null;
+            }
+        }
+        ]]></fx:Script>
+
+    <fx:Binding source="dataSet.dsId" destination="rfrUrl"/>
+    <fx:Binding source="structureIdLst.length" destination="rfrUrl"/>
+    <fx:Binding source="coronalOnly" destination="rfrUrl"/>
+</im:MDLTempAbaDatasetSearchRpcSvc>

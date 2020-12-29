@@ -1,0 +1,239 @@
+<?xml version="1.0"?>
+<v:TreeGridDataColumn xmlns:fx="http://ns.adobe.com/mxml/2009"
+                      xmlns:v="edu.umich.med.mbni.treedatagrid.*"
+                      cellDataClass="edu.umich.med.mbni.pubanatomy.atlas.view.StructureTreeGridDataCellGene">
+    <fx:Script><![CDATA[
+        import edu.umich.med.mbni.treedatagrid.TreeGridDataRow;
+        import edu.umich.med.mbni.utils.ModelOperationMenuItem;
+
+        [Bindable(event="treeGridDataChanged")]
+        public function get structureTreeGridData():StructureTreeGridData{
+            return treeGridData as StructureTreeGridData;
+        }
+
+        private var _childrenIncludeOrEx:Boolean = true;
+
+        [Bindable(event="childrenIncludeOrExChanged")]
+        public function get childrenIncludeOrEx():Boolean{
+            return _childrenIncludeOrEx;
+        }
+
+        public function set childrenIncludeOrEx( value:Boolean ):void{
+            if( value != _childrenIncludeOrEx ){
+                _childrenIncludeOrEx = value;
+                dispatchEvent( new Event( "childrenIncludeOrExChanged" ) );
+            }
+        }
+
+        [Bindable]
+        public var gene:MDLGene;
+
+        override public function compare2RowData( a:TreeGridDataRow, b:TreeGridDataRow ):int{
+            var ga:StructureGeneExprTypeDs = ( a as StructureTreeGridDataRow ).structure.getGeneTypeDs( selectedDataSet,
+                    structureTreeGridData.selectedGeneExprType );
+            var gb:StructureGeneExprTypeDs = ( b as StructureTreeGridDataRow ).structure.getGeneTypeDs( selectedDataSet,
+                    structureTreeGridData.selectedGeneExprType );
+
+            try{
+                return sortByLevel( childrenIncludeOrEx ? ga.levelAvgInC : ga.levelAvgExC,
+                        childrenIncludeOrEx ? gb.levelAvgInC : gb.levelAvgExC );
+            }
+            catch( e:Error ){
+            }
+            return nextOr0( a, b );
+        }
+
+        private function sortByLevel( la:Number, lb:Number ):int{
+            if( isNaN( la ) && isNaN( lb ) ){
+                throw new Error();
+            }
+            else if( isNaN( lb ) ){
+                return sortDesc ? - 1 : 1;
+            }
+            else if( isNaN( la ) ){
+                return sortDesc ? 1 : - 1;
+            }
+
+            if( la > lb ){
+                return sortDesc ? - 1 : 1;
+            }
+            else if( la < lb ){
+                return sortDesc ? 1 : - 1;
+            }
+            else{
+                throw new Error();
+            }
+        }
+        ]]></fx:Script>
+
+    <fx:Script><![CDATA[
+        import edu.umich.med.mbni.utils.ModelOperationMenuChildren;
+        import edu.umich.med.mbni.utils.ModelOperationMenuItemLink;
+        import edu.umich.med.mbni.utils.ModelOperationMenuType;
+
+        import mx.collections.ArrayCollection;
+
+        public function dialogSortTypeCloseSelection():void{
+            if( selectedDataSet == null ){
+                return;
+            }
+
+            dialogDataSetSelection();
+
+            var mn:ArrayCollection = gene.model.rootApp.menuOperations.children;
+
+            mn.addItemAt( new ModelOperationMenuType(), 0 );
+            mn.addItemAt( new OperationColumnGeneSortType( this, false ), 0 );
+            mn.addItemAt( new OperationColumnGeneSortType( this, true ), 0 );
+
+            mn.addItem( new ModelOperationMenuType() );
+            mn.addItem( new OperationColumnGeneClose( this ) );
+
+            gene.model.setMenuOperations( new ModelOperationMenuChildren( mn.toArray() ) );
+        }
+
+        public function dialogDataSetSelection():void{
+            var mn:ArrayCollection = new ArrayCollection();
+
+            if( gene.dataSets != null && gene.dataSets.length > 0 ){
+                for( var j:int = gene.dataSets.length - 1; j >= 0; j -- ){
+                    var o:MDLDataSet = gene.dataSets.getItemAt( j ) as MDLDataSet;
+                    var c2:ModelOperationMenuChildren = new ModelOperationMenuChildren( [
+                        new OperationColumnGeneDataSelect( this, o, structureTreeGridData.selectedGeneExprType ),
+                        new ModelOperationMenuItemLink( "http://mouse.brain-map.org/experiment/show/" + o.sectionDataSetId, "See details in Allen Institute" )
+                    ], null, o.label  );
+                    c2.type = ModelOperationMenuType.TYPE_RADIO;
+                    c2.toggled = ( selectedDataSet == o );
+                    mn.addItemAt( c2, mn.length );
+                }
+            }
+            else{
+                mn.addItemAt( new ModelOperationMenuItem( "loading", null, null, false ), mn.length );
+            }
+            gene.model.setMenuOperations( new ModelOperationMenuChildren( mn.toArray() ) );
+        }
+        ]]></fx:Script>
+
+    <fx:Script><![CDATA[
+        import edu.umich.med.mbni.pubanatomy.flash.dto.DtoGeneExprLevel;
+
+        [Bindable]
+        public var selectedDataSet:MDLDataSet;
+
+        [Bindable]
+        public var selectedDtoExpr:DtoGeneExprLevel;
+
+        private var _getExprLevel:GetExpressionLevel;
+
+        [Bindable(event="getExprLevelChanged")]
+        public function get getExprLevel():GetExpressionLevel{
+            return _getExprLevel;
+        }
+
+        private function set rfrExpr( ignoreVar:* ):void{
+            gene.model.callInNext.putIn( refreshExpr );
+        }
+
+        private function refreshExpr():void{
+            if( structureTreeGridData == null ){
+                return;
+            }
+            var selectedTypeIndex:int = MDLDataSet.EXPR_Types.getItemIndex( structureTreeGridData.selectedGeneExprType ) as
+                    int;
+
+            CONFIG::debugging{
+                if( selectedTypeIndex < 0 ){
+                    throw new Error( this + ".refreshExpr " );
+                }
+            }
+
+            if( gene.model.geneAnnotation != null && selectedDataSet != null ){
+                selectedDtoExpr = selectedDataSet.expressions.getItemAt( selectedTypeIndex ) as DtoGeneExprLevel;
+                if( selectedDtoExpr == null && _getExprLevel == null ){
+                    _getExprLevel = new GetExpressionLevel();
+                    _getExprLevel.model = treeGridData.rootModel;
+                    dispatchEvent( new Event( "getExprLevelChanged" ) );
+                    _getExprLevel.type = structureTreeGridData.selectedGeneExprType;
+                    _getExprLevel.sectionDataSet = selectedDataSet;
+                    _getExprLevel.callRemote();
+                }
+                else if( selectedDtoExpr != null && _getExprLevel != null ){
+                    _getExprLevel = null;
+                    dispatchEvent( new Event( "getExprLevelChanged" ) );
+                }
+            }
+        }
+        ]]></fx:Script>
+
+    <fx:Binding source="structureTreeGridData.selectedGeneExprType" destination="rfrExpr"/>
+    <fx:Binding source="selectedDataSet.expressions.length" destination="rfrExpr"/>
+    <fx:Binding source="gene.model.geneAnnotation" destination="rfrExpr"/>
+
+    <fx:Script><![CDATA[
+        [Bindable]
+        public var dataSetState:String = "loadingDataSets";
+
+        private function set rfrState( ignoreVar:* ):void{
+            gene.model.callInNext.putIn( refreshState );
+        }
+
+        private function refreshState():void{
+            if( gene.dataSetLength < gene.dataSets.length ){
+                dataSetState = "loadingDataSets";
+                return;
+            }
+
+            if( ! gene.allDsExprAvailReady || selectedDataSet == null ){
+                dataSetState = "checkingExpr";
+                if( gene.allDsExprAvailReady && selectedDataSet == null ){
+                    var sg:MDLDataSet;
+                    for( var j:int = gene.dataSets.length - 1; j >= 0; j -- ){
+                        var ds:MDLDataSet = gene.dataSets.getItemAt( j ) as MDLDataSet;
+                        if( ds.exprLevelAvail[ structureTreeGridData.selectedGeneExprType ] ){
+                            if( ds.label.indexOf( "co" ) >= 0 ){
+                                selectedDataSet = ds;
+                                break;
+                            }
+                            else{
+                                sg = ds;
+                            }
+                        }
+                    }
+                    if( selectedDataSet == null ){
+                        if( sg != null ){
+                            selectedDataSet = sg;
+                        }
+                        else{
+                            selectedDataSet = gene.dataSets.getItemAt( 0 ) as MDLDataSet;
+                        }
+                    }
+                }
+                return;
+            }
+
+            if( getExprLevel != null ){
+                dataSetState = "loadingExpr";
+                return;
+            }
+
+            dataSetState =
+                    ( selectedDataSet.exprLevelAvail[ structureTreeGridData.selectedGeneExprType ] ? "readyWithExpr" :
+                            "readyNoExpr" );
+        }
+        ]]></fx:Script>
+    <fx:Binding source="gene.dataSets.length" destination="rfrState"/>
+    <fx:Binding source="gene.dataSetLength" destination="rfrState"/>
+    <fx:Binding source="gene.dataSetLength" destination="rfrState"/>
+    <fx:Binding source="gene.allDsExprAvailReady" destination="rfrState"/>
+    <fx:Binding source="structureTreeGridData.selectedGeneExprType " destination="rfrState"/>
+    <fx:Binding source="selectedDataSet" destination="rfrState"/>
+    <fx:Binding source="getExprLevel" destination="rfrState"/>
+    <fx:Binding source="selectedDtoExpr" destination="rfrState"/>
+
+    <fx:Script><![CDATA[
+        override protected function set rfrCellDataKey( ignoreVar:* ):void{
+            cellDataKey = selectedDataSet;
+        }
+        ]]></fx:Script>
+    <fx:Binding source="selectedDataSet" destination="rfrCellDataKey"/>
+</v:TreeGridDataColumn>

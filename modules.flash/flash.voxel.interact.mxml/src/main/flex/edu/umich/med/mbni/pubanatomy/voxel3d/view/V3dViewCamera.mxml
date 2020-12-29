@@ -1,0 +1,105 @@
+<?xml version="1.0"?>
+<dataview:Dd3dViewCamera xmlns:fx="http://ns.adobe.com/mxml/2009"
+                         xmlns:dataview="edu.umich.med.mbni.pubanatomy.datadriven3dwindow.*"
+                         dragEnter="onDragEnterOverDrop( event );"
+                         dragOver="onDragEnterOverDrop( event );"
+                         dragDrop="onDragEnterOverDrop( event );"
+                         dragExit="onDragEnterOverDrop( event );"
+        >
+
+    <fx:Script><![CDATA[
+        import edu.umich.med.mbni.pubanatomy.atlas.model.RootModelAtlas;
+        import edu.umich.med.mbni.pubanatomy.atlas.model.StructureGeneExprTypeDs;
+        import edu.umich.med.mbni.pubanatomy.voxel3d.model.Voxel3dStructureGeneExprType;
+        import edu.umich.med.mbni.pubanatomy.voxel3d.model.Voxel3dStructureModel;
+        import edu.umich.med.mbni.pubanatomy.voxel3d.model.Voxel3dStructureOn3dTreeGridData;
+
+        import mx.core.IUIComponent;
+        import mx.events.DragEvent;
+        import mx.managers.DragManager;
+
+        override protected function onMouseDown():void{
+            super.onMouseDown();
+            toolTip = null;
+        }
+
+        [Bindable(event="dd3dSceneChanged")]
+        public function get v3dScene():V3dScene{
+            return scene as V3dScene;
+        }
+
+        override public function set toolTip( value:String ):void{
+            super.toolTip = null;
+            if( v3dScene.v3dModel.rootModel3d.rootApp.menuOperations != null || !model.aidTip ){
+                return;
+            }
+            super.toolTip = value;
+            if( value != null ){
+                v3dScene.v3dModel.callInNext.putIn( showToolTipByDispatchMouseOver, this, [ new Point( mouseX, mouseY ) ], 4 );
+            }
+        }
+
+        private function showToolTipByDispatchMouseOver( p:Point ):void{
+            dispatchEvent( new MouseEvent( MouseEvent.MOUSE_OVER, true, true, p.x, p.y ) );
+        }
+
+        private function onDragEnterOverDrop( event:DragEvent ):void{
+            var trDt:Voxel3dStructureOn3dTreeGridData = v3dScene.v3dModel.rootModel3d.on3dStageStructureTreeGridData;
+            if( event.type == DragEvent.DRAG_ENTER ){
+                if( event.dragInitiator is V3dStructureTreeGrid ){
+                    return;
+                }
+                if( trDt.onDragEnter() ){
+                    DragManager.acceptDragDrop( IUIComponent( event.target ) );
+                }
+            }
+            else if( event.type == DragEvent.DRAG_OVER ){
+                DragManager.showFeedback( (trDt.draggingGene != null || trDt.droppingV3dStructures != null) ? DragManager.COPY : DragManager.LINK );
+            }
+            else{
+                trDt.onDragDone( event.type == DragEvent.DRAG_DROP );
+            }
+        }
+
+        private function set rfrShowTip( ignoreVar:* ):void{
+            if( this.getBounds( this ).contains( mouseX, mouseY )
+                    && v3dScene.v3dModel.mouseOverObj != null && model.aidTip ){
+                var strModel:Voxel3dStructureModel = v3dScene.v3dModel.mouseOverObj as Voxel3dStructureModel;
+                if( strModel != null ){
+                    toolTip = "structure name|^|" + strModel.structureItem.atlasStructure.dtoStructure.name
+                            + "\r\n#t(mouseoverv3dstr)p#";
+                    return;
+                }
+
+                var strExpr:Voxel3dStructureGeneExprType = v3dScene.v3dModel.mouseOverObj as Voxel3dStructureGeneExprType;
+                if( strExpr != null ){
+                    var sgExDs:StructureGeneExprTypeDs = strExpr.atlasGeneTypeDs;
+                    var tmp:Vector3D;
+                    var p:Vector3D = v3dScene.v3dModel.mouseLastPosition;
+                    var atls:RootModelAtlas = v3dScene.v3dModel.rootModel3d.rootModelAtlas;
+
+                    var ps:String = "Cursor position|^|(" + atls.format( p.x ) + ","
+                            + atls.format( p.y ) + "," + atls.format( p.z ) + ")";
+
+                    for( var j:int = strExpr.levels.length - 1; j >= 0; j-- ){
+                        tmp = strExpr.levels[ j ] as Vector3D;
+                        if( p.equals( tmp ) ){
+                            break;
+                        }
+                    }
+                    toolTip = ps
+                            + "\r\nGene acronym|^|" + sgExDs.sectionDataSet.modelGene.dtoGene.acronym
+                            + "\r\ndata set id|^|" + sgExDs.sectionDataSet.sectionDataSetId
+                            + "\r\nexpression type|^|" + sgExDs.exprType
+                            + "\r\nstructure name|^|" + sgExDs.structure.dtoStructure.name
+                            + "\r\nexpression level value|^|= " + tmp.w
+                            + "\r\n#t(mouseoverv3dstrgexprtp)p#";
+
+                    return;
+                }
+            }
+            toolTip = null;
+        }
+        ]]></fx:Script>
+    <fx:Binding source="v3dScene.v3dModel.mouseOverObj" destination="rfrShowTip"/>
+</dataview:Dd3dViewCamera>

@@ -1,0 +1,65 @@
+<?xml version="1.0"?>
+<s:Skin xmlns:s="library://ns.adobe.com/flex/spark"
+        xmlns:fx="http://ns.adobe.com/mxml/2009"
+        addedToStage="onAdded();"
+        removedFromStage="onRemoved();"
+        >
+    <fx:Script><![CDATA[
+        import mx.containers.BoxDirection;
+        import mx.containers.DividedBox;
+        import mx.containers.dividedBoxClasses.BoxDivider;
+        import mx.events.ResizeEvent;
+        import mx.managers.CursorManager;
+
+        override protected function updateDisplayList( unscaledWidth:Number, unscaledHeight:Number ):void{
+            var rect:Rectangle;
+            if( ( ( parent as BoxDivider).owner as DividedBox ).direction == BoxDirection.VERTICAL ){
+                rect = new Rectangle( -(parent.width / 2), -( parent.height / 2 ), parent.width, parent.height );
+            }
+            else{
+                rect = new Rectangle( -(parent.height / 2), -( parent.width / 2 ), parent.height, parent.width );
+            }
+
+            /*
+             var fill:LinearGradient = new LinearGradient();
+
+             var g1:GradientEntry = new GradientEntry( 0xFF0000, 0 );
+             var g2:GradientEntry = new GradientEntry( 0xFFFFFF, 0.5 );
+             var g3:GradientEntry = new GradientEntry( 0x00ff00, 1 );
+
+             fill.entries = [ g1, g2, g3 ];
+             fill.angle = 90;
+             graphics.clear();
+             graphics.moveTo( rect.x, rect.y );
+             fill.begin( graphics, rect, new Point( 0, 0 ) );
+             graphics.lineTo( rect.width, rect.y );
+             graphics.lineTo( rect.width, rect.height );
+             graphics.lineTo( rect.x, rect.height );
+             graphics.lineTo( rect.x, rect.y );
+             fill.end( graphics );*/
+
+            graphics.clear();
+            graphics.lineStyle( 3, 0xD9D9D9 );
+            graphics.beginFill( 0xD9D9D9 );
+            graphics.drawRect( rect.x, rect.y, rect.width, rect.height );
+            graphics.endFill();
+        }
+
+        private function onChanged( event:ResizeEvent ):void{
+            invalidateDisplayList();
+        }
+
+        private function onAdded():void{
+            if( parent != null ){
+                parent.addEventListener( ResizeEvent.RESIZE, onChanged, false, 0, true );
+            }
+        }
+
+        private function onRemoved():void{
+            if( parent != null ){
+                parent.removeEventListener( ResizeEvent.RESIZE, onChanged );
+            }
+            CursorManager.removeAllCursors();
+        }
+        ]]></fx:Script>
+</s:Skin>

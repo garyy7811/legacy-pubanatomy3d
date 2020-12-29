@@ -1,0 +1,70 @@
+<?xml version="1.0"?>
+<view:ViewSectionPlanePerspSlider xmlns:fx="http://ns.adobe.com/mxml/2009"
+                                  value="{perspPosition}"
+                                  xmlns:view="edu.umich.med.mbni.pubanatomy.sectioninteract.view.*">
+    <fx:Script><![CDATA[
+        import edu.umich.med.mbni.pubanatomy.atlas.model.MDLISHImage;
+
+        private function set rfrStep( ignoreVar:* ):void{
+            v3dPlane.scene3d.callInNext.putIn( refreshStep );
+        }
+
+        private function refreshStep():void{
+            _step = ( _max - _min ) / ( v3dPlane.image.modelSectionDs.sectionImageList.length - 1 );
+        }
+
+        override protected function system_mouseUpHandler( event:Event ):void{
+            super.system_mouseUpHandler( event );
+            perspPosition = value;
+        }
+        ]]></fx:Script>
+    <fx:Binding source="v3dPlane.image.modelSectionDs.maxAtlasPosition" destination="_max"/>
+    <fx:Binding source="v3dPlane.image.modelSectionDs.minAtlasPosition" destination="_min"/>
+    <fx:Binding source="v3dPlane.image.modelSectionDs.sectionImageList.length" destination="rfrStep"/>
+
+    <fx:Script><![CDATA[
+        import mx.core.IDataRenderer;
+
+        private var _perspPosition:uint;
+
+        [Bindable(event="perspPositionChanged")]
+        public function get perspPosition():uint{
+            return _perspPosition;
+        }
+
+        public function set perspPosition( value:uint ):void{
+            if( value != _perspPosition ){
+                _perspPosition = value;
+                dispatchEvent( new Event( "perspPositionChanged" ) );
+
+                var selectedIndex:int = v3dPlane.image.modelSectionDs.getClosestIndex( _perspPosition );
+                v3dPlane.image = v3dPlane.image.modelSectionDs.sectionImageList.getItemAt( selectedIndex ) as MDLISHImage;
+            }
+        }
+
+        private var _imgPosition:uint;
+        [Bindable(event="imgPositionChanged")]
+        public function get imgPosition():uint{
+            return _imgPosition;
+        }
+
+        public function set imgPosition( value:uint ):void{
+            if( value != _imgPosition ){
+                _imgPosition = value;
+                dispatchEvent( new Event( "imgPositionChanged" ) );
+                perspPosition = _imgPosition / v3dPlane.scene3d.rootModel3d.rootModelAtlas.config.unitLength;
+            }
+        }
+
+
+        override protected function updateDataTip( dataTipInstance:IDataRenderer, initialPosition:Point ):void{
+            super.updateDataTip( dataTipInstance, initialPosition );
+            var t:ViewSectionPlanePerspDatatip = dataTipInstance as ViewSectionPlanePerspDatatip;
+            var selectedIndex:int = v3dPlane.image.modelSectionDs.getClosestIndex( value );
+            var img:MDLISHImage = v3dPlane.image.modelSectionDs.sectionImageList.getItemAt( selectedIndex ) as MDLISHImage;
+
+            t.text = "No." + img.sectionNumber;
+        }
+        ]]></fx:Script>
+    <fx:Binding source="v3dPlane.image.projectionPosition" destination="imgPosition"/>
+</view:ViewSectionPlanePerspSlider>

@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Skin xmlns:fx="http://ns.adobe.com/mxml/2009"
+        xmlns:s="library://ns.adobe.com/flex/spark">
+
+    <fx:Metadata>
+        [HostComponent("spark.components.Button")]
+    </fx:Metadata>
+
+    <s:states>
+        <s:State name="up"/>
+        <s:State name="over"/>
+        <s:State name="down"/>
+        <s:State name="disabled"/>
+    </s:states>
+
+    <!-- background -->
+    <s:Rect includeIn="disabled,down,over" left="0" right="0" top="0" bottom="0" radiusX="2"
+            radiusY="2"
+            alpha.disabled="0.5">
+        <s:stroke>
+            <s:SolidColorStroke color="#A9A9A9" color.over="#9C9C9C" color.down="#6C6C6C"/>
+        </s:stroke>
+        <s:fill>
+            <s:SolidColor color="#BABABA"
+                          color.down="#DDDDDD"
+                          color.over="#DDDDDD"/>
+        </s:fill>
+    </s:Rect>
+
+    <!-- shadow (down state only) -->
+    <s:Rect includeIn="down" left="0" right="0" y="0" height="4" radiusX="2">
+        <s:fill>
+            <s:LinearGradient rotation="90">
+                <s:GradientEntry alpha="0.23" color="#000000" ratio="0"/>
+                <s:GradientEntry alpha="0.20" color="#000000" ratio="0.4"/>
+                <s:GradientEntry alpha="0.055" color="#000000" ratio="0.55"/>
+                <s:GradientEntry alpha="0.0" color="#000000" ratio="0.8"/>
+            </s:LinearGradient>
+        </s:fill>
+    </s:Rect>
+
+    <!-- label -->
+    <s:RichText id="labelDisplay" horizontalCenter="0" verticalCenter="1" textAlign="center"
+                verticalAlign="middle" alpha.disabled="0.5" fontWeight.down="bold"/>
+
+</s:Skin>

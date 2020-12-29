@@ -1,0 +1,69 @@
+<?xml version="1.0"?>
+<v:TreeGridRendererHeader xmlns:fx="http://ns.adobe.com/mxml/2009"
+                          xmlns:s="library://ns.adobe.com/flex/spark"
+                          xmlns:v="edu.umich.med.mbni.treedatagrid.*"
+        >
+    <fx:Metadata>
+        [ResourceBundle("TextAtlas")]
+    </fx:Metadata>
+    <v:states>
+        <s:State name="normal"/>
+        <s:State name="hovered"/>
+    </v:states>
+    <fx:Script><![CDATA[
+        import edu.umich.med.mbni.pubanatomy.atlas.model.StructureTreeGridDataColumnStrCount;
+        import edu.umich.med.mbni.utils.RootModelModule;
+
+        import mx.core.DragSource;
+
+        [Bindable(event="treeGridChanged")]
+        public function get structureTreeGrid():StructureTreeGrid{
+            return treeGrid as StructureTreeGrid;
+        }
+
+        [Bindable]
+        protected var _dataColStr2Cnt:StructureTreeGridDataColumnStrCount;
+        ]]></fx:Script>
+    <fx:Binding source="( treeGridColumn.data as StructureTreeGridDataColumnStrCount )" destination="_dataColStr2Cnt"/>
+    <fx:Script><![CDATA[
+        import edu.umich.med.mbni.pubanatomy.flash.v02tmp.TermToCount;
+
+        override protected function getDragSource():DragSource{
+            var tmp:Vector.<Object> = new Vector.<Object>( _dataColStr2Cnt.structureSymbol2Count.length, true );
+            _dataColStr2Cnt.structureSymbol2Count.forEach( function ( i:TermToCount, idx:int, v:Vector.<TermToCount> ):void{
+                tmp[ idx ] = i;
+            } );
+            var rt:DragSource = new DragSource();
+            rt.addData( tmp, RootModelModule.DRAGGING_FORMAT );
+            return rt;
+
+        }
+        ]]></fx:Script>
+    <s:Rect width="100%" height="100%">
+        <s:fill>
+            <s:LinearGradient rotation="90">
+                <s:GradientEntry color="0xaaaaaa"/>
+                <s:GradientEntry color="0xeeeeee"/>
+            </s:LinearGradient>
+        </s:fill>
+    </s:Rect>
+    <s:HGroup width="100%" height="100%">
+        <s:ToggleButton selected="@{treeGridColumn.data.sortDesc}"
+                        toolTip="#t(sort{getQualifiedClassName(this)})p#"
+                        skinClass="edu.umich.med.mbni.treedatagrid.TreeGridRendererHeaderSortOrder"/>
+        <s:Label width="100%" height="100%" maxDisplayedLines="2" fontWeight="bold"
+                 text="{resourceManager.getString('TextAtlas','treegrid.col.header.label.str2cnt', [ _dataColStr2Cnt.structureSymbol2Count.length ])}"
+                 toolTip="#t(treegrid.col.str2cnt)p#" rightClick="_dataColStr2Cnt.dialogDataSetSelection();"/>
+
+    </s:HGroup>
+    <s:Rect height="100%" width="10" visible="false" id="leftDropIndicator" left="0">
+        <s:fill>
+            <s:SolidColor color="0x000000"/>
+        </s:fill>
+    </s:Rect>
+    <s:Rect height="100%" width="10" visible="false" id="rightDropIndicator" right="0">
+        <s:fill>
+            <s:SolidColor color="0x000000"/>
+        </s:fill>
+    </s:Rect>
+</v:TreeGridRendererHeader>

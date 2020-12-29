@@ -1,0 +1,71 @@
+<?xml version="1.0"?>
+<utils:RootModelModule xmlns:fx="http://ns.adobe.com/mxml/2009"
+                       xmlns:utils="edu.umich.med.mbni.utils.*"
+                       xmlns:as3lib="com.flashflexpro.as3lib.*"
+                       xmlns:s="library://ns.adobe.com/flex/spark"
+                       xmlns:m="edu.umich.med.mbni.pubanatomy.voxel3d.model.*">
+    <fx:Script><![CDATA[
+        import edu.umich.med.mbni.pubanatomy.atlas.model.RootModelAtlas;
+        import edu.umich.med.mbni.pubanatomy.atlas.model.StructureItem;
+        import edu.umich.med.mbni.pubanatomy.flash.dto.Dto3DConfig;
+
+        [Bindable]
+        public var rootModelAtlas:RootModelAtlas;
+
+        [Bindable]
+        public var config:Dto3DConfig;
+
+        private function get3dStructure( s:StructureItem ):Voxel3dStructure{
+            var voxel3dStructure:Voxel3dStructure = new Voxel3dStructure();
+            voxel3dStructure.model = this as RootModelVoxel3d;
+            voxel3dStructure.atlasStructure = s;
+            if( s.dtoStructure.depth < config.preload3dModelDepth ){
+                voxel3dStructure.on3dStage = true;
+            }
+            return voxel3dStructure;
+        }
+
+        private function addModelTo3dStage( v:Voxel3dStructure ):Voxel3dStructure{
+            if( v.on3dStage && on3dStageStructureModels.getItemIndex( v.structure3dModel ) < 0 ){
+                on3dStageStructureModels.addItem( v.structure3dModel );
+            }
+            return v;
+        }
+
+        private function removeModelFrom3dStage( v:Voxel3dStructure ):void{
+            on3dStageStructureModels.removeItem( v.structure3dModel );
+        }
+
+        [Bindable]
+        public var selectedMarkers:Vector.<Object>;
+
+        [Bindable]
+        public var mouseOverPlane:Voxel3dPlane;
+        ]]></fx:Script>
+    <fx:Binding source="rootModelAtlas.config" destination="config"/>
+    <fx:Declarations>
+        <as3lib:Sync2Lists id="syncAllStructuresToVoxels" source="{rootModelAtlas.rootStructure.allChildren}"
+                           getDestInst="get3dStructure">
+            <as3lib:destination>
+                <s:ArrayList id="all3dVoxel3dStructures"/>
+            </as3lib:destination>
+        </as3lib:Sync2Lists>
+        <as3lib:Sync2Lists source="{all3dVoxel3dStructures}"
+                           propertiesReplaceOnUpdate="{[ 'on3dStage' ]}"
+                           getDestInst="addModelTo3dStage"
+                           destroyInst="removeModelFrom3dStage">
+            <as3lib:destination>
+                <s:ArrayList id="__on3dStageStructuresDummy"/>
+            </as3lib:destination>
+        </as3lib:Sync2Lists>
+        <s:ArrayList id="on3dStageStructureModels"/>
+        <m:Voxel3dSceneModel id="scene3d" parent="{this}"/>
+
+        <s:ArrayList id="planeLst"/>
+
+        <s:ArrayList id="markerLst"/>
+
+        <m:Voxel3dStructureOn3dTreeGridData id="on3dStageStructureTreeGridData" rootModelVoxel3d="{this}"/>
+
+    </fx:Declarations>
+</utils:RootModelModule>

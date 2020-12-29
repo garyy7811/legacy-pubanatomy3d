@@ -1,0 +1,295 @@
+<?xml version="1.0"?>
+<atm:StructureTreeGridData xmlns:fx="http://ns.adobe.com/mxml/2009"
+                           xmlns:as3lib="com.flashflexpro.as3lib.*"
+                           xmlns:atm="edu.umich.med.mbni.pubanatomy.atlas.model.*"
+        >
+    <!--initialize-->
+    <fx:Script><![CDATA[
+        import edu.umich.med.mbni.pubanatomy.atlas.model.StructureItem;
+        import edu.umich.med.mbni.pubanatomy.atlas.model.StructureTreeGridDataColumnGene;
+        import edu.umich.med.mbni.pubanatomy.atlas.model.StructureTreeGridDataRow;
+
+        import mx.events.CollectionEvent;
+        import mx.events.CollectionEventKind;
+        ]]></fx:Script>
+    <fx:Binding source="rootModelVoxel3d.rootModelAtlas" destination="rootModel"/>
+
+    <!--refresh structures drag and drop-->
+    <fx:Script><![CDATA[
+        import edu.umich.med.mbni.treedatagrid.TreeGridDataRow;
+
+        [Bindable]
+        public var rootModelVoxel3d:RootModelVoxel3d;
+
+        private function rfrStructures( ev:CollectionEvent = null ):void{
+            if( ev != null && ( ev.kind == CollectionEventKind.MOVE || ev.kind == CollectionEventKind.UPDATE  ) ){
+                return;
+            }
+            rootModel.callInNext.putIn( refreshStructures );
+        }
+
+        private function refreshStructures():void{
+            try{
+                var rt:Vector.<StructureItem> = new <StructureItem>[];
+                for( var j:int = rootModelVoxel3d.on3dStageStructureModels.length - 1; j >= 0; j-- ){
+                    var structure:StructureItem = ( rootModelVoxel3d.on3dStageStructureModels.getItemAt( j ) as Voxel3dStructureModel ).structureItem.atlasStructure;
+                    rt.push( structure );
+                }
+                setInputStructureItems( rt );
+                if( _droppingV3dStructures != null ){
+                    rootModel.callInNext.putIn( keepDropSelected, null, null, 2 );
+                }
+            }
+            catch( bindingError:Error ){
+                CONFIG::debugging{
+                    trace( this + ":" + bindingError.getStackTrace() );
+                }
+            }
+        }
+
+        private function keepDropSelected():void{
+            var droppingAtlsStrucs:Vector.<StructureItem> = new <StructureItem>[];
+            _droppingV3dStructures.forEach(
+                    function ( vs:Voxel3dStructure, idx:int, v:Vector.<Voxel3dStructure> ):void{
+                        droppingAtlsStrucs.push( vs.atlasStructure );
+                    }
+            );
+
+            var foundRows:Vector.<TreeGridDataRow> = inputRowDataList.filter(
+                    function ( row:TreeGridDataRow, idx:int, v:Vector.<TreeGridDataRow> ):Boolean{
+                        return droppingAtlsStrucs.indexOf( ( row as Voxel3dStructureTreeGridDataRow).structure ) >= 0;
+                    }
+            );
+
+            var tmp:Vector.<Object> = new <Object>[];
+            foundRows.forEach(
+                    function ( r:TreeGridDataRow, idx:int, v:Vector.<TreeGridDataRow> ):Object{
+                        if( r.parentRow != null ){
+                            r.parentRow.setOpenOrClose( true );
+                        }
+                        return tmp.push( r );
+                    }
+            );
+            selectedItems = tmp;
+            _droppingV3dStructures = null;
+        }
+
+        private var _droppingV3dStructures:Vector.<Voxel3dStructure>;
+        public function get droppingV3dStructures():Vector.<Voxel3dStructure>{
+            return _droppingV3dStructures;
+        }
+
+        override public function onDragEnter():Boolean{
+            var rt:Boolean = super.onDragEnter();
+            if( _draggingGene != null || _draggingStructureCount != null ){
+                return rt;
+            }
+
+            if( atlasModel.draggingStructureItems != null ){
+                atlasModel.draggingStructureItems.forEach( function ( src:StructureItem, idx:int, vc:Vector.<StructureItem> ):void{
+                    var v:Voxel3dStructure = rootModelVoxel3d.syncAllStructuresToVoxels.getDestBySource( src ) as Voxel3dStructure;
+                    if( !v.on3dStage ){
+                        if( _droppingV3dStructures == null ){
+                            _droppingV3dStructures = new <Voxel3dStructure>[];
+                        }
+                        _droppingV3dStructures.push( v );
+                    }
+                } );
+            }
+            else{
+                return false;
+            }
+            return ( _draggingStructureRowsInThis != null || _droppingV3dStructures != null );
+        }
+
+        override public function onDragDone( isDrop:Boolean ):void{
+            super.onDragDone( isDrop );
+            if( isDrop && _droppingV3dStructures != null ){
+                for( var j:int = _droppingV3dStructures.length - 1; j >= 0; j-- ){
+                    _droppingV3dStructures[j].on3dStage = true;
+                }
+                rfrStructures();
+            }
+        }
+
+
+        override protected function getNewRowData():StructureTreeGridDataRow{
+            return new Voxel3dStructureTreeGridDataRow();
+        }
+        ]]></fx:Script>
+    <fx:Declarations>
+        <as3lib:ChainEndWatcher eventDispatcher="{rootModelVoxel3d.on3dStageStructureModels}"
+                                eventType="{CollectionEvent.COLLECTION_CHANGE}"
+                                eventHandler="rfrStructures" id="structureOn3dTreeGridData_wacthingOn3dModels"/>
+    </fx:Declarations>
+
+    <!--columns-->
+    <fx:Script><![CDATA[
+        import edu.umich.med.mbni.pubanatomy.atlas.model.MDLGene;
+
+        override protected function initStaticColumns():void{
+            super.initStaticColumns();
+            _column3dVisible = new Voxel3dStructureTreeGridDataColumnVisible();
+            _column3dVisible.treeGridData = this;
+            columns.addItem( _column3dVisible );
+        }
+
+        private var _column3dVisible:Voxel3dStructureTreeGridDataColumnVisible;
+        public function get column3dVisible():Voxel3dStructureTreeGridDataColumnVisible{
+            return _column3dVisible;
+        }
+
+        override protected function addGeneCol( g:MDLGene ):StructureTreeGridDataColumnGene{
+            var sgcol:StructureTreeGridDataColumnGene = new Voxel3dStructureTreeGridDataColumnGene();
+            sgcol.treeGridData = this;
+            sgcol.gene = g;
+            columns.addItem( sgcol );
+            return sgcol;
+        }
+        ]]></fx:Script>
+
+    <fx:Script><![CDATA[
+        import mx.collections.ArrayList;
+
+        override protected function refreshMultiSelectionOperation():void{
+            super.refreshMultiSelectionOperation();
+            if( selectedItems != null ){
+                if( selectedItems.length == 1 ){
+                    availMultiOperations.addAll( new ArrayList( ( selectedItems[ 0 ] as Voxel3dStructureTreeGridDataRow ).getStructureCenterAddPlaneExeArray() ) );
+                }
+                var removeStructures:Vector.<Voxel3dStructureTreeGridDataRow> = new Vector.<Voxel3dStructureTreeGridDataRow>();
+
+                for( var j:int = selectedItems.length - 1; j >= 0; j-- ){
+                    var r:Voxel3dStructureTreeGridDataRow = selectedItems[j] as Voxel3dStructureTreeGridDataRow;
+                    removeStructures.push( r );
+                }
+
+                availMultiOperations.addItem( new Voxel3dOperationRemoveStructures( removeStructures ) );
+            }
+        }
+
+        [Bindable]
+        public var isAjustingSelectedItemsAlpha:Boolean = false;
+        ]]></fx:Script>
+    <fx:Script><![CDATA[
+        import edu.umich.med.mbni.pubanatomy.flash.dto.DtoGene;
+        import edu.umich.med.mbni.pubanatomy.voxel3d.model.Voxel3dStructureTreeGridDataRow;
+
+        import spark.components.Alert;
+
+        public function saveInto():Array{
+            var dtoGeneArr:Vector.<DtoGene> = new <DtoGene>[];
+            for( var k:int = geneList.length - 1; k >= 0; k-- ){
+                var g:MDLGene = geneList.getItemAt( k ) as MDLGene;
+                dtoGeneArr.push( g.dtoGene );
+            }
+
+
+            ////////////////////////////////////
+
+            var inputArr:Vector.<uint> = new <uint>[];
+            for( var i:int = inputStructureItems.length - 1; i >= 0; i-- ){
+                var item:StructureItem = inputStructureItems[i] as StructureItem;
+                inputArr.push( item.dtoStructure.structureId );
+            }
+
+            ////////////////////////////////////
+
+            var visualArrId:Vector.<int> = new <int>[];
+            var visualArrOC:Vector.<int> = new <int>[];
+            var visualArrSl:Vector.<int> = new <int>[];
+            for( var j:int = dataGridDataProvider.length - 1; j >= 0; j-- ){
+                var row:Voxel3dStructureTreeGridDataRow = dataGridDataProvider.getItemAt( j ) as Voxel3dStructureTreeGridDataRow;
+                var structureId:int = row.structure.dtoStructure.structureId;
+                visualArrId.push( structureId );
+                if( row.openOrClose ){
+                    visualArrOC.push( structureId );
+                }
+                if( selectedItems.indexOf( row ) ){
+                    visualArrSl.push( structureId );
+                }
+            }
+
+            return [ dtoGeneArr, inputArr, [ visualArrId, visualArrOC, visualArrSl ] ];
+        }
+
+        public function loadFrom( arr:Array ):void{
+            geneList.removeAll();
+            var dtoGeneArr:Vector.<DtoGene> = arr[ 0 ];
+            for( var j:int = dtoGeneArr.length - 1; j >= 0; j-- ){
+                addGene( dtoGeneArr[j] as DtoGene );
+            }
+
+            var on3d:Vector.<uint> = arr[ 1 ];
+            for( var p:int = rootModelVoxel3d.all3dVoxel3dStructures.length - 1; p >= 0; p-- ){
+                var v:Voxel3dStructure = rootModelVoxel3d.all3dVoxel3dStructures.getItemAt( p ) as Voxel3dStructure;
+                v.on3dStage = ( on3d.indexOf( v.atlasStructure.dtoStructure.structureId ) >= 0 );
+            }
+
+            _loadingVisualArr = arr[ 2 ];
+            rfrStructures();
+        }
+
+        private var _loadingVisualArr:Array;
+
+        override protected function loadIntoDataGrid( preDataGridDataProvider:Array = null, preSelected:Vector.<Object> = null ):void{
+            if( _loadingVisualArr != null ){
+
+                preDataGridDataProvider = [];
+                preSelected = new <Object>[];
+
+                var visualArrId:Vector.<int> = _loadingVisualArr[ 0 ];
+                var visualArrSl:Vector.<int> = _loadingVisualArr[ 2 ];
+                _loadingVisualArr = null;
+
+                for( var j:int = inputRowDataList.length - 1; j >= 0; j-- ){
+                    var r:StructureTreeGridDataRow = inputRowDataList[j] as StructureTreeGridDataRow;
+                    if( visualArrId.indexOf( r.structure.dtoStructure.structureId ) >= 0 ){
+                        preDataGridDataProvider.push( r );
+                    }
+                    if( visualArrSl.indexOf( r.structure.dtoStructure.structureId ) >= 0 ){
+                        preSelected.push( r );
+                    }
+                }
+            }
+
+            super.loadIntoDataGrid( preDataGridDataProvider, preSelected );
+        }
+
+        public function onSave():void{
+            var b:ByteArray = new ByteArray();
+            b.objectEncoding = ObjectEncoding.AMF3;
+            b.writeObject( saveInto() );
+            b.compress( CompressionAlgorithm.LZMA );
+            var fr:FileReference = new FileReference();
+            fr.save( b );
+        }
+
+        public function onLoad():void{
+            _fr.addEventListener( Event.SELECT, onSelected );
+            _fr.browse()
+        }
+
+        private var _fr:FileReference = new FileReference();
+
+        private function onSelected( ev:Event ):void{
+            _fr.removeEventListener( Event.SELECT, onSelected );
+            _fr.addEventListener( Event.COMPLETE, onLoaded );
+            _fr.load();
+        }
+
+        private function onLoaded( ev:Event ):void{
+            _fr.removeEventListener( Event.COMPLETE, onLoaded );
+            var b:ByteArray = _fr.data;
+            b.objectEncoding = ObjectEncoding.AMF3;
+            try{
+                b.uncompress( CompressionAlgorithm.LZMA );
+                loadFrom( b.readObject() );
+            }
+            catch( e:Error ){
+                Alert.show( "Error encountered when reading file!", "Please make sure this file is from Pubanatomy!" );
+                return;
+            }
+        }
+        ]]></fx:Script>
+</atm:StructureTreeGridData>

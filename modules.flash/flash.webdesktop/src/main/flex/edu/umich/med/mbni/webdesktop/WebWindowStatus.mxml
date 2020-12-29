@@ -1,0 +1,134 @@
+<?xml version="1.0"?>
+<win:WebWindowEffects xmlns:fx="http://ns.adobe.com/mxml/2009"
+                      xmlns:win="edu.umich.med.mbni.webdesktop.*"
+                      creationComplete="onCreated( event )"
+                      visible="false">
+    <fx:Script><![CDATA[
+        import mx.events.EffectEvent;
+
+        public static const RESIZED:String = "resized";
+        public static const MAXED:String = "maxed";
+        public static const MINIMIZED:String = "minimized";
+
+        private var _status:String;
+        [Bindable(event="statusChanged")]
+        public function get status():String{
+            return _status;
+        }
+
+        internal function setStatus( value:String ):void{
+            if( value != _status ){
+                _status = value;
+                parentGroup.refreshTopWindow();
+                dispatchEvent( new Event( "statusChanged" ) );
+            }
+        }
+
+        protected function onCreated( event:Event ):void{
+            if( _status == null ){
+                if( parentGroup != null ){
+                    _scaleTo = new Point( 1, 1 );
+
+                    //so it can be override
+                    if( _scaleFrom == null ){
+                        _scaleFrom = new Point( barButton.width / width, barButton.height / height );
+                    }
+
+                    if( _moveFrom == null ){
+                        _moveFrom = new Point( (parentGroup.width - barButton.width) / 2,
+                                               ( parentGroup.height - barButton.height) / 2 );
+                    }
+                    if( _moveTo == null ){
+                        _moveTo = new Point( (parentGroup.width - width) / 2, ( parentGroup.height - height) / 2 );
+                    }
+                    _fadeFrom = 0;
+                    _fadeTo = 1;
+                    effect.play();
+                }
+                else{
+                    visible = true;
+                }
+            }
+        }
+
+        override protected function onEffectStart( event:EffectEvent ):void{
+            super.onEffectStart( event );
+            includeInLayout = false;
+            mouseEnabled = false;
+        }
+
+        override protected function onEffectEnd( event:EffectEvent ):void{
+            if( _status == null ){
+                setStatus( MAXED );
+            }
+            else if( _status == MAXED || _status == RESIZED ){
+                if( _fadeTo == 0 ){
+                    parentGroup.removeElement( this );
+                }
+                else{
+                    setStatus( MINIMIZED );
+                }
+            }
+            else if( _status == MINIMIZED ){
+                if( _fadeTo == 0 ){
+                    parentGroup.removeElement( this );
+                }
+                else{
+                    setStatus( _statusBeforMini );
+                }
+            }
+            super.onEffectEnd( event );
+            if( _status == MAXED ){
+                mouseEnabled = true;
+                includeInLayout = true;
+                //                invalidateSize();
+            }
+            else if( _status == MINIMIZED ){
+                visible = false;
+            }
+        }
+
+        internal var _restorePosition:Point;
+
+        private var _restoreSize:Point;
+
+        private var _statusBeforMini:String;
+
+        public function onMini():void{
+            _statusBeforMini = _status;
+            _restoreSize = new Point( width, height );
+
+            _scaleFrom = new Point( 1, 1 );
+            _scaleTo = new Point( barButton.width / width, barButton.height / height );
+
+            _restorePosition = new Point( x, y );
+            _moveFrom = new Point( x, y );
+
+            _moveTo = parentGroup.globalToLocal( barButton.localToGlobal( new Point( 0, 0 ) ) );
+
+            _fadeFrom = 1;
+            _fadeTo = 1;
+            effect.play();
+        }
+
+        public function onRestoreFromMini():void{
+            _scaleTo = new Point( 1, 1 );
+            _scaleFrom = new Point( barButton.width / width, barButton.height / height );
+
+            _moveFrom = parentGroup.globalToLocal( barButton.localToGlobal( new Point( 0, 0 ) ) );
+            _moveTo = _restorePosition;
+
+            _fadeFrom = 1;
+            _fadeTo = 1;
+            effect.play();
+            visible = true;
+        }
+
+        internal function onMax():void{
+            setStatus( MAXED );
+            explicitWidth = NaN;
+            explicitHeight = NaN;
+        }
+
+        ]]></fx:Script>
+</win:WebWindowEffects>

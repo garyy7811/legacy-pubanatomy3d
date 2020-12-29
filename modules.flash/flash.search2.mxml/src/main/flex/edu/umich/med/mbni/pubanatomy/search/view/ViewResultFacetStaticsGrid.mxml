@@ -1,0 +1,147 @@
+<?xml version="1.0"?>
+<s:DataGrid xmlns:fx="http://ns.adobe.com/mxml/2009" xmlns:s="library://ns.adobe.com/flex/spark"
+            rollOver="checkNeedToLoadMore();"
+            dataProvider="{facet.resultList}"
+            creationComplete="onCreated();"
+            skinClass="edu.umich.med.mbni.utils.DataGridBusySkin"
+            enabled="{facet.rpc==null }"
+            gridMouseDrag="startDragDrop(event)"
+            resize="rfrVisibleRows=null;"
+            selectionMode="singleRow"
+            rowHeight="26"
+        >
+    <fx:Script><![CDATA[
+        import edu.umich.med.mbni.pubanatomy.search.model.QueryRelate2Terms;
+        import edu.umich.med.mbni.pubanatomy.search.model.QueryTermT;
+        import edu.umich.med.mbni.pubanatomy.search.model.ResultFacet;
+        import edu.umich.med.mbni.pubanatomy.search.model.ResultFacetTerm2Count;
+        import edu.umich.med.mbni.pubanatomy.search.model.SearchModel;
+        import edu.umich.med.mbni.utils.RootModelModule;
+
+        import mx.core.DragSource;
+
+        import spark.events.GridEvent;
+
+        private var _facet:ResultFacet;
+
+        [Bindable(event="facetChanged")]
+        public function get facet():ResultFacet{
+            return _facet;
+        }
+
+        public function set facet( value:ResultFacet ):void{
+            if( value != _facet ){
+                _facet = value;
+                dispatchEvent( new Event( "facetChanged" ) );
+            }
+        }
+
+        private function startDragDrop( event:GridEvent ):void{
+            if( event.rowIndex >= 0 && event.item == selectedItem
+                    && facet.queryResult.searchModel.rootApp.dragging == null ){
+                var toDrag:DragSource = getDragSource( event );
+                if( toDrag == null ){
+                    return;
+                }
+                facet.queryResult.searchModel.doDrag( this, toDrag, event );
+            }
+        }
+
+        protected function getDragSource( event:GridEvent ):DragSource{
+            var tmp:SearchModel = _facet.queryResult.searchModel;
+            var ds:DragSource = new DragSource();
+            var r2:QueryRelate2Terms = tmp.instantiate( QueryRelate2Terms ) as QueryRelate2Terms;
+            r2.term = tmp.instantiate( QueryTermT ) as QueryTermT;
+            r2.term.field = _facet.field;
+            ( r2.term as QueryTermT ).inputTxt = ( event.item as ResultFacetTerm2Count ).term;
+            ds.addData( r2, RootModelModule.DRAGGING_FORMAT );
+            return ds;
+        }
+
+        override protected function columnHeaderGroup_clickHandler( event:GridEvent ):void{
+            if( ( event.column == colCount || event.column == colIndex ) && facet.field.id != event.column.dataField &&
+                    facet.resultList != null && facet.resultList.length > 0 ){
+                event.column.sortDescending = ( event.column == colCount );
+                facet.sortResultBy( event.column.dataField );
+                if( columnHeaderGroup ){
+                    columnHeaderGroup.visibleSortIndicatorIndices = Vector.<int>( [event.column.columnIndex] );
+                }
+            }
+        }
+
+        private function getDragableTip( item:*, t:* ):String{
+            return "#t(searchResultSummaryTermDraggable)p#";
+        }
+
+        ]]></fx:Script>
+
+    <s:columns>
+        <s:ArrayList>
+            <s:GridColumn id="inQ" headerText="q" sortable="false"
+                          itemRenderer="edu.umich.med.mbni.pubanatomy.search.view.SearchViewResultFacetGridRendererInQ"/>
+            <s:GridColumn id="colIndex" dataField="term" headerText="{facet.field.label}" sortable="false" showDataTips="true" dataTipFunction="getDragableTip"/>
+            <s:GridColumn id="colCount" dataField="count" headerText="count" showDataTips="true" dataTipFunction="getDragableTip"/>
+        </s:ArrayList>
+    </s:columns>
+
+    <fx:Script><![CDATA[
+        protected function onCreated():void{
+            scroller.verticalScrollBar.addEventListener( Event.CHANGE, checkNeedToLoadMore );
+            if( columnHeaderGroup ){
+                columnHeaderGroup.visibleSortIndicatorIndices = Vector.<int>( [colCount.columnIndex] );
+            }
+            _facet.queryResult.searchModel.callInNext.putIn( checkNeedToLoadMore );
+            if( _facet.queryResult.queryModel.rootTerm == null ){
+                var idx:int = columns.getItemIndex( inQ );
+                if( idx >= 0 ){
+                    columns.removeItemAt( idx );
+                }
+            }
+        }
+
+        [Bindable]
+        public var visibleRowBegin:int;
+        [Bindable]
+        public var visibleRowEnd:int;
+
+        private function checkNeedToLoadMore( event:Event = null ):void{
+            if( facet.lastResult == null ){
+                return;
+            }
+            if( scroller.verticalScrollBar.value == scroller.verticalScrollBar.maximum &&
+                    facet.lastResult.length <= facet.pageRows && facet.lastResult.length > 0 ){
+                facet.getMoreResults();
+            }
+            rfrVisibleRows = null;
+        }
+
+        private function set rfrVisibleRows( ignoreVar:* ):void{
+            facet.queryResult.searchModel.callInNext.putIn( refreshVisibleRows );
+        }
+
+        private function refreshVisibleRows():void{
+            try{
+                facet.visibleRowIndices = grid.getVisibleRowIndices();
+                if( facet.visibleRowIndices == null || facet.visibleRowIndices.length == 0 ){
+                    visibleRowBegin = -1;
+                    visibleRowEnd = -1;
+                    return;
+                }
+                visibleRowBegin = facet.visibleRowIndices[ 0 ] + 1;
+
+                if( visibleRowEnd > facet.resultList.length ){
+                    visibleRowEnd = facet.resultList.length;
+                }
+                else{
+                    visibleRowEnd = facet.visibleRowIndices[ facet.visibleRowIndices.length - 1 ] + 1;
+                }
+            }
+            catch( bindingError:Error ){
+                CONFIG::debugging{
+                    trace( this + ":" + bindingError.getStackTrace() );
+                }
+            }
+        }
+        ]]></fx:Script>
+    <fx:Binding source="facet.resultList.length" destination="rfrVisibleRows"/>
+</s:DataGrid>

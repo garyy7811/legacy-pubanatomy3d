@@ -1,0 +1,41 @@
+<?xml version="1.0"?>
+<tg:TreeGridDataRow xmlns:fx="http://ns.adobe.com/mxml/2009"
+                    xmlns:tg="edu.umich.med.mbni.treedatagrid.*"
+        >
+    <fx:Script><![CDATA[
+        import edu.umich.med.mbni.treedatagrid.TreeGridDataRow;
+
+        [Bindable]
+        public var structure:StructureItem;
+
+        override public function equals( o:TreeGridDataRow ):Boolean{
+            return o is StructureTreeGridDataRow && ( o as StructureTreeGridDataRow ).structure == structure;
+        }
+
+        [Bindable(event="treeGridDataChanged")]
+        public function get structureTreeGridData():StructureTreeGridData{
+            return treeGridData as StructureTreeGridData;
+        }
+        ]]></fx:Script>
+    <fx:Binding source="structure.dtoStructure.name" destination="name"/>
+    <fx:Binding source="structure.dtoStructure.depth+1" destination="depth"/>
+    <fx:Script><![CDATA[
+        private function set rfrOpenMouseOverStructure( ignoreVar:* ):void{
+            if( structureTreeGridData != null && structureTreeGridData.atlasModel != null ){
+                structureTreeGridData.atlasModel.callInNext.putIn( refreshOpenMouseOverStructure );
+            }
+        }
+
+        private function refreshOpenMouseOverStructure():void{
+            if( structureTreeGridData.autoOpenMouseOverStructure
+                    && structureTreeGridData.atlasModel.mouseOverStructure == structure ){
+                if( parentRow != null ){
+                    parentRow.setOpenOrClose( true );
+                }
+                structureTreeGridData.ensureVisibleRow = this;
+            }
+        }
+        ]]></fx:Script>
+    <fx:Binding source="structureTreeGridData.autoOpenMouseOverStructure" destination="rfrOpenMouseOverStructure"/>
+    <fx:Binding source="structure.model.mouseOverStructure" destination="rfrOpenMouseOverStructure"/>
+</tg:TreeGridDataRow>

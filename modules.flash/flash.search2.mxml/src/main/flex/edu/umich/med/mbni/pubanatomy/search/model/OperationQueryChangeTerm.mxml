@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<utils:ModelOperationMenuItem xmlns:fx="http://ns.adobe.com/mxml/2009" xmlns:utils="edu.umich.med.mbni.utils.*">
+    <fx:Script><![CDATA[
+        [Bindable]
+        public var field:QueryField;
+
+        [Bindable(event="targetChanged")]
+        public function get q2terms():QueryRelate2Terms{
+            return target as QueryRelate2Terms;
+        }
+
+        override protected function onExecute():void{
+            q2terms.term.field = field;
+        }
+        ]]></fx:Script>
+    <fx:Binding source="field.label" destination="label"/>
+</utils:ModelOperationMenuItem>

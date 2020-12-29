@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<v:StructureTreeGridColumnTreeItemRenderer xmlns:fx="http://ns.adobe.com/mxml/2009"
+                                           xmlns:v="edu.umich.med.mbni.pubanatomy.atlas.view.*"
+        >
+    <fx:Script><![CDATA[
+        private function set rfrLabel( ignoreVar:* ):void{
+            structureRowData.treeGridData.rootModel.callInNext.putIn( refreshLabel, this, null, stage.frameRate / 2 );
+        }
+
+        private function refreshLabel():void{
+            var tlbl:String = structureRowData.structure.dtoStructure.acronym;
+            var tttp:String = "";
+            if( visible && currentState == "hovered" && structureRowData.structure.directChildren.length > 0 ){
+                tlbl += ( " (" + structureRowData.structure.directChildren.length + "|" + structureRowData.structure.allChildren.length + ")" );
+                tttp += structureRowData.structure.directChildren.length + " direct children " +
+                        ( ( structureRowData.structure.allChildren.length > structureRowData.structure.directChildren.length) ?
+                                (' total' + structureRowData.structure.allChildren.length + 'children' ) : '' )
+                        + " not loaded into 3D stage";
+            }
+            nameLabel.text = tlbl;
+            nameLabel.toolTip = tttp;
+        }
+        ]]></fx:Script>
+    <fx:Binding source="structureRowData.structure.directChildren.length" destination="rfrLabel"/>
+    <fx:Binding source="currentState" destination="rfrLabel"/>
+    <fx:Binding source="visible" destination="rfrLabel"/>
+</v:StructureTreeGridColumnTreeItemRenderer>

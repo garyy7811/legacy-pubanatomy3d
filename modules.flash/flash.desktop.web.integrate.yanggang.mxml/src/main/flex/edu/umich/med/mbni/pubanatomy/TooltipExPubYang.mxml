@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+<view:TooltipExPub xmlns:fx="http://ns.adobe.com/mxml/2009" xmlns:view="edu.umich.med.mbni.pubanatomy.integrate.view.*">
+    <fx:Script><![CDATA[
+        import edu.umich.med.mbni.pubanatomy.integrate.model.MDLTooltipExPub;
+
+        import mx.controls.Alert;
+
+        import mx.managers.ToolTipManager;
+
+
+        override public function set mouseEnabled( enabled:Boolean ):void{
+            super.mouseEnabled = true;
+        }
+
+        override protected function newModel():MDLTooltipExPub{
+            return new MDLTooltipExPubYang();
+        }
+
+        override protected function onClick( event:MouseEvent = null ):void{
+            if( model == null ){
+                Alert.show( "this tip is not editable yet, ask Gary to make it editable with this code:\r\n"
+                                    + ToolTipManager.currentTarget );
+                return;
+            }
+            super.onClick( event );
+        }
+        ]]></fx:Script>
+</view:TooltipExPub>

@@ -1,0 +1,100 @@
+<?xml version="1.0"?>
+<as3lib:MxmlEventDispatcher xmlns:fx="http://ns.adobe.com/mxml/2009"
+                            xmlns:as3lib="com.flashflexpro.as3lib.*">
+    <fx:Script><![CDATA[
+        private function set refresh( v:* ):void{
+            if( planeHeight > 0 && planeWidth > 0 ){
+                var tmp:Matrix = new Matrix();
+                if( verBiggerThanHor ){
+                    if( dirHorizontal && dirVertical ){
+                        //nothing need to do
+                    }
+                    else if( !dirHorizontal && dirVertical ){
+                        tmp.scale( -1, 1 );
+                        tmp.translate( planeWidth, 0 );
+                    }
+                    else if( !dirHorizontal && !dirVertical ){
+                        tmp.scale( -1, -1 );
+                        tmp.translate( planeWidth, planeHeight );
+                    }
+                    else if( dirHorizontal && !dirVertical ){
+                        tmp.scale( 1, -1 );
+                        tmp.translate( 0, planeHeight );
+                    }
+                }
+                else{
+                    tmp.scale( 1, -1 );
+                    tmp.rotate( Math.PI / 2 );
+                    if( dirHorizontal && dirVertical ){
+                        //nothing to do
+                    }
+                    else if( !dirHorizontal && dirVertical ){
+                        tmp.scale( -1, 1 );
+                        tmp.translate( planeHeight, 0 );
+                    }
+                    else if( !dirHorizontal && !dirVertical ){
+                        tmp.scale( -1, -1 );
+                        tmp.translate( planeHeight, planeWidth );
+                    }
+                    else if( dirHorizontal && !dirVertical ){
+                        tmp.scale( 1, -1 );
+                        tmp.translate( 0, planeWidth );
+                    }
+                }
+                setMatrix( tmp );
+            }
+            else{
+                setMatrix( null );
+            }
+        }
+
+        private var _matrix:Matrix;
+        [Bindable(event="matrixChanged")]
+        public function get matrix():Matrix{
+            return _matrix;
+        }
+
+        private var _revMtrx:Matrix;
+
+        [Bindable(event="matrixChanged")]
+        public function get revMtrx():Matrix{
+            return _revMtrx;
+        }
+
+        private function setRevMtrx( value:Matrix ):void{
+            if( value != _revMtrx ){
+                _revMtrx = value;
+                dispatchEvent( new Event( "matrixChanged" ) );
+            }
+        }
+
+        private function setMatrix( value:Matrix ):void{
+            if( value != _matrix ){
+                _matrix = value;
+                if( value == null ){
+                    _revMtrx = value;
+                }
+                else{
+                    _revMtrx = value.clone();
+                    _revMtrx.invert();
+                }
+                dispatchEvent( new Event( "matrixChanged" ) );
+            }
+        }
+        ]]></fx:Script>
+    <fx:Binding source="planeWidth" destination="refresh"/>
+    <fx:Binding source="planeHeight" destination="refresh"/>
+
+    <fx:Binding source="dirHorizontal" destination="refresh"/>
+    <fx:Binding source="dirVertical" destination="refresh"/>
+    <fx:Binding source="verBiggerThanHor" destination="refresh"/>
+
+    <fx:Declarations>
+        <fx:Number id="planeWidth"/>
+        <fx:Number id="planeHeight"/>
+
+        <fx:Boolean id="dirHorizontal"/>
+        <fx:Boolean id="dirVertical"/>
+        <fx:Boolean id="verBiggerThanHor"/>
+    </fx:Declarations>
+</as3lib:MxmlEventDispatcher>

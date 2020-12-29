@@ -1,0 +1,43 @@
+<?xml version="1.0"?>
+<core:MXMLObjectAdapter xmlns:fx="http://ns.adobe.com/mxml/2009" xmlns:core="mx.core.*">
+    <fx:Script><![CDATA[
+        import edu.umich.med.mbni.pubanatomy.atlas.model.MDLDataSet;
+        import edu.umich.med.mbni.pubanatomy.atlas.model.MDLISHImage;
+
+        private function set rfrResult( ignoreVar:* ):void{
+            owner.model.callInNext.putIn( refreshResult );
+        }
+
+        private function refreshResult():void{
+            if( dataSet.sectionImageList != null && dataSet.sectionImageList.length > 0
+                    && dataSet.matrix3d != null ){
+
+                for( var k:int = dataSet.sectionImageList.length - 1; k >= 0; k-- ){
+                    var img:MDLISHImage = dataSet.sectionImageList.getItemAt( k ) as MDLISHImage;
+                    if( img.matrix2d != null ){
+                        owner.model.onImageCorners( img.sectionImageId,
+                                                    img.point2vector3d( new Point( 0, 0 ) ), img.point2vector3d( new Point( img.width, 0 ) ),
+                                                    img.point2vector3d( new Point( img.width, img.height ) ), img.point2vector3d( new Point( 0, img.height ) )
+                        );
+                        if( img.modelSectionDs.projectionDir == 0 ){
+                            owner.model.chkWaiting.addItem( new CheckSectionImgAvailInAtlas( owner.model, img ) );
+                        }
+                    }
+                }
+            }
+            owner.done( this );
+        }
+
+        public function destroy():void{
+            dataSet = null;
+            owner = null;
+        }
+
+        [Bindable]
+        public var dataSet:MDLDataSet;
+
+        [Bindable]
+        public var owner:GeneImageWorker;
+        ]]></fx:Script>
+    <fx:Binding source="dataSet.sectionImageList.length" destination="rfrResult"/>
+</core:MXMLObjectAdapter>

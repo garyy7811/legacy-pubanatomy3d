@@ -1,0 +1,45 @@
+<?xml version="1.0"?>
+<s:DropDownList xmlns:fx="http://ns.adobe.com/mxml/2009"
+                xmlns:s="library://ns.adobe.com/flex/spark"
+                prompt="{plane.scene3d.rootModel3d.rootModelAtlas.geneModelList.length==0
+                ?'No gene in 3D stage':'Jump to closest image'}"
+                change="onChanged();">
+    <fx:Script><![CDATA[
+        import edu.umich.med.mbni.pubanatomy.atlas.model.MDLISHImage;
+        import edu.umich.med.mbni.pubanatomy.voxel3d.model.Voxel3dPlane;
+
+        [Bindable]
+        public var plane:Voxel3dPlane;
+
+        private function onChanged():void{
+            plane.jumpToImage( selectedItem as MDLISHImage );
+        }
+        ]]></fx:Script>
+    <s:dataProvider>{plane.closestImages}</s:dataProvider>
+    <s:itemRenderer>
+        <fx:Component>
+            <s:ItemRenderer
+                    rollOver="img.modelSectionDs.modelGene.model.mouseOverImg = img;"
+                    rollOut="img.modelSectionDs.modelGene.model.mouseOverImg = null;"
+                    >
+                <fx:Script><![CDATA[
+                    import edu.umich.med.mbni.pubanatomy.atlas.model.MDLISHImage;
+
+                    [Bindable("dataChange")]
+                    public function get img():MDLISHImage{
+                        return data as MDLISHImage;
+                    }
+
+                    [Bindable]
+                    private var _label:String;
+                    ]]></fx:Script>
+                <s:Label text="{_label}"
+                         toolTip="Click jump to section image: {_label}"
+                         height="16" textAlign="center"/>
+                <fx:Binding source="img.modelSectionDs.modelGene.dtoGene.acronym
+                + '|' +  img.modelSectionDs.label
+                + '|' + img.sectionNumber" destination="_label"/>
+            </s:ItemRenderer>
+        </fx:Component>
+    </s:itemRenderer>
+</s:DropDownList>

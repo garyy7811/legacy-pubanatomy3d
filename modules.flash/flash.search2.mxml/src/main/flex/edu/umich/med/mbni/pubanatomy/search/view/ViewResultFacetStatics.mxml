@@ -1,0 +1,70 @@
+<?xml version="1.0"?>
+<webdesktop:TiBoTlePanel xmlns:fx="http://ns.adobe.com/mxml/2009"
+                         xmlns:webdesktop="edu.umich.med.mbni.webdesktop.*"
+                         initialize="onStaticsInit();"
+                         xmlns:s="library://ns.adobe.com/flex/spark">
+    <fx:Script><![CDATA[
+        import edu.umich.med.mbni.pubanatomy.search.model.QueryField;
+        import edu.umich.med.mbni.pubanatomy.search.model.ResultFacet;
+
+        [Bindable]
+        public var model:ResultFacet;
+
+        private function set rfrTitle( ignoreVar:* ):void{
+            model.queryResult.searchModel.callInNext.putIn( refreshTitle );
+        }
+
+        protected function refreshTitle():void{
+            try{
+                if( model.lastResult != null ){
+                    title = ( model.lastResult.length < model.pageRows ? " Total " : " Top " ) +
+                            model.resultList.length + " of " + model.field.label;
+                    if( model.resultList != null && model.resultList.length > 0 ){
+                        title += " loaded, displaying "
+                                + facetGrid.visibleRowBegin
+                                + " - "
+                                + facetGrid.visibleRowEnd;
+                    }
+                }
+                else{
+                    title = "N/A";
+                }
+            }
+            catch( bindingError:Error ){
+                CONFIG::debugging{
+                    trace( this + ":" + bindingError.getStackTrace() );
+                }
+            }
+        }
+        ]]></fx:Script>
+    <fx:Binding source="model.resultList.length" destination="rfrTitle"/>
+    <fx:Binding source="model.field.label" destination="rfrTitle"/>
+
+    <fx:Binding source="facetGrid.visibleRowBegin" destination="rfrTitle"/>
+    <fx:Binding source="facetGrid.visibleRowEnd" destination="rfrTitle"/>
+
+    <webdesktop:titleGroupContent>
+        <s:HGroup width="100%" verticalAlign="middle">
+            <s:Label text="{title}" maxDisplayedLines="1" fontWeight="bold" width="100%" toolTip="#t(searchResultFacet_{model.field.toolTip})p#"/>
+            <s:TextInput prompt="filter" text="@{model.filterTxt}" toolTip="#t(searchResultFacetFilter)p#"
+                         visible="{model.field.type == QueryField.type_sentences || model.field.type == QueryField.type_single_word}"
+                         includeInLayout="{model.field.type == QueryField.type_sentences || model.field.type == QueryField.type_single_word}"
+                    />
+            <s:Button skinClass="spark.skins.spark.TitleWindowCloseButtonSkin" width="16" height="16"
+                      click="model.queryResult.resultModel.removeFacet( model.field );" toolTip="#t(searchResultFacetCloseBtn)p#"/>
+        </s:HGroup>
+    </webdesktop:titleGroupContent>
+
+    <fx:Script><![CDATA[
+        [Bindable]
+        public var facetGrid:ViewResultFacetStaticsGrid;
+
+        protected function onStaticsInit():void{
+            facetGrid = new ViewResultFacetStaticsGrid();
+            facetGrid.facet = model;
+            facetGrid.percentHeight = 100;
+            facetGrid.percentWidth = 100;
+            addElement( facetGrid );
+        }
+        ]]></fx:Script>
+</webdesktop:TiBoTlePanel>

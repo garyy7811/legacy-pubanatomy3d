@@ -1,0 +1,41 @@
+<?xml version="1.0"?>
+<im:MDLTempAbaDatasetSearchRpcSvc xmlns:fx="http://ns.adobe.com/mxml/2009"
+                                  xmlns:im="edu.umich.med.mbni.pubanatomy.integrate.model.*">
+    <fx:Script><![CDATA[
+        import mx.collections.ArrayList;
+        import mx.collections.IList;
+
+        [Bindable]
+        public var structures1IdLst:IList = new ArrayList();
+
+        [Bindable]
+        public var structures2IdLst:IList = new ArrayList();
+
+        [Bindable]
+        public var threshold1:Number = 1;
+        [Bindable]
+        public var threshold2:Number = 1;
+
+        protected function set rfrUrl( ignoreVar:* ):void{
+            var idLst1:String = structureToIdLst( structures1IdLst, "1", threshold1 );
+            var idLst2:String = structureToIdLst( structures2IdLst, "2", threshold2 );
+            if( idLst1.length > 0 && idLst2.length > 0 ){
+                paramStrAfterQ = (
+                        "criteria=service::mouse_differential[set$eq"
+                                + ( coronalOnly ? "mouse_coronal" : "mouse" ) + "]"
+                                + idLst1 + idLst2
+                );
+            }
+            else{
+                paramStrAfterQ = null;
+            }
+        }
+        ]]></fx:Script>
+
+
+    <fx:Binding source="structures1IdLst.length" destination="rfrUrl"/>
+    <fx:Binding source="structures2IdLst.length" destination="rfrUrl"/>
+    <fx:Binding source="threshold1" destination="rfrUrl"/>
+    <fx:Binding source="threshold2" destination="rfrUrl"/>
+    <fx:Binding source="coronalOnly" destination="rfrUrl"/>
+</im:MDLTempAbaDatasetSearchRpcSvc>

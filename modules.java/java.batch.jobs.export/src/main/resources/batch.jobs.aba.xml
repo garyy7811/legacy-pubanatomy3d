@@ -1,0 +1,179 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:batch="http://www.springframework.org/schema/batch"
+       xsi:schemaLocation="
+       http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://www.springframework.org/schema/batch
+       http://www.springframework.org/schema/batch/spring-batch.xsd">
+
+    <batch:job id="aba3DModel" restartable="true">
+        <batch:step id="initAbaStructureTree" next="downloadAba3DAtlasAnnotation25">
+            <batch:tasklet>
+                <batch:chunk commit-interval="3">
+                    <batch:reader>
+                        <bean class="edu.umich.med.mbni.pubanatomy.batch.aba.BatchReaderAbaDownloadJsonStructure">
+                            <property name="pageSize" value="50"/>
+                            <property name="queryStrAfterQ" value="criteria=model::Structure[ontology_id$eq1]"/>
+                        </bean>
+                    </batch:reader>
+                    <batch:writer>
+                        <bean class="edu.umich.med.mbni.pubanatomy.batch.job.BatchWriterDomainObj">
+                            <property name="service" ref="abaStructureService"/>
+                        </bean>
+                    </batch:writer>
+                </batch:chunk>
+            </batch:tasklet>
+        </batch:step>
+        <batch:step id="downloadAba3DAtlasAnnotation25" next="downloadAba3DAtlasAnnotation100">
+            <batch:tasklet>
+                <batch:chunk writer="batchWriterFileAndMeta" commit-interval="1">
+                    <batch:reader>
+                        <bean class="edu.umich.med.mbni.pubanatomy.batch.aba.BatchReaderAbaDownloadFileAnnotation">
+                            <property name="url"
+                                      value="http://api.brain-map.org/api/v2/well_known_file_download/111568429"/>
+                            <property name="ontologyId" value="1"/>
+                            <property name="resolutionUm" value="25"/>
+                        </bean>
+                    </batch:reader>
+                </batch:chunk>
+            </batch:tasklet>
+        </batch:step>
+        <batch:step id="downloadAba3DAtlasAnnotation100" parent="downloadAba3DAtlasAnnotation25"
+                    next="downloadAba3DAtlasAnnotation200">
+            <batch:tasklet>
+                <batch:chunk>
+                    <batch:reader>
+                        <bean class="edu.umich.med.mbni.pubanatomy.batch.aba.BatchReaderAbaDownloadFileAnnotation">
+                            <property name="url"
+                                      value="http://api.brain-map.org/api/v2/well_known_file_download/159081322"/>
+                            <property name="ontologyId" value="1"/>
+                            <property name="resolutionUm" value="100"/>
+                        </bean>
+                    </batch:reader>
+                </batch:chunk>
+            </batch:tasklet>
+        </batch:step>
+
+        <batch:step id="downloadAba3DAtlasAnnotation200" parent="downloadAba3DAtlasAnnotation25"
+                    next="initSectionDataSets">
+            <batch:tasklet>
+                <batch:chunk>
+                    <batch:reader>
+                        <bean class="edu.umich.med.mbni.pubanatomy.batch.aba.BatchReaderAbaDownloadFileAnnotation">
+                            <property name="url"
+                                      value="http://api.brain-map.org/api/v2/well_known_file_download/159081322"/>
+                            <property name="ontologyId" value="1"/>
+                            <property name="resolutionUm" value="200"/>
+                        </bean>
+                    </batch:reader>
+                </batch:chunk>
+            </batch:tasklet>
+        </batch:step>
+
+        <batch:step id="initSectionDataSets" next="downloadGeneExprZip">
+            <batch:tasklet>
+                <batch:chunk commit-interval="3">
+                    <batch:reader>
+                        <bean class="edu.umich.med.mbni.pubanatomy.batch.aba.BatchReaderAbaDownloadJsonDataSet">
+                            <property name="pageSize" value="50"/>
+                            <property name="queryStrAfterQ"
+                                      value="criteria=model::SectionDataSet,rma::criteira[failed$eqfalse],reference_space[id$in9,10]"/>
+                        </bean>
+                    </batch:reader>
+                    <batch:writer>
+                        <bean class="edu.umich.med.mbni.pubanatomy.batch.job.BatchWriterDomainObj">
+                            <property name="service" ref="abaSectionDataSetService"/>
+                        </bean>
+                    </batch:writer>
+                </batch:chunk>
+            </batch:tasklet>
+        </batch:step>
+
+        <batch:step id="downloadGeneExprZip">
+            <batch:tasklet>
+                <batch:chunk writer="batchWriterFileAndMeta" commit-interval="1">
+                    <batch:reader>
+                        <bean class="edu.umich.med.mbni.pubanatomy.batch.aba.BatchReaderAbaDownloadFileGeneExprZip">
+                            <property name="pageSize" value="1"/>
+                        </bean>
+                    </batch:reader>
+                </batch:chunk>
+            </batch:tasklet>
+        </batch:step>
+    </batch:job>
+
+    <batch:job id="abaSvgAnnotation" restartable="true">
+        <batch:step id="importAbaAtlas1_2SectionImageIdList">
+            <batch:tasklet>
+                <batch:chunk commit-interval="1">
+                    <batch:reader>
+                        <bean class="edu.umich.med.mbni.pubanatomy.batch.aba.BatchReaderAbaAtlasSectionImgIdToSVG">
+                            <property name="flatFileItemReader">
+                                <bean class="org.springframework.batch.item.file.FlatFileItemReader">
+                                    <property name="resource" value="data/aba_sectionimageid_atlas1_2_for_svg_download.txt"/>
+                                    <property name="encoding" value="UTF-8"/>
+                                    <property name="linesToSkip" value="0"/>
+                                    <property name="lineMapper">
+                                        <bean class="org.springframework.batch.item.file.mapping.DefaultLineMapper">
+                                            <property name="lineTokenizer">
+                                                <bean class="org.springframework.batch.item.file.transform.DelimitedLineTokenizer">
+                                                    <property name="delimiter" value="|"/>
+                                                </bean>
+                                            </property>
+                                            <property name="fieldSetMapper">
+                                                <bean class="edu.umich.med.mbni.pubanatomy.batch.aba.BatchFieldMapAbaAtlasSectionImgId"/>
+                                            </property>
+                                        </bean>
+                                    </property>
+                                </bean>
+                            </property>
+                        </bean>
+                    </batch:reader>
+                    <batch:writer>
+                        <bean class="edu.umich.med.mbni.pubanatomy.batch.job.BatchWriterDomainObj">
+                            <property name="service" ref="abaAtlasSectionImgToStructureService"/>
+                        </bean>
+                    </batch:writer>
+                </batch:chunk>
+            </batch:tasklet>
+        </batch:step>
+    </batch:job>
+    <batch:job id="loadAbaMouseGene" restartable="true">
+        <batch:step id="initAbaMouseGene">
+            <batch:tasklet>
+                <batch:chunk commit-interval="3">
+                    <batch:reader>
+                        <bean class="edu.umich.med.mbni.pubanatomy.batch.aba.BatchReaderAbaDownloadJsonMouseGene">
+                            <property name="pageSize" value="500"/>
+                            <property name="queryStrAfterQ" value="criteria=model::Gene,rma::include,products[species$eq'Mouse']"/>
+                        </bean>
+                    </batch:reader>
+                    <batch:writer>
+                        <bean class="edu.umich.med.mbni.pubanatomy.batch.job.BatchWriterDomainObj">
+                            <property name="service" ref="abaGeneService"/>
+                        </bean>
+                    </batch:writer>
+                </batch:chunk>
+            </batch:tasklet>
+        </batch:step>
+    </batch:job>
+
+    <batch:job id="exportAbaAtlasSectionImgToStructures">
+        <batch:step id="sdfs">
+            <batch:tasklet>
+                <batch:chunk commit-interval="1">
+                    <batch:reader>
+                        <bean class="edu.umich.med.mbni.pubanatomy.batch.BatchReaderAtlasImgToStructureList">
+                            <property name="pageSize" value="1"/>
+                        </bean>
+                    </batch:reader>
+                    <batch:writer>
+                        <bean class="edu.umich.med.mbni.pubanatomy.batch.job.BatchWriterFileAndMeta"/>
+                    </batch:writer>
+                </batch:chunk>
+            </batch:tasklet>
+        </batch:step>
+    </batch:job>
+
+</beans>

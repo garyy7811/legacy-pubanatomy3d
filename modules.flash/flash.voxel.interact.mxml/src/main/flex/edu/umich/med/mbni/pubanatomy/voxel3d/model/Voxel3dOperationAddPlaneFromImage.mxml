@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<m:Voxel3dOperationAddPlane xmlns:fx="http://ns.adobe.com/mxml/2009"
+                            xmlns:m="edu.umich.med.mbni.pubanatomy.voxel3d.model.*">
+    <fx:Script><![CDATA[
+        import edu.umich.med.mbni.pubanatomy.atlas.model.MDLISHImage;
+
+        [Bindable]
+        public var image:MDLISHImage;
+
+        override protected function onExecute():void{
+            _planeProjectionDir = image.modelSectionDs.projectionDir;
+            _planeProjectionVal = image.projectionPosition / rootModel3d.config.unitLength;
+            result = rootModel3d.addSection( _planeProjectionDir, _planeProjectionVal );
+            result.image = image;
+            result.imageSectionMode = Voxel3dPlane.IMG_SECTION_MODE_SVG;
+        }
+
+        public var result:Voxel3dPlane;
+        ]]></fx:Script>
+    <fx:Binding source="image!=null" destination="available"/>
+</m:Voxel3dOperationAddPlane>

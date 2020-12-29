@@ -1,0 +1,42 @@
+<?xml version="1.0"?>
+<histogram:ViewLevelHistogramBarLevelRenderer xmlns:fx="http://ns.adobe.com/mxml/2009"
+                                              xmlns:histogram="edu.umich.med.mbni.histogram.*"
+                                              toolTip="level from|^|{sgBar.levelFrom + '\r\n'}
+                                              level to |^|{ sgBar.levelTo + '\r\n' }
+                                              gene name |^|{_geneCol.gene.dtoGene.name + '\r\n'}
+                                              number of voxels |^|{ _levelLength + '\r\n' }
+                                              #t(strglvlhisblr0)p#">
+    <fx:Script><![CDATA[
+        import edu.umich.med.mbni.pubanatomy.atlas.model.StructureGeneLevelHistogram;
+        import edu.umich.med.mbni.pubanatomy.atlas.model.StructureTreeGridDataColumnGene;
+
+        [Bindable]
+        private var _levelLength:uint;
+
+        [Bindable("initialize")]
+        public function get sgBar():StructureGeneLevelHistogramBarRenderer{
+            return parentDocument as StructureGeneLevelHistogramBarRenderer;
+        }
+
+        [Bindable]
+        private var _geneCol:StructureTreeGridDataColumnGene;
+
+        private function set rfrGeneCol( v:* ):void{
+            if( levels == null ){
+                return;
+            }
+            var index:int = bar.levelBar.inputBars.indexOf( levels );
+            CONFIG::debugging{
+                if( index < 0 ){
+                    throw new Error( this + ".rfrGene " );
+                }
+            }
+            _geneCol = ( sgBar.sgHistogram.structureModel as StructureGeneLevelHistogram ).getColumnByBarIndex( index );
+            _levelLength = levels.length;
+        }
+        ]]></fx:Script>
+    <fx:Binding source="( sgBar.sgHistogram.structureModel as StructureGeneLevelHistogram ).geneColWatchers.length"
+                destination="rfrGeneCol"/>
+    <fx:Binding source="levels" destination="rfrGeneCol"/>
+    <fx:Binding source="_geneCol.selectedDataSet.color" destination="levelColor"/>
+</histogram:ViewLevelHistogramBarLevelRenderer>

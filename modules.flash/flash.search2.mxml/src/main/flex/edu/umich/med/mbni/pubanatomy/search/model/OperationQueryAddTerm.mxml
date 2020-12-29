@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<utils:ModelOperationMenuItem xmlns:fx="http://ns.adobe.com/mxml/2009" xmlns:utils="edu.umich.med.mbni.utils.*">
+    <fx:Script><![CDATA[
+        [Bindable]
+        public var field:QueryField;
+
+        [Bindable]
+        public var addTo:QueryRelate2Terms;
+
+        override protected function onExecute():void{
+            var tmp:SearchModel = addTo.query.queryResult.searchModel;
+
+            var rt:QueryRelate2Terms = tmp.instantiate( QueryRelate2Terms ) as QueryRelate2Terms;
+            var nt:QueryTerm = tmp.instantiate( ( field is QueryFieldT ) ? QueryTermT : QueryTermR ) as QueryTerm;
+
+            nt.field = field;
+            rt.term = nt;
+
+            addTo.query.setFocusedOnTerm( nt );
+            addTo.addTerm( rt );
+        }
+        ]]></fx:Script>
+</utils:ModelOperationMenuItem>

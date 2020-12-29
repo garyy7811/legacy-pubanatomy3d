@@ -1,0 +1,47 @@
+<?xml version="1.0"?>
+<m:Voxel3dOperationBase xmlns:fx="http://ns.adobe.com/mxml/2009"
+                        xmlns:m="edu.umich.med.mbni.pubanatomy.voxel3d.model.*">
+    <fx:Metadata>
+        [ResourceBundle("Text3d")]
+    </fx:Metadata>
+    <fx:Script><![CDATA[
+        import mx.resources.ResourceManager;
+
+        override protected function onExecute():void{
+            if( newCentralStructure != null ){
+                v3dSceneModel.centralStructure = newCentralStructure;
+            }
+            else if( newCenter != null ){
+                v3dSceneModel.centralPosition = newCenter;
+            }
+            else{
+                CONFIG::debugging{
+                    throw new Error( this + ".rfr " );
+                }
+            }
+        }
+
+        [Bindable]
+        public var newCenter:Vector3D;
+
+        [Bindable]
+        public var v3dSceneModel:Voxel3dSceneModel;
+
+        [Bindable]
+        public var newCentralStructure:Voxel3dStructureModel;
+
+
+        private function set rfr( ignoreVar:* ):void{
+            if( newCentralStructure != null ){
+                label = ResourceManager.getInstance().getString( 'Text3d', 'v3dPutCameraAroundModel', [newCentralStructure.structureItem.atlasStructure.dtoStructure.name] );
+                toolTip = "#t(v3dPutCameraAroundModel.tip)p#";
+            }
+            else if( newCenter != null ){
+                label = ResourceManager.getInstance().getString( 'Text3d', 'v3dPutCameraAroundHit' );
+                toolTip = "#t(v3dPutCameraAroundHit.tip)p#";
+            }
+        }
+        ]]></fx:Script>
+    <fx:Binding source="newCenter" destination="rfr"/>
+    <fx:Binding source="newCentralStructure" destination="rfr"/>
+</m:Voxel3dOperationBase>

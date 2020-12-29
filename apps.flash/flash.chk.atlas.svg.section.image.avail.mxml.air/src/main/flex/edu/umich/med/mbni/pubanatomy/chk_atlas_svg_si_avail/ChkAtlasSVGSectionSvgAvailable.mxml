@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<utils:RootModelApp xmlns:fx="http://ns.adobe.com/mxml/2009"
+                    xmlns:utils="edu.umich.med.mbni.utils.*"
+                    xmlns:s="library://ns.adobe.com/flex/spark">
+    <fx:Script><![CDATA[
+        public function thisAppInit( s:Stage ):void{
+            restUrl = "";
+            stage = s;
+            super.appInit();
+            new GetAtlas1And2().start( this );
+        }
+
+        public function onAtlasReady():void{
+            trace( "onAtlasReady" );
+        }
+        ]]></fx:Script>
+
+    <utils:pressedKeys>
+        <s:ArrayList/>
+    </utils:pressedKeys>
+    <utils:rpcOnAir>
+        <s:ArrayList/>
+    </utils:rpcOnAir>
+    <utils:rpcWaitQue>
+        <s:ArrayList/>
+    </utils:rpcWaitQue>
+</utils:RootModelApp>

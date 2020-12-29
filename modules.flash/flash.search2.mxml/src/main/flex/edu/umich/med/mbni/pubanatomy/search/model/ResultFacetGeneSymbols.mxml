@@ -1,0 +1,55 @@
+<?xml version="1.0"?>
+<model:ResultFacet xmlns:fx="http://ns.adobe.com/mxml/2009"
+                   xmlns:model="edu.umich.med.mbni.pubanatomy.search.model.*" xmlns:utils="edu.umich.med.mbni.utils.*">
+    <fx:Script><![CDATA[
+        import edu.umich.med.mbni.pubanatomy.flash.dto.DtoGene;
+
+        [Bindable(event="fieldChanged")]
+        public function get fieldGene():QueryFieldTGeneSymbols{
+            return field as QueryFieldTGeneSymbols;
+        }
+
+        override protected function termCount2ResultFacetTerm2Count( term:String, obj:Object ):ResultFacetTerm2Count{
+            var rt:ResultFacetTerm2Count = new ResultFacetTerm2CountGene();
+            rt.facet = this;
+            rt.term = term;
+            rt.count = obj[ term ];
+            return  rt;
+        }
+
+        public function onGenesResult( getGene:ResultFacetGeneRpc ):void{
+            for each( var dg:DtoGene in getGene.resultGenes ){
+                for each( var f:ResultFacetTerm2CountGene in getGene.geneFacets ){
+                    if( f.term.toLowerCase() == dg.acronym.toLowerCase() ){
+                        f.gene = dg;
+                        loadOnRealtime.onEachItemLoad( f );
+                        break;
+                    }
+                }
+            }
+        }
+
+        private static function isGeneLoaded( f2cg:ResultFacetTerm2CountGene ):Boolean{
+            return f2cg.gene != null;
+        }
+
+        /**
+         * the reason we do it here is that:
+         * this is a virtual layout cell which means only visual cells need to load, but
+         * inside resultList, there could be a lot more that don't need to call rpc because not being visual yet!
+         * @param arr
+         * @return
+         */
+        private function getGenesRpc( arr:Array ):ResultFacetGeneRpc{
+            var nextGetGene:ResultFacetGeneRpc = queryResult.searchModel.instantiate( ResultFacetGeneRpc ) as ResultFacetGeneRpc;
+            nextGetGene.geneFacets = arr;
+            nextGetGene.modelFacetGene = this;
+            nextGetGene.callRemote();
+            return nextGetGene;
+        }
+        ]]></fx:Script>
+    <fx:Declarations>
+        <utils:ListLoadOnRealtime id="loadOnRealtime" visibleRowIndices="{visibleRowIndices}" itemList="{resultList}"
+                                  isItemLoaded="{isGeneLoaded}" fireRpc="{getGenesRpc}"/>
+    </fx:Declarations>
+</model:ResultFacet>

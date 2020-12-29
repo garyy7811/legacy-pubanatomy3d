@@ -1,0 +1,51 @@
+<?xml version="1.0"?>
+<dd3d:Dd3dViewMeshStructure xmlns:fx="http://ns.adobe.com/mxml/2009"
+                            xmlns:dd3d="edu.umich.med.mbni.pubanatomy.datadriven3dwindow.*">
+    <fx:Script><![CDATA[
+        import away3d.containers.Scene3D;
+        import away3d.core.base.Geometry;
+
+        import edu.umich.med.mbni.pubanatomy.voxel3d.model.Voxel3dStructureModel;
+
+        [Bindable(event="modelChanged")]
+        public function get structureModelItem():Voxel3dStructureModel{
+            return model as Voxel3dStructureModel;
+        }
+
+        override public function getCenter():Vector3D{
+            var rt:Vector3D = super.getCenter();
+            rt.scaleBy( structureModelItem.scale );
+            return rt;
+        }
+
+        [Bindable(event="v3dSceneChanged")]
+        public function get v3dScene():V3dScene{
+            return scene as V3dScene;
+        }
+
+        override public function set scene( value:Scene3D ):void{
+            var old:Scene3D = scene;
+            super.scene = value;
+            if( value != old ){
+                dispatchEvent( new Event( "v3dSceneChanged" ) );
+            }
+        }
+
+
+        override public function set geometry( value:Geometry ):void{
+            super.geometry = value;
+            if( structureModelItem != null && structureModelItem.dtoModel.structureId == 8 ){
+                var tmp:Vector3D = new Vector3D( maxX + minX, maxY + minY, maxZ + minZ );
+                tmp.scaleBy( 0.5 );
+                v3dScene.v3dModel.centralPosition = tmp;
+            }
+        }
+
+        override protected function updateBounds():void{
+            super.updateBounds();
+            structureModelItem.structureItem.atlasStructure.dtoStructure.max = [ maxX, maxY, maxZ ];
+            structureModelItem.structureItem.atlasStructure.dtoStructure.min = [ minX, minY, minZ ];
+        }
+        ]]></fx:Script>
+    <fx:Binding source="structureModelItem.structureItem.selected" destination="model.selected" twoWay="true"/>
+</dd3d:Dd3dViewMeshStructure>

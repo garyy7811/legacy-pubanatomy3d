@@ -1,0 +1,45 @@
+<?xml version="1.0"?>
+<s:VGroup xmlns:fx="http://ns.adobe.com/mxml/2009" xmlns:s="library://ns.adobe.com/flex/spark"
+          xmlns:view="edu.umich.med.mbni.pubanatomy.sectioninteract.view.*"
+          currentState="s" creationComplete="rfrState=null;">
+
+    <fx:Script><![CDATA[
+        import edu.umich.med.mbni.pubanatomy.atlas.model.RootModelAtlas;
+
+        [Bindable]
+        public var showOrHide:Boolean;
+
+        [Bindable]
+        public var modelAtlas:RootModelAtlas;
+
+        private function set rfrState( ignoreVar:* ):void{
+            if( modelAtlas != null ){
+                modelAtlas.callInNext.putIn( refreshState );
+            }
+        }
+
+        private function refreshState():void{
+            if( initialized ){
+                currentState = showOrHide ? "s" : "h";
+            }
+        }
+        ]]></fx:Script>
+    <fx:Binding source="showOrHide" destination="rfrState"/>
+    <fx:Binding source="modelAtlas.callInNext" destination="rfrState"/>
+    <view:ViewSectionPlanePerspDatatip dir="{modelAtlas.mouseOverImg.modelSectionDs.projectionDir}" id="tip"
+                                       value="{modelAtlas.mouseOverImg.projectionPosition/modelAtlas.config.unitLength}"
+                                       rootAtlas="{modelAtlas}" includeIn="s"
+            />
+    <s:states>
+        <s:State name="h"/>
+        <s:State name="s"/>
+    </s:states>
+    <s:transitions>
+        <s:Transition fromState="h" toState="s" autoReverse="true">
+            <s:Parallel target="{tip}">
+                <s:Fade alphaFrom="0" alphaTo="0"/>
+                <s:Resize heightFrom="0" heightTo="{tip.height}"/>
+            </s:Parallel>
+        </s:Transition>
+    </s:transitions>
+</s:VGroup>

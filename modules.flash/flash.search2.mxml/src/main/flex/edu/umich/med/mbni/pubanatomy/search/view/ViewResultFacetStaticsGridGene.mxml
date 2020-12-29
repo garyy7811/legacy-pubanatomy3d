@@ -1,0 +1,62 @@
+<?xml version="1.0"?>
+<view:ViewResultFacetStaticsGrid xmlns:fx="http://ns.adobe.com/mxml/2009"
+                                 xmlns:view="edu.umich.med.mbni.pubanatomy.search.view.*">
+
+    <fx:Script><![CDATA[
+        import edu.umich.med.mbni.pubanatomy.flash.dto.DtoGene;
+        import edu.umich.med.mbni.pubanatomy.search.model.ResultFacetGeneSymbols;
+        import edu.umich.med.mbni.pubanatomy.search.model.ResultFacetTerm2CountGene;
+        import edu.umich.med.mbni.utils.RootModelModule;
+
+        import mx.core.DragSource;
+
+        import spark.components.gridClasses.GridColumn;
+
+        import spark.events.GridEvent;
+
+        override protected function getDragSource( event:GridEvent ):DragSource{
+            var rt:DragSource = new DragSource();
+            var g:DtoGene = ( event.item as ResultFacetTerm2CountGene).gene;
+            if( g == null ){
+                return null;
+            }
+            rt.addData( g, RootModelModule.DRAGGING_FORMAT );
+            return rt;
+        }
+
+        [Bindable(event="facetChanged")]
+        public function get facetGene():ResultFacetGeneSymbols{
+            return facet as ResultFacetGeneSymbols;
+        }
+
+        override protected function onCreated():void{
+            super.onCreated();
+            var gridColumn:GridColumn;
+            if( false /*facetGene is ResultFacetGeneIds*/ ){
+                gridColumn = new GridColumn();
+                gridColumn.dataField = "gene.acronym";
+                gridColumn.dataTipField = "gene.acronym";
+                gridColumn.sortable = false;
+                gridColumn.headerText = "gene symbol";
+                columns.addItem( gridColumn );
+            }
+            else{
+                gridColumn = new GridColumn();
+                gridColumn.dataField = "gene.geneId";
+                gridColumn.dataTipField = "gene.geneId";
+                gridColumn.sortable = false;
+                gridColumn.headerText = "gene Id";
+                columns.addItem( gridColumn );
+            }
+            gridColumn = new GridColumn();
+            gridColumn.dataField = "gene.name";
+            gridColumn.dataTipField = "gene.name";
+            gridColumn.sortable = false;
+            gridColumn.headerText = "gene name";
+            columns.addItem( gridColumn );
+        }
+
+        override protected function columnHeaderGroup_clickHandler( event:GridEvent ):void{
+        }
+        ]]></fx:Script>
+</view:ViewResultFacetStaticsGrid>

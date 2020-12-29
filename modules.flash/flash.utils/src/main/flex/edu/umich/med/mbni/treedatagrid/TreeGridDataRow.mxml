@@ -1,0 +1,188 @@
+<?xml version="1.0"?>
+<tm:TreeBranchItem xmlns:fx="http://ns.adobe.com/mxml/2009"
+                   xmlns:tm="edu.umich.med.mbni.treemodel.*" xmlns:as3lib="com.flashflexpro.as3lib.*"
+                   xmlns:s="library://ns.adobe.com/flex/spark">
+    <fx:Script><![CDATA[
+        import mx.events.PropertyChangeEvent;
+
+        [Bindable]
+        public var isInDataGrid:Boolean;
+
+        {
+            private var _treeGridData:TreeGridData;
+            [Bindable(event="treeGridDataChanged")]
+            public function get treeGridData():TreeGridData{
+                return _treeGridData;
+            }
+
+            public function set treeGridData( value:TreeGridData ):void{
+                if( value != _treeGridData ){
+                    _treeGridData = value;
+                    dispatchEvent( new Event( "treeGridDataChanged" ) );
+                }
+            }
+
+            [Bindable]
+            public var name:String;
+
+            private var _openOrClose:Boolean;
+            [Bindable(event="propertyChange")]
+            public function get openOrClose():Boolean{
+                return _openOrClose;
+            }
+
+            public function setOpenOrClose( value:Boolean ):void{
+                if( value && parent != null ){
+                    parentRow.setOpenOrClose( true );
+                }
+                if( value != _openOrClose ){
+                    var old:Boolean = _openOrClose;
+                    _openOrClose = value;
+                    dispatchEvent( PropertyChangeEvent.createUpdateEvent( this, "openOrClose", old, _openOrClose ) );
+                }
+            }
+        }
+
+        [Bindable(event="propertyChange")]
+        public function get parentRow():TreeGridDataRow{
+            return parent as TreeGridDataRow;
+        }
+
+        public function equals( o:TreeGridDataRow ):Boolean{
+            throw new Error( "override me" );
+        }
+
+        public function openOrCloseChildren( openOrClose:Boolean, depthsOfChildren:uint = 0 ):void{
+            setOpenOrClose( openOrClose );
+            if( depthsOfChildren <= 0 ){
+                return;
+            }
+            depthsOfChildren--;
+            for( var j:int = directChildren.length - 1; j >= 0; j-- ){
+                var c:TreeGridDataRow = directChildren.getItemAt( j ) as TreeGridDataRow;
+                c.openOrCloseChildren( openOrClose, depthsOfChildren );
+            }
+        }
+
+        public function selectDirChildren():void{
+            var rt:Vector.<Object> = treeGridData.rootModel.pressedKeys.getItemIndex( Keyboard.CONTROL ) >= 0 ? treeGridData.selectedItems.concat( new <Object>[] ) : new <Object>[];
+            for( var j:int = directChildren.length - 1; j >= 0; j-- ){
+                var c:TreeGridDataRow = directChildren.getItemAt( j ) as TreeGridDataRow;
+                c.setOpenOrClose( true );
+                rt.push( c );
+            }
+            treeGridData.selectedItems = rt;
+        }
+
+        [Bindable]
+        public var matchingChildren:Vector.<TreeGridDataRow>;
+
+        internal function getAllOpenChildren( rt:Vector.<TreeGridDataRow> = null ):Vector.<TreeGridDataRow>{
+            if( rt == null ){
+                rt = new <TreeGridDataRow>[];
+            }
+            else{
+                rt.push( this );
+            }
+            if( directChildren.length > 0 && _openOrClose ){
+                for( var j:int = directChildren.length - 1; j >= 0; j-- ){
+                    directChildren.getItemAt( j ).getAllOpenChildren( rt );
+                }
+            }
+            return rt;
+        }
+
+        public function openMatching():void{
+            new OperationOpenMatching( this ).execute();
+        }
+
+        public function onOpenCloseClick():void{
+            setOpenOrClose( !openOrClose );
+        }
+        ]]></fx:Script>
+    <fx:Script><![CDATA[
+        import edu.umich.med.mbni.utils.ModelOperationMenuChildren;
+        import edu.umich.med.mbni.utils.ModelOperationMenuType;
+
+        public function getMenuItems( ev:MouseEvent = null ):ModelOperationMenuChildren{
+            var relativeMaxDepth:uint = 0;
+            var relativeMaxOpenDepth:uint = 0;
+            var allChildrenArr:Array = allChildren.toArray();
+            allChildrenArr.forEach( function ( ele:TreeGridDataRow, idx:int, o:Array ):void{
+                var childRow:TreeGridDataRow = allChildren.getItemAt( idx ) as TreeGridDataRow;
+                relativeMaxDepth = Math.max( relativeMaxDepth, childRow.depth - depth );
+                if( openOrClose && childRow.isInDataGrid && childRow.openOrClose ){
+                    relativeMaxOpenDepth = Math.max( relativeMaxOpenDepth, childRow.depth - depth );
+                }
+            } );
+            var mnItms:Array = [];
+            var nextOpen:int = Math.min( 3, relativeMaxDepth - relativeMaxOpenDepth - 1 );
+            if( nextOpen > 0 ){
+                mnItms.push( new TreeOperationOpenClose( this, true, nextOpen ) );
+                mnItms.push( new TreeOperationOpenClose( this, true, nextOpen, TreeOperationOpenClose.CLOSE_BROTHERS_ONLY ) );
+                mnItms.push( new TreeOperationOpenClose( this, true, nextOpen, TreeOperationOpenClose.CLOSE_ALL_OTHERS ) );
+            }
+
+            if( allChildren.length > 0 ){
+                var nextClose:int = Math.min( relativeMaxOpenDepth + 1, 3 );
+                if( nextClose > 1 ){
+                    mnItms.push( new TreeOperationOpenClose( this, false, nextClose ) );
+                    mnItms.push( new TreeOperationOpenClose( this, false, nextClose, TreeOperationOpenClose.CLOSE_BROTHERS_ONLY ) );
+                    mnItms.push( new TreeOperationOpenClose( this, false, nextClose, TreeOperationOpenClose.CLOSE_ALL_OTHERS ) );
+                }
+                mnItms.push( new TreeOperationOpenClose( this, false, 0 ) );
+            }
+
+            mnItms.push( new ModelOperationMenuType() );
+            if( parentRow != null ){
+                mnItms.push( new TreeOperationSelection( this ) );
+            }
+            if( directChildren.length > 1 ){
+                mnItms.push( new TreeOperationSelection( this, TreeOperationSelection.SELECT_CHILDREN_LEVEL, 1 ) );
+                if( allChildren.length > directChildren.length ){
+                    mnItms.push( new TreeOperationSelection( this, TreeOperationSelection.SELECT_CHILDREN_LEVEL, int.MAX_VALUE ) );
+                }
+            }
+            return new ModelOperationMenuChildren( mnItms, this, "Structure:" + name );
+        }
+        ]]></fx:Script>
+
+    <fx:Script><![CDATA[
+        protected var _col2cell:Dictionary = new Dictionary( true );
+        public function get col2cell():Dictionary{
+            return _col2cell;
+        }
+
+        protected function colToCell( col:TreeGridDataColumn ):TreeGridDataCell{
+            var rt:TreeGridDataCell = _col2cell[ col.cellDataKey ];
+            if( rt == null && col.cellDataClass != null && col.cellDataKey != null ){
+                rt = new col.cellDataClass();
+                _col2cell[ col.cellDataKey ] = rt;
+            }
+            if( rt != null ){
+                rt.col = col;
+                rt.row = this;
+            }
+
+            return  rt;
+        }
+
+        private function destroyCell( c:TreeGridDataCell ):void{
+            if( c != null ){
+                c.destroy();
+            }
+        }
+        ]]></fx:Script>
+    <fx:Declarations>
+        <as3lib:Sync2Lists id="syncCol2Cell"
+                           source="{treeGridData.columns}"
+                           getDestInst="colToCell"
+                           destroyInst="destroyCell"
+                           propertiesReplaceOnUpdate="[ 'cellDataKey', 'cellDataClass' ]"
+                >
+            <as3lib:destination>
+                <s:ArrayList id="cellList"/>
+            </as3lib:destination>
+        </as3lib:Sync2Lists>
+    </fx:Declarations>
+</tm:TreeBranchItem>

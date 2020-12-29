@@ -1,0 +1,133 @@
+<?xml version="1.0"?>
+<datadriven3dwindow:Dd3dViewScene3dImpl xmlns:fx="http://ns.adobe.com/mxml/2009"
+                                        xmlns:as3lib="com.flashflexpro.as3lib.*"
+                                        xmlns:datadriven3dwindow="edu.umich.med.mbni.pubanatomy.datadriven3dwindow.*">
+    <fx:Script><![CDATA[
+        import mx.collections.ArrayList;
+
+        [Bindable]
+        public var mouseEnabled:Boolean = true;
+
+        {
+            protected function data2meshArr( item:Dd3dModelMeshStructure ):Dd3dViewMeshStructure{
+                var rt:Dd3dViewMeshStructure = getNewViewStructure();
+                addChild( rt );
+                rt.model = item;
+                return rt;
+            }
+
+            protected function getNewViewStructure():Dd3dViewMeshStructure{
+                return new Dd3dViewMeshStructure();
+            }
+
+            private function destroyMeshArr( meshArr:Dd3dViewMeshStructure ):void{
+                removeChild( meshArr );
+                meshArr.destroy();
+            }
+
+            [ArrayElementType("edu.umich.med.mbni.pubanatomy.datadriven3dwindow.Dd3dViewMeshStructure")]
+            [Bindable]
+            protected var _meshArrs:ArrayList = new ArrayList();
+            [Bindable(event="fake")]
+            public function get meshArrs():ArrayList{
+                return _meshArrs;
+            }
+        }
+
+        {
+
+            [ArrayElementType("edu.umich.med.mbni.pubanatomy.datadriven3dwindow.Dd3dViewMeshPlane")]
+            [Bindable]
+            protected var _planeArrs:ArrayList = new ArrayList();
+            [Bindable(event="fake")]
+            public function get planeArrs():ArrayList{
+                return _planeArrs;
+            }
+
+            protected function plane2planeArr( item:Dd3dModelMeshPlane ):Dd3dViewMeshPlane{
+                var rt:Dd3dViewMeshPlane = getNewViewPlane();
+                addChild( rt );
+                rt.model = item;
+                return rt;
+            }
+
+            protected function destroyPlaneArr( plane:Dd3dViewMeshPlane ):void{
+                removeChild( plane );
+                plane.destroy();
+            }
+
+            protected function getNewViewPlane():Dd3dViewMeshPlane{
+                return new Dd3dViewMeshPlane()
+            }
+        }
+
+
+        {
+            [ArrayElementType("edu.umich.med.mbni.pubanatomy.datadriven3dwindow.Dd3dViewMeshParticleSet")]
+            [Bindable]
+            protected var _particleArrs:ArrayList = new ArrayList();
+
+            protected function particle2view( m:Dd3dModelMeshParticleSet ):Dd3dViewMeshParticleSet{
+                var particleSet:Dd3dViewMeshParticleSet = new Dd3dViewMeshParticleSet();
+                particleSet.model = m;
+                return addChild( particleSet ) as Dd3dViewMeshParticleSet;
+            }
+
+            private function destroyParticle( p:Dd3dViewMeshParticleSet ):void{
+                removeChild( p );
+            }
+        }
+
+
+        {
+            private var _mouseOverMesh:Dd3dViewMeshBase;
+
+            public static const mouseOverMesh_CHANGED:String = "mouseOverMeshChanged";
+
+            [Bindable(event="mouseOverMeshChanged")]
+            public function get mouseOverMesh():Dd3dViewMeshBase{
+                return _mouseOverMesh;
+            }
+
+            public function setMouseOverMesh( value:Dd3dViewMeshBase ):void{
+                if( value != _mouseOverMesh ){
+                    _mouseOverMesh = value;
+                    dispatchEvent( new Event( mouseOverMesh_CHANGED ) );
+                }
+            }
+
+            private function set rfrMouseAbove( ignoreVar:* ):void{
+                model.callInNext.putIn( refreshMouseAbove );
+            }
+
+            private function refreshMouseAbove():void{
+                try{
+                    var idx:int = model.meshDataProvider.getItemIndex( model.mouseOverObj );
+                    if( idx >= 0 ){
+                        setMouseOverMesh( idx >= 0 ? meshArrs.getItemAt( idx ) as Dd3dViewMeshBase : null );
+                    }
+                    else{
+                        idx = model.particleDataProvider.getItemIndex( model.mouseOverObj );
+                        setMouseOverMesh( idx >= 0 ? _particleArrs.getItemAt( idx ) as Dd3dViewMeshBase : null );
+                    }
+                }
+                catch( bindingError:Error ){
+                    CONFIG::debugging{
+                        trace( this + ":" + bindingError.getStackTrace() );
+                    }
+                }
+            }
+        }
+        ]]></fx:Script>
+    <fx:Binding source="model.mouseOverObj" destination="rfrMouseAbove"/>
+    <fx:Declarations>
+        <as3lib:Sync2Lists source="{model.meshDataProvider}" destination="{_meshArrs}"
+                           getDestInst="data2meshArr" destroyInst="destroyMeshArr"/>
+
+        <as3lib:Sync2Lists source="{model.planeDataProvider}" destination="{_planeArrs}"
+                           getDestInst="plane2planeArr" destroyInst="destroyPlaneArr"/>
+
+        <as3lib:Sync2Lists source="{model.particleDataProvider}" destination="{_particleArrs}"
+                           getDestInst="particle2view" destroyInst="destroyParticle"/>
+    </fx:Declarations>
+</datadriven3dwindow:Dd3dViewScene3dImpl>

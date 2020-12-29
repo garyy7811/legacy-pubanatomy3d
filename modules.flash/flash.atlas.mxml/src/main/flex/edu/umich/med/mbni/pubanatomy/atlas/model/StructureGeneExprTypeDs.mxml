@@ -1,0 +1,122 @@
+<?xml version="1.0"?>
+<as3lib:MxmlEventDispatcher xmlns:fx="http://ns.adobe.com/mxml/2009"
+                            xmlns:as3lib="com.flashflexpro.as3lib.*">
+    <fx:Script><![CDATA[
+        import edu.umich.med.mbni.pubanatomy.flash.dto.DtoGeneExprLevel;
+        import edu.umich.med.mbni.pubanatomy.flash.dto.DtoVoxelLevel;
+
+        [Bindable]
+        public var sectionDataSet:MDLDataSet;
+
+        [Bindable]
+        public var exprType:String;
+
+        private function set rfrGeneExprDto( ignoreVar:* ):void{
+            if( sectionDataSet != null ){
+                sectionDataSet.modelGene.model.callInNext.putIn( refreshGeneExprDto );
+            }
+        }
+
+        private function refreshGeneExprDto():void{
+            if( exprType != null && sectionDataSet != null ){
+                var idx:int = MDLDataSet.EXPR_Types.getItemIndex( exprType );
+                _dtoGeneExpr = sectionDataSet.expressions.getItemAt( idx ) as DtoGeneExprLevel;
+            }
+        }
+
+        [Bindable]
+        private var _dtoGeneExpr:DtoGeneExprLevel;
+
+        public function destroy():void{
+        }
+        ]]></fx:Script>
+    <fx:Binding source="exprType" destination="rfrGeneExprDto"/>
+    <fx:Binding source="sectionDataSet.expressions.length" destination="rfrGeneExprDto"/>
+
+    <fx:Script><![CDATA[
+        [Bindable]
+        public var structure:StructureItem;
+
+        private function set rfrGeneLevelExpr( v:* ):void{
+            if( sectionDataSet != null ){
+                sectionDataSet.modelGene.model.callInNext.putIn( refreshLevelExpr );
+            }
+        }
+
+        private function refreshLevelExpr():void{
+            if( _dtoGeneExpr == null || _dtoGeneExpr.structureId2VoxelLevels == null ){
+                return;
+            }
+
+            var childrenLevelSum:Number = 0;
+            var childrenVoxelNumSum:uint = 0;
+            if( structure.directChildren.length > 0 ){
+                for( var j:int = structure.directChildren.length - 1; j >= 0; j-- ){
+                    var csgi:StructureGeneExprTypeDs = ( structure.directChildren.getItemAt( j ) as StructureItem ).getGeneTypeDs( sectionDataSet, exprType );
+                    if( csgi.levelSumInC >= 0 && csgi.voxelNumSumInC >= 0 ){
+                        childrenLevelSum += csgi.levelSumInC;
+                        childrenVoxelNumSum += csgi.voxelNumSumInC;
+                    }
+                }
+            }
+
+            voxelLevels = _dtoGeneExpr.structureId2VoxelLevels[ structure.dtoStructure.structureId ] as Vector.<DtoVoxelLevel>;
+
+            var sum:Number = 0;
+            if( voxelLevels != null ){
+                voxelNumSumExC = voxelLevels.length;
+                if( voxelNumSumExC > 0 ){
+                    for( var lj:int = voxelLevels.length - 1; lj >= 0; lj-- ){
+                        var vl:DtoVoxelLevel = voxelLevels[lj] as DtoVoxelLevel;
+                        CONFIG::debugging{
+                            if( vl.level < 0 ){
+                                throw new Error( this + ".refreshExpr " );
+                            }
+                        }
+                        sum += vl.level;
+                    }
+                    levelSumExC = sum;
+                    levelAvgExC = sum / voxelNumSumExC;
+                }
+            }
+            voxelNumSumInC = childrenVoxelNumSum + ( voxelLevels != null ? voxelLevels.length : 0 );
+            levelSumInC = childrenLevelSum + sum;
+            if( levelSumInC >= 0 && voxelNumSumInC > 0 ){
+                levelAvgInC = levelSumInC / voxelNumSumInC;
+            }
+
+            if( structure.parent != null ){
+                structure.parentStructure.getGeneTypeDs( sectionDataSet, exprType ).rfrGeneLevelExpr = null;
+
+                sectionDataSet.geneExprDistributing = true;
+            }
+            else{
+                sectionDataSet.geneExprDistributing = false;
+            }
+        }
+
+        [Bindable]
+        public var voxelLevels:Vector.<DtoVoxelLevel>;
+
+        [Bindable]
+        public var levelSumInC:Number = NaN;
+
+        [Bindable]
+        public var voxelNumSumInC:int = -1;
+
+        [Bindable]
+        public var levelAvgInC:Number = NaN;
+
+        [Bindable]
+        public var levelSumExC:Number = NaN;
+
+        [Bindable]
+        public var voxelNumSumExC:int = -1;
+
+        [Bindable]
+        public var levelAvgExC:Number = NaN;
+        ]]></fx:Script>
+
+    <fx:Binding source="_dtoGeneExpr.structureId2VoxelLevels" destination="rfrGeneLevelExpr"/>
+    <fx:Binding source="structure" destination="rfrGeneLevelExpr"/>
+</as3lib:MxmlEventDispatcher>

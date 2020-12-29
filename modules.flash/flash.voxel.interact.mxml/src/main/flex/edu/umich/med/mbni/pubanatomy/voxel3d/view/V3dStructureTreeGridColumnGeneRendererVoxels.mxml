@@ -1,0 +1,46 @@
+<?xml version="1.0"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009"
+         xmlns:s="library://ns.adobe.com/flex/spark"
+         currentState="{data.expr3dState}"
+         visible.na="false"
+         includeInLayout.na="false"
+
+         minHeight="1" minWidth="1"
+        >
+    <s:states>
+        <s:State name="loading" stateGroups="na"/>
+        <s:State name="none" stateGroups="na"/>
+
+        <s:State name="exclVisible" stateGroups="clickable"/>
+        <s:State name="exclInvisible" stateGroups="clickable"/>
+
+        <s:State name="inclVisibleAsRoot" stateGroups="clickable"/>
+        <s:State name="inclVisibleAsChild"/>
+        <s:State name="inclInVisible" stateGroups="clickable"/>
+    </s:states>
+    <fx:Script><![CDATA[
+        [Bindable]
+        public var data:V3dStructureTreeGridDataCellGene;
+        ]]></fx:Script>
+
+    <s:CheckBox
+            selected.exclVisible="true"
+            toolTip.exclVisible="#t(toolTip.exclVisible.selected.true)p#"
+
+            selected.exclInvisible="false"
+            toolTip.exclInvisible="#t(toolTip.exclInvisible.selected.false)p#"
+
+            selected.inclInVisible="false"
+            toolTip.inclInVisible="#t(toolTip.inclInVisible.selected.false)p#"
+
+            selected.inclVisibleAsRoot="true"
+            toolTip.inclVisibleAsRoot="#t(toolTip.selected.inclVisibleAsRoot.true)p#"
+
+        excludeFrom="inclVisibleAsChild"
+
+        color="{data.delayOn?0x777777:0}"
+
+        click.clickable="data.onUserInput( currentState=='exclInvisible' || currentState=='inclInVisible' );"/>
+<s:RadioButton includeIn="inclVisibleAsChild" selected="true"
+               toolTip.inclVisibleAsChild="#t(tooltip.inclVisibleAsChild)p#"/>
+        </s:Group>

@@ -1,0 +1,59 @@
+<?xml version="1.0"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009"
+         xmlns:s="library://ns.adobe.com/flex/spark"
+         xmlns:v="edu.umich.med.mbni.pubanatomy.sectioninteract.view.*"
+         xmlns:free2dcoror="edu.umich.med.mbni.free2dcoror.*">
+    <fx:Script><![CDATA[
+        import edu.umich.med.mbni.pubanatomy.sectioninteract.model.ModelSectionPlane;
+        import edu.umich.med.mbni.pubanatomy.voxel3d.model.Voxel3dPlane;
+
+        [Bindable]
+        public var sectionPlane:ModelSectionPlane;
+
+        private function set rfrCoronalTurn( ignoreVar:* ):void{
+            if( sectionPlane.v3dPlane.projectionDirection == 0 && sectionPlane.v3dPlane.imageSectionMode == Voxel3dPlane.IMG_SECTION_MODE_XYZ ){
+                fc2d.setDirVerBigHor( false );
+            }
+            else{
+                fc2d.setDirVerBigHor( true );
+            }
+        }
+        ]]></fx:Script>
+    <fx:Binding source="sectionPlane.v3dPlane.projectionDirection" destination="rfrCoronalTurn"/>
+    <fx:Binding source="sectionPlane.v3dPlane.imageSectionMode" destination="rfrCoronalTurn"/>
+    <s:BitmapImage x="{fc2d.margin}" y="{fc2d.margin}" width="{fc2d.contentGroup.width}"
+                   height="{fc2d.contentGroup.height}" includeIn="inDetail"
+                   source="{sectionPlane.imgDetail.url}"/>
+    <free2dcoror:FreeCorordinate2d id="fc2d" margin="18" textColor="0xFF0000"
+
+                                   horDir="{sectionPlane.v3dPlane.horizontalDirection}"
+                                   verDir="{sectionPlane.v3dPlane.verticalDirection}"
+
+                                   hTxt="{sectionPlane.v3dPlane.horizontalTxt}"
+                                   vTxt="{sectionPlane.v3dPlane.verticalTxt}"
+                                   cTxt="{sectionPlane.v3dPlane.projectionTxt}:{sectionPlane.rootModelAtlas.format( sectionPlane.v3dPlane.projectionPosition )}"
+                                   lineColor="{sectionPlane.lineColor}"
+                                   lineWeight="{sectionPlane.lineWeight}"
+                                   backgroundColor="{sectionPlane.v3dPlane.color}"
+                                   backgroundAlpha="{sectionPlane.v3dPlane.imageSectionMode == Voxel3dPlane.IMG_SECTION_MODE_XYZ?sectionPlane.v3dPlane.alpha:0}"
+                                   width="100%" height="100%"
+                                   maxWidth="{sectionView.width + 2*fc2d.margin + 1}"
+                                   maxHeight="{sectionView.height + 2*fc2d.margin + 1}"
+            >
+        <v:ViewSectionPlaneImgEdgeMate id="sectionView" section2dModel="{sectionPlane}"/>
+    </free2dcoror:FreeCorordinate2d>
+    <fx:Binding source="fc2d.dirHor" destination="sectionPlane.dirHor"/>
+    <fx:Binding source="fc2d.dirVer" destination="sectionPlane.dirVer"/>
+    <fx:Binding source="fc2d.dirVerBigHor" destination="sectionPlane.dirVerBigHor"/>
+    <fx:Binding source="fc2d.clippingRectangle" destination="sectionPlane.clipRect"/>
+    <s:states>
+        <s:State name="inDetail"/>
+        <s:State name="noDetail"/>
+    </s:states>
+    <fx:Script><![CDATA[
+        private function set rfrState( ignoreVar:* ):void{
+            currentState = sectionPlane.imgDetail == null ? "noDetail" : "inDetail";
+        }
+        ]]></fx:Script>
+    <fx:Binding source="sectionPlane.imgDetail" destination="rfrState"/>
+</s:Group>

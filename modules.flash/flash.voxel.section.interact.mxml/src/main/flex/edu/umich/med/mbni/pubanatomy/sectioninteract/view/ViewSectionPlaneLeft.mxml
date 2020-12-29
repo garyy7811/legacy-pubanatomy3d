@@ -1,0 +1,34 @@
+<?xml version="1.0"?>
+<ww:TiBoTlePanel xmlns:fx="http://ns.adobe.com/mxml/2009" xmlns:s="library://ns.adobe.com/flex/spark"
+                 xmlns:atlasView="edu.umich.med.mbni.pubanatomy.atlas.view.*"
+                 xmlns:v="edu.umich.med.mbni.pubanatomy.sectioninteract.view.*"
+                 xmlns:ww="edu.umich.med.mbni.webdesktop.*">
+    <fx:Script><![CDATA[
+        import edu.umich.med.mbni.pubanatomy.sectioninteract.model.ModelSectionPlane;
+
+        [Bindable]
+        public var sectionPlane:ModelSectionPlane;
+        ]]></fx:Script>
+    <ww:states>
+        <s:State name="normal"/>
+        <s:State name="withHistogram"/>
+    </ww:states>
+    <fx:Binding source="sectionPlane.treeGridData.geneList.length>0?'withHistogram':'normal'"
+                destination="currentState"/>
+    <ww:titleGroupContent>
+        <s:Label text="Section Tree View" width="100%" maxDisplayedLines="1"/>
+        <atlasView:StructureTreeGridMoreOptions data="{sectionPlane.treeGridData}"/>
+        <s:Button skinClass="spark.skins.spark.TitleWindowCloseButtonSkin" width="16" height="16"
+                  click="sectionPlane.showSectionTree=false;"/>
+    </ww:titleGroupContent>
+    <ww:titleGroupLayout>
+        <s:HorizontalLayout verticalAlign="middle"/>
+    </ww:titleGroupLayout>
+    <v:ViewSection2dStructureTreeGrid width="100%" height="100%" minHeight="120"
+                                      treeGridData="{sectionPlane.treeGridData}"/>
+    <ww:botleGroupContent>
+        <!--
+            <atlasView:StructureGeneLevelHistogramView model="{sectionPlane.treeGridData.geneLevelHistogram}" width="100%"
+                                                       height="40%" includeIn="withHistogram"/>-->
+    </ww:botleGroupContent>
+</ww:TiBoTlePanel>

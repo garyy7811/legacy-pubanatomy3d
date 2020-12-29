@@ -1,0 +1,33 @@
+<?xml version="1.0"?>
+<rs:RpcSpringMvcGet xmlns:fx="http://ns.adobe.com/mxml/2009"
+                    xmlns:rs="edu.umich.med.mbni.pubanatomy.flash.rs.*"
+                    singletonByUrl="true" path="allen-inst">
+    <fx:Script><![CDATA[
+        import edu.umich.med.mbni.pubanatomy.sectioninteract.model.RootModelSection2d;
+        import edu.umich.med.mbni.pubanatomy.flash.dto.DtoPlane;
+        import edu.umich.med.mbni.pubanatomy.sectioninteract.model.ModelSectionPlane;
+
+        import mx.collections.IList;
+
+        [Bindable(event="modelChanged")]
+        public function get model2d():RootModelSection2d{
+            return model as RootModelSection2d;
+        }
+
+        override protected function onObjResult( result:* = null ):void{
+            var edges:IList = result as IList;
+            sectionPlane.onEdges( edges );
+        }
+
+        [Bindable]
+        public var sectionPlane:ModelSectionPlane;
+
+        override public function callRemote():Boolean{
+            var p:DtoPlane = sectionPlane.v3dPlane.getDtoPlane();
+            args = [ p.direction, p.value ];
+            model.log( path + "->" + remoteMethodName + "->" + p.direction + "|" + p.value );
+            return super.callRemote();
+        }
+        ]]></fx:Script>
+    <fx:Binding source="sectionPlane.rootModelSection2d" destination="model"/>
+</rs:RpcSpringMvcGet>

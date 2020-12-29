@@ -1,0 +1,201 @@
+<?xml version="1.0"?>
+<m:ModelSectionPlaneRfrEdges xmlns:fx="http://ns.adobe.com/mxml/2009"
+                             xmlns:as3lib="com.flashflexpro.as3lib.*"
+                             xmlns:s="library://ns.adobe.com/flex/spark"
+                             xmlns:m="edu.umich.med.mbni.pubanatomy.sectioninteract.model.*">
+    <fx:Script><![CDATA[
+        import edu.umich.med.mbni.pubanatomy.flash.dto.IModelSectionEdge;
+        import edu.umich.med.mbni.pubanatomy.voxel3d.model.Voxel3dPlane;
+
+        import mx.collections.IList;
+
+        import mx.events.CollectionEvent;
+        import mx.events.CollectionEventKind;
+
+        private function set rfrSPSELst( v:* ):void{
+            rfrSectionPlaneStructureEdgeLst();
+        }
+
+        private function rfrSectionPlaneStructureEdgeLst( ev:CollectionEvent = null ):void{
+            if( ev != null && ( ev.kind == CollectionEventKind.MOVE || ev.kind == CollectionEventKind.UPDATE  ) ){
+                return;
+            }
+            rootModelSection2d.callInNext.putIn( refreshSectionPlaneStructureEdgeLst );
+            CONFIG::debugging{
+                trace( this + ".rfrSectionPlaneStructureEdgeLst: ev:" + ev );
+            }
+        }
+
+        private function refreshSectionPlaneStructureEdgeLst():void{
+            if( structureSectionEdgeList == null || ( v3dPlane.imageSectionMode == Voxel3dPlane.IMG_SECTION_MODE_SVG && v3dPlane.image.structure2Path == null ) ){
+                return;
+            }
+
+            //todo: make this more efficient;
+            structureSectionEdgeList.removeAll();
+
+            var s2dStr:ModelSection2dStructure;
+
+            var tmp:Vector.<ModelSection2dPlaneStructureEdge> = new Vector.<ModelSection2dPlaneStructureEdge>();
+            if( v3dPlane.imageSectionMode == Voxel3dPlane.IMG_SECTION_MODE_SVG ){
+                for( var j:int = rootModelSection2d.onSection2dStructures.length - 1; j >= 0; j-- ){
+                    s2dStr = rootModelSection2d.onSection2dStructures.getItemAt( j ) as ModelSection2dStructure;
+                    if( s2dStr.onSection2d ){
+                        var path:Vector.<XML> = v3dPlane.image.structure2Path[ s2dStr.structure3d.atlasStructure.dtoStructure.structureId ] as Vector.<XML>;
+                        if( path != null ){
+                            tmp.push( createAnnotationSectionPlaneStructure( path, s2dStr ) );
+                        }
+                    }
+                }
+            }
+            else{
+                for( var r:int = rootModelSection2d.onSection2dStructures.length - 1; r >= 0; r-- ){
+                    s2dStr = rootModelSection2d.onSection2dStructures.getItemAt( r ) as ModelSection2dStructure;
+                    var edgeDTOs:IList = (v3dPlane.imageSectionMode == Voxel3dPlane.IMG_SECTION_MODE_CLIP) ? v3dPlane.image.sections : currentModelEdgeDTOs;
+                    if( edgeDTOs != null ){
+                        for( var k:int = edgeDTOs.length - 1; k >= 0; k-- ){
+                            var modelSectionEdgeDto:IModelSectionEdge = edgeDTOs.getItemAt( k ) as IModelSectionEdge;
+                            if( s2dStr.onSection2d && modelSectionEdgeDto.getModel().structureId == s2dStr.structure3d.atlasStructure.dtoStructure.structureId ){
+                                tmp.push( createModelSectionPlaneStructure( modelSectionEdgeDto, s2dStr ) );
+                            }
+                        }
+                    }
+                }
+            }
+
+            tmp.sort( compare2S2s );
+
+            for( var q:int = structureSectionEdgeList.length - 1; q >= 0; q-- ){
+                var edge:ModelSection2dPlaneStructureEdge = structureSectionEdgeList.getItemAt( q ) as ModelSection2dPlaneStructureEdge;
+                edge.destroy();
+            }
+
+            const len:int = tmp.length;
+            for( var i:int = 0; i < len; i++ ){
+                var section2dStructure:ModelSection2dPlaneStructureEdge = tmp[i] as ModelSection2dPlaneStructureEdge;
+                structureSectionEdgeList.addItem( section2dStructure );
+            }
+        }
+
+        private function compare2S2s( s1:ModelSection2dPlaneStructureEdge, s2:ModelSection2dPlaneStructureEdge ):int{
+            var d1:int = s1.structure2d.structure3d.atlasStructure.dtoStructure.depth;
+            var d2:int = s2.structure2d.structure3d.atlasStructure.dtoStructure.depth;
+            if( d1 > d2 ){
+                return 1;
+            }
+            else if( d2 > d1 ){
+                return -1;
+            }
+            else{
+                return s1.structure2d.structure3d.atlasStructure.dtoStructure.name > s2.structure2d.structure3d.atlasStructure.dtoStructure.name ? 1 : -1;
+            }
+        }
+
+        private function createModelSectionPlaneStructure( mse:IModelSectionEdge, s2dStructure:ModelSection2dStructure ):ModelSection2dPlaneStructureEdge{
+            var sectionPlaneStructure:ModelSection2dPlaneStructureEdgeModel = new ModelSection2dPlaneStructureEdgeModel();
+            sectionPlaneStructure.sectionPlane = this as ModelSectionPlane;
+            sectionPlaneStructure.modelSection = mse;
+            sectionPlaneStructure.structure2d = s2dStructure;
+            return sectionPlaneStructure;
+        }
+
+        private function createAnnotationSectionPlaneStructure( paths:Vector.<XML>, s2dStructure:ModelSection2dStructure ):ModelSection2dPlaneStructureEdge{
+            var sectionPlaneStructure:ModelSection2dPlaneStructureEdgeAnnotation = new ModelSection2dPlaneStructureEdgeAnnotation();
+            sectionPlaneStructure.sectionPlane = this as ModelSectionPlane;
+            sectionPlaneStructure.paths = paths;
+            sectionPlaneStructure.structure2d = s2dStructure;
+            return sectionPlaneStructure;
+        }
+
+        override public function destroy():void{
+            super.destroy();
+            if( structureSectionEdgeList != null ){
+                while( structureSectionEdgeList.length > 0 ){
+                    ( structureSectionEdgeList.removeItemAt( 0 ) as ModelSection2dPlaneStructureEdge ).destroy();
+                }
+                structureSectionEdgeList = null;
+            }
+        }
+        ]]></fx:Script>
+    <fx:Binding source="currentModelEdgeDTOs" destination="rfrSPSELst"/>
+    <fx:Binding source="v3dPlane.imageSectionMode" destination="rfrSPSELst"/>
+    <fx:Binding source="v3dPlane.image.sections" destination="rfrSPSELst"/>
+    <fx:Binding source="v3dPlane.image.structure2Path" destination="rfrSPSELst"/>
+    <fx:Declarations>
+        <!--SectionPlaneStructureEdge-->
+        <s:ArrayList id="structureSectionEdgeList"/>
+        <as3lib:ChainEndWatcher eventDispatcher="{rootModelSection2d.onSection2dStructures}"
+                                eventType="{CollectionEvent.COLLECTION_CHANGE}"
+                                eventHandler="rfrSectionPlaneStructureEdgeLst"
+                                id="modelsectionplanerfredge2structures_watchingOnSection2dStructures"/>
+
+    </fx:Declarations>
+
+    <fx:Script><![CDATA[
+        import edu.umich.med.mbni.pubanatomy.atlas.model.StructureItem;
+
+        [Bindable]
+        public var mouseOverStructureEdge:ModelSection2dPlaneStructureEdge;
+
+        [Bindable]
+        public var selectedStructureEdges:Vector.<ModelSection2dPlaneStructureEdge>;
+
+        private function set rfrMouseSelected( ignoreVar:* ):void{
+            rootModelSection2d.callInNext.putIn( refreshMouseOverSelected );
+        }
+
+        private function refreshMouseOverSelected():void{
+            try{
+                var selectedEdges:Vector.<ModelSection2dPlaneStructureEdge> = new <ModelSection2dPlaneStructureEdge>[];
+
+                var selectedAtlasStructures:ArrayList = rootModelAtlas.selectedStructures;
+                if( structureSectionEdgeList != null && selectedAtlasStructures != null ){
+                    for( var j:int = structureSectionEdgeList.length - 1; j >= 0; j-- ){
+                        var mse:ModelSection2dPlaneStructureEdge = structureSectionEdgeList.getItemAt( j ) as ModelSection2dPlaneStructureEdge;
+                        CONFIG::debugging{
+                            if( mse == null ){
+                                throw new Error( this + ".refreshMouseOverSelected " );
+                            }
+                        }
+                        for( var k:int = selectedAtlasStructures.length - 1; k >= 0; k-- ){
+                            var er:StructureItem = selectedAtlasStructures.getItemAt( k ) as StructureItem;
+                            if( er == mse.structure2d.structure3d.atlasStructure ){
+                                selectedEdges.push( mse );
+                            }
+                        }
+                    }
+                }
+                selectedStructureEdges = selectedEdges;
+            }
+            catch( bindingError:Error ){
+                CONFIG::debugging{
+                    trace( this + ":" + bindingError.getStackTrace() );
+                }
+            }
+        }
+        ]]></fx:Script>
+    <fx:Binding source="structureSectionEdgeList.length" destination="rfrMouseSelected"/>
+    <fx:Binding source="rootModelAtlas.selectedStructures.length"
+                destination="rfrMouseSelected"/>
+
+    <fx:Script><![CDATA[
+        private function set rfrMouseOver( ignoreVar:* ):void{
+            rootModelSection2d.callInNext.putIn( refreshMouseOver );
+        }
+
+        private function refreshMouseOver():void{
+            if( structureSectionEdgeList != null && rootModelAtlas.mouseOverStructure != null ){
+                for( var j:int = structureSectionEdgeList.length - 1; j >= 0; j-- ){
+                    var mse:ModelSection2dPlaneStructureEdge = structureSectionEdgeList.getItemAt( j ) as ModelSection2dPlaneStructureEdge;
+                    if( rootModelAtlas.mouseOverStructure == mse.structure2d.structure3d.atlasStructure ){
+                        mouseOverStructureEdge = mse;
+                        return;
+                    }
+                }
+            }
+            mouseOverStructureEdge = null;
+        }
+        ]]></fx:Script>
+    <fx:Binding source="rootModelAtlas.mouseOverStructure"
+                destination="rfrMouseOver"/>
+</m:ModelSectionPlaneRfrEdges>

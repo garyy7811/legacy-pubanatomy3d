@@ -1,0 +1,71 @@
+<?xml version="1.0"?>
+<model:StructureTreeGridDataColumnGene xmlns:fx="http://ns.adobe.com/mxml/2009"
+                                       xmlns:model="edu.umich.med.mbni.pubanatomy.atlas.model.*"
+                                       cellDataClass="edu.umich.med.mbni.pubanatomy.voxel3d.view.V3dStructureTreeGridDataCellGene">
+    <fx:Script><![CDATA[
+        import edu.umich.med.mbni.utils.ModelOperation;
+
+
+        override public function set childrenIncludeOrEx( value:Boolean ):void{
+
+            structureOn3dTreeGridData.rootModelVoxel3d.all3dVoxel3dStructures.toArray().forEach(
+                    function ( v:Voxel3dStructure, idx:int, a:Array ):void{
+                        var v3dGeneStructureExprByGeneAndType:Voxel3dStructureGeneExprType
+                                = v.getV3dGeneStructureExprByGeneAndType( selectedDataSet, structureOn3dTreeGridData.selectedGeneExprType );
+                        v3dGeneStructureExprByGeneAndType.on3dStage = false;
+                    }
+            );
+
+            super.childrenIncludeOrEx = value;
+        }
+
+        [Bindable(event="treeGridDataChanged")]
+        public function get structureOn3dTreeGridData():Voxel3dStructureOn3dTreeGridData{
+            return treeGridData as Voxel3dStructureOn3dTreeGridData;
+        }
+
+        override public function getAvailMultiOperations( selectedItems:Vector.<Object> ):Vector.<ModelOperation>{
+            if( childrenIncludeOrEx || selectedDataSet == null || structureTreeGridData == null ){
+                return null;
+            }
+            var dsTypesOn3d:Vector.<Voxel3dStructureGeneExprType> = new Vector.<Voxel3dStructureGeneExprType>();
+            var dsTypesOff3d:Vector.<Voxel3dStructureGeneExprType> = new Vector.<Voxel3dStructureGeneExprType>();
+            for( var j:int = selectedItems.length - 1; j >= 0; j-- ){
+                var row:Voxel3dStructureTreeGridDataRow = selectedItems[j] as Voxel3dStructureTreeGridDataRow;
+                if( row == null || row.v3dStructure == null ){
+                    return null;
+                }
+
+                var dsType:Voxel3dStructureGeneExprType = row.v3dStructure.getV3dGeneStructureExprByGeneAndType( selectedDataSet, structureTreeGridData.selectedGeneExprType );
+
+                if( dsType.atlasGeneTypeDs.voxelNumSumExC <= 0 ){
+                    continue;
+                }
+
+                if( dsType.on3dStage ){
+                    dsTypesOn3d.push( dsType );
+                }
+                else{
+                    dsTypesOff3d.push( dsType );
+                }
+            }
+
+            if( dsTypesOff3d.length == 0 && dsTypesOn3d.length == 0 ){
+                return null;
+            }
+
+            if( dsTypesOff3d.length == 0 ){
+                return new <ModelOperation>[ new Voxel3dOperationGeneExprOnOff3dStage( dsTypesOn3d, null, false )];
+            }
+            if( dsTypesOn3d.length == 0 ){
+                return new <ModelOperation>[ new Voxel3dOperationGeneExprOnOff3dStage( dsTypesOff3d, null, true )];
+            }
+
+            return new <ModelOperation>[
+                new Voxel3dOperationGeneExprOnOff3dStage( dsTypesOn3d, selectedItems, false ),
+                new Voxel3dOperationGeneExprOnOff3dStage( dsTypesOff3d, selectedItems, true )
+            ];
+        }
+        ]]></fx:Script>
+    <fx:Binding source="childrenIncludeOrEx" destination="structureOn3dTreeGridData.rfrMultiSelectionOperation"/>
+</model:StructureTreeGridDataColumnGene>

@@ -1,0 +1,109 @@
+<?xml version="1.0"?>
+<model:QueryTerm xmlns:fx="http://ns.adobe.com/mxml/2009" xmlns:model="edu.umich.med.mbni.pubanatomy.search.model.*">
+    <fx:Metadata>
+        [RemoteClass]
+    </fx:Metadata>
+    <fx:Script><![CDATA[
+        [Bindable]
+        public var inputRangeFromTxt:String = "*";
+        [Bindable]
+        public var inputRangeToTxt:String = "*";
+
+        private var _rangeFrom:Number;
+
+
+        [Bindable(event="rangeFromChanged")]
+        public function get rangeFrom():Number{
+            return _rangeFrom;
+        }
+
+        protected function setRangeFrom( value:Number ):void{
+            if( !isNaN( value ) && !isNaN( _rangeFrom ) ){
+                if( _rangeTo < value ){
+                    value = _rangeTo;
+                }
+            }
+            if( value != _rangeFrom ){
+                _rangeFrom = value;
+                dispatchEvent( new Event( "rangeFromChanged" ) );
+                commitQueryStr();
+            }
+        }
+
+        private var _rangeTo:Number;
+        [Bindable(event="rangeToChanged")]
+        public function get rangeTo():Number{
+            return _rangeTo;
+        }
+
+        protected function setRangeTo( value:Number ):void{
+            if( !isNaN( value ) && !isNaN( _rangeTo ) ){
+                if( _rangeFrom > value ){
+                    value = _rangeFrom;
+                }
+            }
+
+            if( value != _rangeTo ){
+                _rangeTo = value;
+                dispatchEvent( new Event( "rangeToChanged" ) );
+                commitQueryStr();
+            }
+        }
+
+        private function commitQueryStr():void{
+            var rt:String = "[ ";
+            if( isNaN( rangeFrom ) ){
+                rt += "*";
+            }
+            else{
+                rt += rangeFrom;
+            }
+            rt += " TO ";
+
+            if( isNaN( rangeTo ) ){
+                rt += "*";
+            }
+            else{
+                rt += rangeTo;
+            }
+            rt += " ]";
+            setQueryStr( rt );
+        }
+
+        override public function clone( newQuery:Query = null, newInst:QueryTerm = null ):QueryTerm{
+            var ni:QueryTermR = new QueryTermR();
+            super.clone( newQuery, ni );
+            ni.setRangeFrom( _rangeFrom );
+            ni.setRangeTo( _rangeTo );
+            ni.revert();
+            return ni;
+        }
+
+        override public function commit():Boolean{
+            super.commit();
+            setRangeFrom( Number( inputRangeFromTxt ) );
+            setRangeTo( Number( inputRangeToTxt ) );
+            revert();
+            return true;
+        }
+
+        override public function revert():void{
+            inputRangeFromTxt = isNaN( _rangeFrom ) ? "*" : String( _rangeFrom );
+            inputRangeToTxt = isNaN( _rangeTo ) ? "*" : String( _rangeTo );
+        }
+        ]]></fx:Script>
+    <fx:Binding source="queryStrAsChild" destination="label"/>
+    <fx:Script><![CDATA[
+        override public function writeExternal( output:IDataOutput ):void{
+            super.writeExternal( output );
+            output.writeDouble( _rangeFrom );
+            output.writeDouble( _rangeTo );
+        }
+
+        override public function readExternal( input:IDataInput ):void{
+            super.readExternal( input );
+            _rangeFrom = input.readDouble();
+            _rangeTo = input.readDouble();
+        }
+        ]]></fx:Script>
+</model:QueryTerm>

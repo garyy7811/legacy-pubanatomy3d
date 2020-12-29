@@ -1,0 +1,109 @@
+<?xml version="1.0"?>
+<view:StructureTreeGridDataCell xmlns:fx="http://ns.adobe.com/mxml/2009"
+                                xmlns:view="edu.umich.med.mbni.pubanatomy.atlas.view.*">
+    <fx:Script><![CDATA[
+        import edu.umich.med.mbni.pubanatomy.atlas.model.StructureGeneExprTypeDs;
+        import edu.umich.med.mbni.pubanatomy.atlas.model.StructureTreeGridDataColumnGene;
+
+        [Bindable(event="colChanged")]
+        public function get colGene():StructureTreeGridDataColumnGene{
+            return col as StructureTreeGridDataColumnGene;
+        }
+
+        private function set rfrDsExpr( ignoreVar:* ):void{
+            row.treeGridData.rootModel.callInNext.putIn( refreshDataSetExpr );
+        }
+
+        private function refreshDataSetExpr():void{
+            if( colGene == null || colGene.dataSetState.indexOf( "ready" ) < 0 ){
+                exprState = "loading";
+                return;
+            }
+            else if( colGene.dataSetState == "readyNoExpr" ){
+                exprState = "noExpr";
+                return;
+            }
+            geneExpr = structureDataRow.structure.getGeneTypeDs( colGene.selectedDataSet,
+                                                                 structureDataRow.structureTreeGridData.selectedGeneExprType );
+        }
+
+        [Bindable]
+        public var geneExpr:StructureGeneExprTypeDs;
+
+        [Bindable]
+        public var exprState:String = "loading";
+        ]]></fx:Script>
+    <fx:Binding source="colGene.dataSetState" destination="rfrDsExpr"/>
+    <fx:Binding source="structureDataRow.structure.genes.length" destination="rfrDsExpr"/>
+    <fx:Binding source="colGene.selectedDataSet.modelGene.dataSets.length" destination="rfrDsExpr"/>
+    <fx:Binding source="structureDataRow.structureTreeGridData.selectedGeneExprType" destination="rfrDsExpr"/>
+
+    <fx:Binding source="structureDataRow.structureTreeGridData.geneLevelHistogram" destination="_histgram"/>
+    <fx:Script><![CDATA[
+        import edu.umich.med.mbni.pubanatomy.atlas.model.StructureGeneLevelHistogram;
+
+        [Bindable]
+        protected var _histgram:StructureGeneLevelHistogram;
+
+        [Bindable]
+        public var levelNum:Number;
+
+        [Bindable]
+        public var selected:Boolean = true;
+
+        [Bindable]
+        public var ratio:Number;
+
+        [Bindable]
+        public var toolTipDynamics:String = "N/A";
+
+        [Bindable]
+        public var label:String = "N/A";
+
+        private function set rfrGeneExpr( ignoreVar:* ):void{
+            row.treeGridData.rootModel.callInNext.putIn( refreshGeneExpr );
+        }
+
+        protected function refreshGeneExpr():void{
+            if( geneExpr == null || geneExpr.sectionDataSet == null || geneExpr.sectionDataSet.geneExprDistributing ){
+                exprState = "calculating";
+                return;
+            }
+
+            if( ( isNaN( geneExpr.levelAvgInC ) && colGene.childrenIncludeOrEx )
+                    ||
+                    ( geneExpr.voxelLevels == null && !colGene.childrenIncludeOrEx ) ){
+                exprState = "noExpr";
+                return;
+            }
+
+            levelNum = colGene.childrenIncludeOrEx ? geneExpr.levelAvgInC : geneExpr.levelAvgExC;
+
+            ratio = ( levelNum - _histgram.levelMinimum  ) / ( _histgram.levelMaximum - _histgram.levelMinimum );
+
+            selected = ( levelNum >= _histgram.selectedLevelMinimum && levelNum < _histgram.selectedLevelMaximum );
+
+            toolTipDynamics =
+                    "voxel number including children|^|" + geneExpr.voxelNumSumInC + "\r\n"
+                            + "average level including children|^|" + geneExpr.levelAvgInC + "\r\n"
+                            + "voxel number excluding children|^|" + geneExpr.voxelNumSumExC + "\r\n"
+                            + "average level excluding children|^|" + geneExpr.levelAvgExC + "\r\n"
+            ;
+
+            label = colGene.gene.model.numberFormatter.format( levelNum );
+            exprState = "exprReady";
+        }
+        ]]></fx:Script>
+
+    <fx:Binding source="geneExpr.levelSumInC" destination="rfrGeneExpr"/>
+    <fx:Binding source="geneExpr.sectionDataSet.geneExprDistributing" destination="rfrGeneExpr"/>
+    <fx:Binding source="colGene.childrenIncludeOrEx" destination="rfrGeneExpr"/>
+    <fx:Binding source="colGene.gene.dataSets.length" destination="rfrGeneExpr"/>
+    <fx:Binding source="_histgram.levelMaximum" destination="rfrGeneExpr"/>
+    <fx:Binding source="_histgram.levelMinimum" destination="rfrGeneExpr"/>
+    <fx:Binding source="_histgram.selectedLevelMinimum" destination="rfrGeneExpr"/>
+    <fx:Binding source="_histgram.selectedLevelMaximum" destination="rfrGeneExpr"/>
+    <fx:Script><![CDATA[
+
+        ]]></fx:Script>
+</view:StructureTreeGridDataCell>

@@ -1,0 +1,76 @@
+<?xml version="1.0"?>
+<s:DataGroup xmlns:fx="http://ns.adobe.com/mxml/2009"
+             xmlns:s="library://ns.adobe.com/flex/spark"
+             itemRenderer="edu.umich.med.mbni.pubanatomy.sectioninteract.view.ViewSectionPlaneTitleRenderer"
+        >
+    <fx:Script><![CDATA[
+        import edu.umich.med.mbni.pubanatomy.flash.dto.DtoGene;
+        import edu.umich.med.mbni.pubanatomy.sectioninteract.model.ModelSectionPlane;
+        import edu.umich.med.mbni.pubanatomy.datadriven3dwindow.Dd3dModelMeshPlane;
+        import edu.umich.med.mbni.pubanatomy.voxel3d.model.Voxel3dPlane;
+        import edu.umich.med.mbni.utils.ModelOperationMenuItem;
+
+        [Bindable]
+        public var sectionPlane:ModelSectionPlane;
+
+        [Bindable]
+        public var txtTitle:String;
+
+        private function set rfrTtl( ignoreVar:* ):void{
+            sectionPlane.rootModelSection2d.callInNext.putIn( refreshTitle );
+        }
+
+        private function refreshTitle():void{
+            dataProvider.removeAll();
+            if( sectionPlane != null && sectionPlane.structureSectionEdgeList != null && sectionPlane.v3dPlane != null ){
+                var mItem:ModelOperationMenuItem = new ModelOperationMenuItem();
+                mItem.rootModel = sectionPlane.rootModelSection2d;
+                mItem.label = Dd3dModelMeshPlane.cutNames[ sectionPlane.v3dPlane.projectionDirection ] + " view, "
+                        + sectionPlane.structureSectionEdgeList.length + " structures found, "
+                        + sectionPlane.v3dPlane.projectionTxt + "=" + sectionPlane.rootModelAtlas.format( sectionPlane.v3dPlane.projectionPosition );
+                mItem.toolTip = "Drag from here to move content out.";
+                mItem.target = sectionPlane;
+                txtTitle = mItem.label;
+                dataProvider.addItem( mItem );
+                if( sectionPlane.v3dPlane.image != null
+                        && sectionPlane.v3dPlane.imageSectionMode != Voxel3dPlane.IMG_SECTION_MODE_XYZ ){
+                    dataProvider.addItem( null );
+                    mItem = new ModelOperationMenuItem();
+                    mItem.rootModel = sectionPlane.rootModelSection2d;
+                    var dtoGene:DtoGene = sectionPlane.v3dPlane.image.modelSectionDs.modelGene.dtoGene;
+                    mItem.label = "Gene:" + dtoGene.acronym;
+                    mItem.toolTip = "gene id: " + dtoGene.geneId + "\n draggable";
+                    mItem.target = dtoGene;
+                    dataProvider.addItem( mItem );
+
+                    dataProvider.addItem( null );
+                    mItem = new ModelOperationMenuItem();
+                    mItem.rootModel = sectionPlane.rootModelSection2d;
+                    mItem.label = "data set: " + sectionPlane.v3dPlane.image.modelSectionDs.label;
+                    mItem.toolTip = "section data set id: " + sectionPlane.v3dPlane.image.modelSectionDs.sectionDataSetId;
+                    mItem.target = sectionPlane.v3dPlane.image.modelSectionDs;
+                    dataProvider.addItem( mItem );
+
+                    dataProvider.addItem( null );
+                    mItem = new ModelOperationMenuItem();
+                    mItem.rootModel = sectionPlane.rootModelSection2d;
+                    mItem.label = "No." + sectionPlane.v3dPlane.image.sectionNumber;
+                    mItem.toolTip = "Image section number: " + sectionPlane.v3dPlane.image.sectionNumber
+                            + "\n section image id:" + sectionPlane.v3dPlane.image.sectionImageId;
+                    mItem.target = sectionPlane.v3dPlane.image;
+                    dataProvider.addItem( mItem );
+                }
+                txtTitle += " " + mItem.label;
+            }
+        }
+        ]]></fx:Script>
+    <fx:Binding source="sectionPlane.structureSectionEdgeList.length" destination="rfrTtl"/>
+    <fx:Binding source="sectionPlane.v3dPlane.image" destination="rfrTtl"/>
+    <fx:Binding source="sectionPlane.v3dPlane.imageSectionMode" destination="rfrTtl"/>
+    <s:layout>
+        <s:HorizontalLayout variableColumnWidth="true" useVirtualLayout="false"/>
+    </s:layout>
+    <s:dataProvider>
+        <s:ArrayList/>
+    </s:dataProvider>
+</s:DataGroup>

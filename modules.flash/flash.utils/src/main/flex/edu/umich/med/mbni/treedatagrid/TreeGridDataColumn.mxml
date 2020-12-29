@@ -1,0 +1,105 @@
+<?xml version="1.0"?>
+<as3lib:MxmlEventDispatcher xmlns:fx="http://ns.adobe.com/mxml/2009" xmlns:as3lib="com.flashflexpro.as3lib.*">
+    <fx:Script><![CDATA[
+        import edu.umich.med.mbni.utils.ModelOperation;
+
+        public var next:TreeGridDataColumn;
+
+        [Bindable]
+        public var sortDesc:Boolean = false;
+
+        public function compare2RowData( a:TreeGridDataRow, b:TreeGridDataRow ):int{
+            throw new Error( "override me!" );
+        }
+
+        protected function nextOr0( a:TreeGridDataRow, b:TreeGridDataRow ):int{
+            if( next != null ){
+                return next.compare2RowData( a, b );
+            }
+            return 0;
+        }
+
+        public function isRowMatch( rowData:TreeGridDataRow ):Boolean{
+            if( next == null ){
+                return false;
+            }
+            return next.isRowMatch( rowData );
+        }
+
+        protected var _treeGridData:TreeGridData;
+        [Bindable(event="treeGridDataChanged")]
+        public function get treeGridData():TreeGridData{
+            return _treeGridData;
+        }
+
+        public function set treeGridData( value:TreeGridData ):void{
+            if( value != _treeGridData ){
+                _treeGridData = value;
+                dispatchEvent( new Event( "treeGridDataChanged" ) );
+            }
+        }
+
+        [Bindable]
+        public var nextFound:TreeGridDataRow;
+
+        public function findNext( forwardOrBackward:Boolean = true ):void{
+            var row:TreeGridDataRow;
+            var indexFound:int = -1;
+            if( nextFound != null && _treeGridData.dataGridDataProvider != null ){
+                indexFound = _treeGridData.dataGridDataProvider.getItemIndex( nextFound );
+            }
+            if( forwardOrBackward ){
+                const len:int = _treeGridData.dataGridDataProvider.length;
+                for( var j:int = indexFound >= 0 ? indexFound + 1 : 0; j < len; j++ ){
+                    row = _treeGridData.dataGridDataProvider.getItemAt( j ) as TreeGridDataRow;
+                    if( isRowMatch( row ) ){
+                        nextFound = row;
+                        return;
+                    }
+                }
+            }
+            else{
+                for( var k:int = indexFound >= 0 ? indexFound - 1 : _treeGridData.dataGridDataProvider.length - 1; k >= 0; k-- ){
+                    row = _treeGridData.dataGridDataProvider.getItemAt( k ) as TreeGridDataRow;
+                    if( isRowMatch( row ) ){
+                        nextFound = row;
+                        return;
+                    }
+                }
+            }
+            nextFound = null;
+        }
+
+        public function destroy():void{
+
+        }
+
+        private function set rfrFoundVisible( v:* ):void{
+            treeGridData.rootModel.callInNext.putIn( makeFoundVisible );
+        }
+
+        private function makeFoundVisible():void{
+            if( nextFound != null ){
+                treeGridData.ensureVisibleRow = nextFound;
+            }
+        }
+
+        public function getAvailMultiOperations( selectedItems:Vector.<Object> ):Vector.<ModelOperation>{
+            return null;
+        }
+        ]]></fx:Script>
+    <fx:Binding source="nextFound" destination="rfrFoundVisible"/>
+    <fx:Script><![CDATA[
+
+        public var cellDataClass:Class;
+
+        [Bindable]
+        public var cellDataKey:Object;
+
+        protected function set rfrCellDataKey( ignoreVar:* ):void{
+            cellDataKey = this;
+        }
+
+        ]]></fx:Script>
+    <fx:Binding source="treeGridData" destination="rfrCellDataKey"/>
+</as3lib:MxmlEventDispatcher>

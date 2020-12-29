@@ -1,0 +1,121 @@
+<?xml version="1.0"?>
+<view:WebWinBase xmlns:fx="http://ns.adobe.com/mxml/2009"
+                 xmlns:s="library://ns.adobe.com/flex/spark"
+                 xmlns:view="edu.umich.med.mbni.pubanatomy.integrate.view.*"
+                 title="Search Data Set from AllenBrain by NeuroBlast"
+        >
+    <fx:Script><![CDATA[
+        import edu.umich.med.mbni.pubanatomy.flash.rs.GetXmlFromAba;
+        import edu.umich.med.mbni.pubanatomy.integrate.model.CMDTempAddAbaSearch;
+        import edu.umich.med.mbni.pubanatomy.integrate.model.MDLTempAbaDatasetSearchRpcCorr;
+        import edu.umich.med.mbni.pubanatomy.integrate.model.MDLTempAbaDatasetSearchRpcDiff;
+        import edu.umich.med.mbni.pubanatomy.integrate.model.MDLTempAbaDatasetSearchRpcGene;
+        import edu.umich.med.mbni.pubanatomy.integrate.model.MDLTempAllenBrainGeneSearchVO;
+        import edu.umich.med.mbni.utils.ModelOperationMenuChildren;
+        import edu.umich.med.mbni.utils.ModelOperationMenuItemLink;
+        import edu.umich.med.mbni.utils.ModelOperationMenuType;
+
+        import mx.collections.ArrayCollection;
+
+        import mx.core.UIComponent;
+
+        import mx.events.DragEvent;
+        import mx.managers.DragManager;
+
+        [Bindable]
+        private var _restrictStructureIds:Vector.<int> = new <int>[ 1089, 1097, 313, 315, 354, 477, 512, 549, 698, 703, 771, 8, 803 ];
+
+        [Bindable(event="dataChanged")]
+        public function get model():MDLTempAbaDatasetSearchRpcCorr{
+            return data as MDLTempAbaDatasetSearchRpcCorr;
+        }
+
+        private var _dragingVo:MDLTempAllenBrainGeneSearchVO;
+
+        protected function onDragEnterOverDropExit( event:DragEvent ):void{
+            if( event.isDefaultPrevented() ){
+                return;
+            }
+
+            if( event.type == DragEvent.DRAG_ENTER ){
+
+                var dsgr:TmpGeneDataSetDataGrid = event.dragInitiator as TmpGeneDataSetDataGrid;
+                if( dsgr == null ){
+                    return;
+                }
+
+                _dragingVo = dsgr.selectedItem as MDLTempAllenBrainGeneSearchVO;
+                if( _dragingVo != null ){
+                    DragManager.acceptDragDrop( event.target as UIComponent );
+                    form.drawFocus( true );
+                }
+            }
+            else if( event.type == DragEvent.DRAG_OVER ){
+                DragManager.showFeedback( DragManager.COPY );
+            }
+            else{
+                form.drawFocus( false );
+                if( event.type == DragEvent.DRAG_DROP ){
+                    model.dataSet = _dragingVo;
+                }
+                _dragingVo = null;
+            }
+        }
+
+        private function onDsClick():void{
+            var mnu:ArrayCollection = new ArrayCollection(
+                    [
+                        new CMDTempAddAbaSearch( new MDLTempAbaDatasetSearchRpcGene(), "By Gene Name/Symbol" ),
+                        new CMDTempAddAbaSearch( new MDLTempAbaDatasetSearchRpcDiff(), "By Structure Differential" )
+                    ] );
+            if( model.dataSet != null ){
+                mnu.addItem( new ModelOperationMenuType() );
+                mnu.addItem( new ModelOperationMenuItemLink( "http://mouse.brain-map.org/experiment/show/" + model.dataSet.dsId, "View Data Set on Allen Brain" ) );
+            }
+            model.model.setMenuOperations( new ModelOperationMenuChildren( mnu.toArray() ) );
+        }
+        ]]></fx:Script>
+    <view:layout>
+        <s:VerticalLayout paddingLeft="3" paddingBottom="3" paddingTop="3" paddingRight="3"/>
+    </view:layout>
+    <s:Form id="form">
+        <s:FormItem label="Target Data set: "
+                    toolTip=" drag a data set from allen search result and drop in to here"
+                    dragEnter="onDragEnterOverDropExit( event );"
+                    dragOver="onDragEnterOverDropExit( event );"
+                    dragDrop="onDragEnterOverDropExit( event );"
+                    dragExit="onDragEnterOverDropExit( event );">
+            <s:Button label="{model.dataSet == null?'Drop a data set into here':String(model.dataSet.dsId)}"
+                      click="onDsClick();"/>
+        </s:FormItem>
+        <s:FormItem label="Target Structures: ">
+            <s:layout>
+                <s:HorizontalLayout verticalAlign="middle"/>
+            </s:layout>
+            <view:TmpStructureListH rootModel="{model.model}" id="lst"
+                                    restrictStructureIds="{_restrictStructureIds}"
+                                    dataProvider="@{model.structureIdLst}"/>
+            <s:Label text="!!!"
+                     toolTip="#t(neuroBlastStructuresLimit)p#"/>
+        </s:FormItem>
+    </s:Form>
+    <s:HGroup width="100%" horizontalAlign="right">
+        <s:CheckBox selected="@{model.coronalOnly}" label="Coronal data Only"/>
+        <s:Button label="Submit" click="model.callRemote();"
+                  enabled="{
+                      model.paramStrAfterQ != null
+                      &amp;&amp; model.paramStrAfterQ != model.lastParamStrAfterQ
+                      &amp;&amp;( model.bytesLoaded == model.bytesTotal || isNaN(model.bytesLoaded ) )
+                  }"/>
+    </s:HGroup>
+
+    <view:TmpGeneDataSetDataGrid model="{model}"/>
+    <view:botleGroupContent>
+        <s:Button textDecoration="underline" label="Allen Brain Service Failed"
+                  skinClass="edu.umich.med.mbni.utils.UpLabelOverBtnSkin"
+                  visible="{model.resultSectionDataSets.length == 0 &amp;&amp; model.bytesLoaded == model.bytesTotal &amp;&amp; model.bytesLoaded > 0 }"
+                  includeInLayout="{model.resultSectionDataSets.length == 0 &amp;&amp; model.bytesLoaded == model.bytesTotal &amp;&amp; model.bytesLoaded > 0 }"
+                  toolTip="Click to see raw response from Allen Inst."
+                  click="navigateToURL( new URLRequest( GetXmlFromAba._urlBeforeQ + '?' + model.lastParamStrAfterQ ), '_blank' )"/>
+    </view:botleGroupContent>
+</view:WebWinBase>

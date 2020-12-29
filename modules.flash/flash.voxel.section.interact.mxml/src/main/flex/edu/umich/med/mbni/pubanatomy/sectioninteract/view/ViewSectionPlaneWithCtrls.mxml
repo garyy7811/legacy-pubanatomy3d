@@ -1,0 +1,90 @@
+<?xml version="1.0"?>
+<s:BorderContainer xmlns:fx="http://ns.adobe.com/mxml/2009"
+                   xmlns:mx="library://ns.adobe.com/flex/mx"
+                   xmlns:s="library://ns.adobe.com/flex/spark"
+                   xmlns:utils="edu.umich.med.mbni.utils.*"
+                   xmlns:v3d="edu.umich.med.mbni.pubanatomy.voxel3d.view.*"
+                   xmlns:v2d="edu.umich.med.mbni.pubanatomy.sectioninteract.view.*"
+                   backgroundColor="0xFFFFFF">
+    <fx:Script><![CDATA[
+        import edu.umich.med.mbni.pubanatomy.sectioninteract.model.ModelSectionPlane;
+        import edu.umich.med.mbni.pubanatomy.voxel3d.model.Voxel3dPlane;
+
+        [Bindable]
+        public var sectionPlane:ModelSectionPlane;
+        ]]></fx:Script>
+    <fx:Binding source="sectionPlane.v3dPlane.imageSectionMode == Voxel3dPlane.IMG_SECTION_MODE_XYZ?'xyz':'image'"
+                destination="currentState"/>
+    <s:layout>
+        <s:VerticalLayout gap="1"/>
+    </s:layout>
+    <s:states>
+        <s:State name="image"/>
+        <s:State name="xyz"/>
+    </s:states>
+    <s:HGroup width="100%" horizontalAlign="center">
+        <s:Button label="Zoom: {Math.round( sectionPlane.userScale*100)}%" click="onScaleClick();"
+                  skinClass="edu.umich.med.mbni.utils.UpLabelOverBtnSkin"
+                  toolTip="#t(sctnsclbtn0)p#"
+                  fontWeight="bold">
+            <fx:Script><![CDATA[
+                private function onScaleClick():void{
+                    var p:sectionScaleSlider = new sectionScaleSlider();
+                    p.sectionPlane = sectionPlane;
+                    p.show();
+                }
+                ]]></fx:Script>
+        </s:Button>
+        <s:Button label="Opacity: {Math.round( coorView.sectionView.sections.alpha * 100)}%" click="onAlphaClick();"
+                  skinClass="edu.umich.med.mbni.utils.UpLabelOverBtnSkin"
+                  toolTip="#t(sctnalfbtn0)p#"
+                  fontWeight="bold">
+            <fx:Script><![CDATA[
+                private function onAlphaClick():void{
+                    var p:sectionAlphaSlider = new sectionAlphaSlider();
+                    p.coorView = coorView;
+                    p.show();
+                }
+                ]]></fx:Script>
+        </s:Button>
+        <v3d:V3dSectionImageModeSelector plane="{sectionPlane.v3dPlane}" includeIn="image" width="100%"
+                                         enabled="{sectionPlane.v3dPlane.image.svgLoader == null
+                                          &amp;&amp; sectionPlane.v3dPlane.image.sectionsLoader == null }"
+                                         toolTip="#t(V3dSectionImageClosestImgSelector)p#"/>
+        <v3d:V3dSectionImageClosestImgSelector plane="{sectionPlane.v3dPlane}" width="100%"
+                                               visible="{sectionPlane.v3dPlane.closestImages.length > 0}"
+                                               includeInLayout="{sectionPlane.v3dPlane.closestImages.length > 0}"
+                                               toolTip="#t(SectionImageClosestImgSelector)p#"/>
+        <mx:LinkButton includeIn="image" click="sectionPlane.v3dPlane.image.linkToAllenBrain().execute();"
+                       label="High Def" textDecoration="underline" toolTip="See high def details on Allen Brain"/>
+    </s:HGroup>
+    <fx:Declarations>
+        <fx:Component className="sectionScaleSlider">
+            <utils:PopupSlider value="@{sectionPlane.userScale}" minimum="1" height="200"
+                               maximum="{sectionPlane.rootModelSection2d.rootModelVoxel3d.config.unitLength}"
+                               liveDragging="false" dataTipFormatFunction="formatDtp"
+                               snapInterval="0.1">
+                <fx:Script><![CDATA[
+                    import edu.umich.med.mbni.pubanatomy.sectioninteract.model.ModelSectionPlane;
+
+                    [Bindable]
+                    public var sectionPlane:ModelSectionPlane;
+
+                    private function formatDtp( v:Number ):String{
+                        return Math.round( v * 100 ) + "%";
+                    }
+                    ]]></fx:Script>
+            </utils:PopupSlider>
+        </fx:Component>
+        <fx:Component className="sectionAlphaSlider">
+            <utils:PopupSlider value="@{coorView.sectionView.sections.alpha}" minimum="0"
+                               maximum="1" snapInterval="0.05" showDataTip="false">
+                <fx:Script><![CDATA[
+                    [Bindable]
+                    public var coorView:ViewSectionPlaneCoorView;
+                    ]]></fx:Script>
+            </utils:PopupSlider>
+        </fx:Component>
+    </fx:Declarations>
+    <v2d:ViewSectionPlaneCoorView id="coorView" width="100%" height="100%" sectionPlane="{sectionPlane}"/>
+</s:BorderContainer>

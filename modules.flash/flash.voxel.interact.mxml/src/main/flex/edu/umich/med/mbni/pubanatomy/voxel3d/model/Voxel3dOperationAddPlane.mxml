@@ -1,0 +1,35 @@
+<?xml version="1.0"?>
+<m:Voxel3dOperationBase xmlns:fx="http://ns.adobe.com/mxml/2009"
+                        xmlns:m="edu.umich.med.mbni.pubanatomy.voxel3d.model.*">
+    <fx:Script><![CDATA[
+        import edu.umich.med.mbni.pubanatomy.datadriven3dwindow.Dd3dModelMeshPlane;
+
+        [Bindable]
+        protected var _planeProjectionDir:int = -1;
+
+        [Bindable]
+        protected var _planeProjectionVal:int = -1;
+
+        override protected  function onExecute():void{
+            CONFIG::debugging{
+                if( _planeProjectionDir < 0 || _planeProjectionDir > 2 ){
+                    throw new Error( this + ".onExecute " );
+                }
+            }
+            rootModel3d.addSection( _planeProjectionDir, _planeProjectionVal );
+        }
+
+        private function set rfrLabel( ignoreVar:* ):void{
+            if( _planeProjectionDir >= 0 && _planeProjectionDir < 3 ){
+                label = 'Add ' + Dd3dModelMeshPlane.cutNames[ _planeProjectionDir ] + ' plane through model';
+                toolTip = 'section name|^|' + Dd3dModelMeshPlane.cutNames[ _planeProjectionDir ] + '\r\n#t(addPlnThr)p#';
+
+                CONFIG::debugging{
+                    label += _planeProjectionDir + ":" + _planeProjectionVal;
+                }
+            }
+        }
+        ]]></fx:Script>
+    <fx:Binding source="_planeProjectionDir" destination="rfrLabel"/>
+    <fx:Binding source="_planeProjectionVal" destination="rfrLabel"/>
+</m:Voxel3dOperationBase>

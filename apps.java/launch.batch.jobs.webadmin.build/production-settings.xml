@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<settings xmlns="http://maven.apache.org/SETTINGS/1.0.0"
+          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.0.0 http://maven.apache.org/xsd/settings-1.0.0.xsd">
+    <mirrors>
+        <mirror>
+            <id>pubanatomy-nexus</id>
+            <name>pubanatomy-nexus</name>
+            <url>http://127.0.0.1:12380/nexus/content/groups/public</url>
+            <mirrorOf>*</mirrorOf>
+        </mirror>
+    </mirrors>
+    <profiles>
+        <profile>
+            <id>batch-pubanatomy.org</id>
+            <properties>
+                <mongo.host>127.0.0.1</mongo.host>
+                <mongo.port>27017</mongo.port>
+                <mongo.dbname>Production_Search_Batch</mongo.dbname>
+
+                <batch.data.source.init>false</batch.data.source.init>
+                <postgre.host>127.0.0.1</postgre.host>
+                <postgre.port>5432</postgre.port>
+                <postgre.dbname>Production_Batch_Search</postgre.dbname>
+                <postgre.user>Production_Batch_Search</postgre.user>
+                <postgre.pswd>9II*UjY^iji_6</postgre.pswd>
+
+                <deploy.target.tomcat.content.path.pubanatomy.batch>/batch_search
+                </deploy.target.tomcat.content.path.pubanatomy.batch>
+                <deploy.target.tomcat.url.pubanatomy.batch>http://127.0.0.1:9119/manager-8sjjuqs23/text
+                </deploy.target.tomcat.url.pubanatomy.batch>
+                <deploy.target.tomcat.auth.pubanatomy.batch>tomcat.to.deploy
+                </deploy.target.tomcat.auth.pubanatomy.batch>
+
+                <solr.medline.merge.all.into>http://127.0.0.1:8099/solr430Batch/medline.all.merge.here
+                </solr.medline.merge.all.into>
+                <all.merge.solr.commit.perNum>1111</all.merge.solr.commit.perNum>
+
+                <solr.pmid2concept.chemical>http://127.0.0.1:8099/solr430Batch/chemical</solr.pmid2concept.chemical>
+                <solr.pmid2concept.diseases>http://127.0.0.1:8099/solr430Batch/diseases</solr.pmid2concept.diseases>
+                <solr.pmid2concept.functions>http://127.0.0.1:8099/solr430Batch/functions</solr.pmid2concept.functions>
+                <solr.pmid2concept.structures>http://127.0.0.1:8099/solr430Batch/structures
+                </solr.pmid2concept.structures>
+                <solr.pmid2concept.genes>http://127.0.0.1:8099/solr430Batch/genes</solr.pmid2concept.genes>
+
+
+                <medline.autoupdate.lock.file>/home/yanggang/mbni.org_pubA/lock</medline.autoupdate.lock.file>
+                <medline.autoupdate.lock.check.millionsec>9000</medline.autoupdate.lock.check.millionsec>
+
+                <ncbi.medline.ftp.medlease.gzFolder>
+                    /home/yanggang/mbni.org_pubA/medline.download/ftp.nlm.nih.gov/nlmdata/.medlease/gz
+                </ncbi.medline.ftp.medlease.gzFolder>
+                <ncbi.medline.ftp.medleasebaseline.gzFolder>
+                    /home/yanggang/mbni.org_pubA/medline.download/ftp.nlm.nih.gov/nlmdata/.medleasebaseline/gz
+                </ncbi.medline.ftp.medleasebaseline.gzFolder>
+
+                <pmid.cui.chemical.file>/home/yanggang/mbni.org_pubA/OUTPUT/mgrep_Drug.txt</pmid.cui.chemical.file>
+                <pmid.cui.disease.file>/home/yanggang/mbni.org_pubA/OUTPUT/mgrep_Disease.txt</pmid.cui.disease.file>
+                <pmid.cui.function.file>/home/yanggang/mbni.org_pubA/OUTPUT/mgrep_Function.txt</pmid.cui.function.file>
+                <pmid.cui.abasid.file>
+                    /home/yanggang/pubanatomy_batch_search_tmp_files/pmid_abasid_name.large
+                </pmid.cui.abasid.file>
+                <pmid.cui.gene.file>
+                    /home/yanggang/pubanatomy_batch_search_tmp_files/gene2pubmed.large
+                </pmid.cui.gene.file>
+
+                <pmid.cui.split.folder>/home/yanggang/pubanatomy_batch_search_tmp_files/splitting
+                </pmid.cui.split.folder>
+                <pmid.cui.split.commitInterval>100000</pmid.cui.split.commitInterval>
+                <pmid.cui.split.itemCountLimitPerResource>2000000</pmid.cui.split.itemCountLimitPerResource>
+                <pmid.cui.solr.commitInterval>5000</pmid.cui.solr.commitInterval>
+
+                <batch.exe.thread.num>15</batch.exe.thread.num>
+
+                <solr.core.folder.build>N/A</solr.core.folder.build>
+            </properties>
+        </profile>
+    </profiles>
+
+    <activeProfiles>
+        <activeProfile>batch-pubanatomy.org</activeProfile>
+    </activeProfiles>
+
+    <servers>
+        <server>
+            <id>tomcat.to.deploy</id>
+            <username>script-manager</username>
+            <password>itZa1qs7crbkk125</password>
+        </server>
+    </servers>
+
+</settings>

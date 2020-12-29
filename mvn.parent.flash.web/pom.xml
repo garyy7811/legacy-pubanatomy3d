@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>pubanatomy.parent.flash.swf</artifactId>
+    <version>0.1-SNAPSHOT</version>
+    <packaging>pom</packaging>
+
+    <parent>
+        <artifactId>pubanatomy.parent.flash</artifactId>
+        <groupId>edu.umich.med.mbni</groupId>
+        <version>0.1-SNAPSHOT</version>
+        <relativePath>../mvn.parent.flash/pom.xml</relativePath>
+    </parent>
+
+    <properties>
+        <!--<web.dir>E:\work\3dbrain-svn\trunk\apps\web.tomcat\target\brain.point.apps.web.tomcat-0.1-SNAPSHOT\select</web.dir>-->
+        <web.dir>${project.build.directory}/swfWrapperArtifact</web.dir>
+        <html.title>Select Proper Organ Shape</html.title>
+        <bgcolor>#000000</bgcolor>
+    </properties>
+
+    <build>
+        <plugins>
+            <plugin>
+                <artifactId>maven-clean-plugin</artifactId>
+                <configuration>
+                    <filesets>
+                        <fileset>
+                            <directory>${project.build.sourceDirectory}</directory>
+                            <includes>
+                                <include>AppCompiledConfig.mxml</include>
+                            </includes>
+                        </fileset>
+                        <fileset>
+                            <directory>${web.dir}</directory>
+                            <includes>
+                                <include>*.*</include>
+                            </includes>
+                        </fileset>
+                    </filesets>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>net.flexmojos.oss</groupId>
+                <artifactId>flexmojos-maven-plugin</artifactId>
+                <extensions>true</extensions>
+                <configuration>
+                    <reduceLzma>true</reduceLzma>
+                    <!-- NOT WORKING, Flexmojos 6.0.1 bug-->
+                    <includeSources>
+                        <includeSource>${project.basedir}/src/main/compile.config.filtered</includeSource>
+                    </includeSources>
+                    <sourceFile>AppMain.mxml</sourceFile>
+                    <loadConfig>${project.basedir}/../../mvn.parent.flash.web/flex.config.swf.version.xml</loadConfig>
+                    <storepass/>
+                </configuration>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>wrapper</goal>
+                        </goals>
+                        <configuration>
+                            <targetPlayer>${target.flash.player.version}</targetPlayer>
+                            <!--<templateURI>embed:express-installation</templateURI>-->
+                            <templateURI>folder:${project.basedir}/../../mvn.parent.flash.web/wrapper.template
+                            </templateURI>
+                            <outputDirectory>${web.dir}</outputDirectory>
+                            <parameters>
+                                <title>${html.title}</title>
+                                <bgcolor>${bgcolor}</bgcolor>
+                                <renderMode>gpu</renderMode>
+                                <wmode>direct</wmode>
+                            </parameters>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <artifactId>maven-resources-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>filteringSwfAppConfig</id>
+                        <phase>validate</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${project.build.sourceDirectory}</outputDirectory>
+                            <resources>
+                                <resource>
+                                    <directory>${basedir}/src/main/compile.config</directory>
+                                    <includes>
+                                        <include>AppCompiledConfig.mxml</include>
+                                    </includes>
+                                    <filtering>true</filtering>
+                                </resource>
+                            </resources>
+                            <overwrite>true</overwrite>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>copySwfFilesToWeb</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${web.dir}</outputDirectory>
+                            <resources>
+                                <resource>
+                                    <directory>${project.build.directory}</directory>
+                                    <includes>
+                                        <include>*.swf</include>
+                                    </includes>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+
+</project>

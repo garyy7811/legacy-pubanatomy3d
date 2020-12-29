@@ -1,0 +1,125 @@
+<?xml version="1.0"?>
+<model:ResultBase xmlns:fx="http://ns.adobe.com/mxml/2009"
+                  xmlns:model="edu.umich.med.mbni.pubanatomy.search.model.*">
+    <fx:Script><![CDATA[
+        import edu.umich.med.mbni.pubanatomy.flash.dto.DtoFacetResultMedline;
+
+        import mx.collections.ArrayCollection;
+
+        import spark.collections.Sort;
+        import spark.collections.SortField;
+
+        private var _field:QueryField;
+        [Bindable(event="fieldChanged")]
+        public function get field():QueryField{
+            return _field;
+        }
+
+        public function set field( value:QueryField ):void{
+            if( value != _field ){
+                _field = value;
+                dispatchEvent( new Event( "fieldChanged" ) );
+            }
+        }
+
+        private var _sortField:String = "count";
+
+        [Bindable]
+        public var filterTxt:String;
+
+        private var _lastResult:ArrayCollection;
+
+        [Bindable(event="lastResultChanged")]
+        public function get lastResult():ArrayCollection{
+            return _lastResult;
+        }
+
+        private function setLastResult( value:ArrayCollection ):void{
+            if( value != _lastResult ){
+                _lastResult = value;
+                dispatchEvent( new Event( "lastResultChanged" ) );
+            }
+        }
+
+        override public function getMoreResults():void{
+            setRpc( queryResult.searchModel.instantiate( SearchWithFacet ) as SearchWithFacet );
+            rpc.startRow = 0;
+            rpc.rowNum = 0;
+            rpc.field2offsetLimitPrefixSort = {};
+            rpc.field2offsetLimitPrefixSort[ field.id ] =
+                    [ resultList.length, pageRows, filterTxt != null ? filterTxt.toLocaleLowerCase() : null,
+                      _sortField == "count" ? "count" : "index" ];
+            super.getMoreResults();
+        }
+
+        override public function onResult( result:DtoFacetResultMedline ):void{
+            var obj:Object = result.rFacetsRecords[ field.id ];
+            var lst:ArrayCollection = new ArrayCollection();
+            for( var term:String in obj ){
+                lst.addItem( termCount2ResultFacetTerm2Count( term, obj ) );
+            }
+            if( lst.length > 0 ){
+                var sort:Sort = new Sort();
+                sort.fields = [ new SortField( "count", true, true )];
+                lst.sort = sort;
+                lst.refresh();
+                for each( var ft:ResultFacetTerm2Count in lst ){
+                    onResultRecord( ft.term, ft );
+                }
+            }
+            super.onResult( result );
+            setLastResult( lst );
+        }
+
+        protected function termCount2ResultFacetTerm2Count( term:String, obj:Object ):ResultFacetTerm2Count{
+            var rt:ResultFacetTerm2Count = new ResultFacetTerm2Count();
+            rt.facet = this;
+            rt.term = term;
+            rt.count = obj[ term ];
+            return  rt;
+        }
+
+        override protected function onResultRecord( key:String, o:Object ):void{
+            var r:ResultFacetTerm2Count = o as ResultFacetTerm2Count;
+            var exi:ResultFacetTerm2Count = resultMap[ key ];
+            if( exi != null ){
+                CONFIG::debugging{
+                    if( exi.count != r.count ){
+                        throw new Error( this + ".onResultRecord " );
+                    }
+                }
+                return;
+            }
+            super.onResultRecord( key, o );
+        }
+
+        [Bindable]
+        public var visibleRowIndices:Vector.<int>;
+
+        public function sortResultBy( dataField:String ):void{
+            _sortField = dataField;
+            discardResults();
+            getMoreResults();
+        }
+
+        public function destroy():void{
+
+        }
+        ]]></fx:Script>
+
+    <fx:Binding source="filterTxt" destination="rfrReset"/>
+    <fx:Binding source="queryResult.searchModel.callInNext" destination="rfrReset"/>
+    <fx:Script><![CDATA[
+        private function set rfrReset( ignoreVar:* ):void{
+            queryResult.searchModel.callInNext.putIn( reset );
+        }
+
+        private function reset():void{
+            if( queryResult.resultModel != null && queryResult.resultModel.query != null
+                    && queryResult.resultModel.query.rootQueryStr.length > 3 ){
+                discardResults();
+                getMoreResults();
+            }
+        }
+        ]]></fx:Script>
+</model:ResultBase>

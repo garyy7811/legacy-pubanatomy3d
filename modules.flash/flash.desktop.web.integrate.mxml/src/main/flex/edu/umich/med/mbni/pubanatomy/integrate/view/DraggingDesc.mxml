@@ -1,0 +1,56 @@
+<?xml version="1.0"?>
+<s:BorderContainer xmlns:fx="http://ns.adobe.com/mxml/2009" xmlns:s="library://ns.adobe.com/flex/spark"
+                   minWidth="1" minHeight="1" borderColor="0x000000" borderVisible="true" borderWeight="3">
+    <fx:Script><![CDATA[
+        import edu.umich.med.mbni.pubanatomy.atlas.model.MDLISHImage;
+        import edu.umich.med.mbni.pubanatomy.atlas.model.StructureItem;
+        import edu.umich.med.mbni.pubanatomy.atlas.model.StructureTreeGridDataRow;
+        import edu.umich.med.mbni.pubanatomy.flash.dto.DtoGene;
+        import edu.umich.med.mbni.pubanatomy.flash.dto.DtoStructure;
+        import edu.umich.med.mbni.pubanatomy.search.model.QueryRelate2Terms;
+        import edu.umich.med.mbni.pubanatomy.search.model.ResultFacetTerm2CountBrainStr;
+        import edu.umich.med.mbni.utils.RootModelApp;
+        import edu.umich.med.mbni.utils.RootModelModule;
+
+        [Bindable]
+        public var rootApp:RootModelApp;
+
+        private function set rfrTxt( v:* ):void{
+            if( rootApp != null && rootApp.dragging != null ){
+                var draggin:Object = rootApp.dragging.dataForFormat( RootModelModule.DRAGGING_FORMAT );
+                if( draggin != null ){
+                    if( draggin is DtoGene ){
+                        _draggingContent = " Gene:" + ( draggin as DtoGene ).name;
+                    }
+                    else if( draggin is QueryRelate2Terms ){
+                        _draggingContent = " Query Term";
+                        //todo: from summary or query??
+                    }
+                    else if( draggin is MDLISHImage ){
+                        _draggingContent = " a Gene ISH Image";
+                    }
+                    else{
+                        var vc:Vector.<Object> = draggin as Vector.<Object>;
+                        if( vc != null && vc.length > 0 ){
+                            if( vc[ 0 ] is DtoStructure
+                                    || vc[ 0 ] is StructureItem
+                                    || vc[ 0 ] is StructureTreeGridDataRow
+                                    ){
+                                _draggingContent = vc.length + " brain structures";
+                                //todo: tell the difference of these sources
+                            }
+                            else if( vc[ 0 ] is ResultFacetTerm2CountBrainStr ){
+                                _draggingContent = " search result with " + vc.length + " medline citation counts";
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        [Bindable]
+        private var _draggingContent:String = "???";
+        ]]></fx:Script>
+    <fx:Binding source="rootApp.dragging" destination="rfrTxt"/>
+    <s:Label text="Dragging {_draggingContent}" paddingLeft="5" paddingRight="5" paddingTop="5" paddingBottom="5"/>
+</s:BorderContainer>

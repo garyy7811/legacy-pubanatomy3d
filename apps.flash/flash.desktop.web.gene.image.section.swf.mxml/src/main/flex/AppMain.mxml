@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<s:Application xmlns:fx="http://ns.adobe.com/mxml/2009"
+               xmlns:s="library://ns.adobe.com/flex/spark"
+               skinClass="edu.umich.med.mbni.pubanatomy.AppSkin">
+    <fx:Script><![CDATA[
+        import edu.umich.med.mbni.pubanatomy.AppSkin;
+
+        private function set rfr( ignoreVar:* ):void{
+            if( skin is AppSkin ){
+                ( skin as AppSkin ).onPreInit( new AppCompiledConfig().getUrl( systemManager.loaderInfo ), systemManager.stage );
+            }
+        }
+
+        ]]></fx:Script>
+    <fx:Binding source="skin" destination="rfr"/>
+</s:Application>

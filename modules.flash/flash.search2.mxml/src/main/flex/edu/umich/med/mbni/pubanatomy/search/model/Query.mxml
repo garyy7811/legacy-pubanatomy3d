@@ -1,0 +1,96 @@
+<?xml version="1.0"?>
+<as3lib:MxmlEventDispatcher xmlns:fx="http://ns.adobe.com/mxml/2009"
+                            xmlns:as3lib="com.flashflexpro.as3lib.*"
+                            xmlns:m="edu.umich.med.mbni.pubanatomy.search.model.*">
+    <fx:Script><![CDATA[
+        private var _queryResult:QueryResult;
+
+        [Bindable(event="queryResultChanged")]
+        public function get queryResult():QueryResult{
+            return _queryResult;
+        }
+
+        public function set queryResult( value:QueryResult ):void{
+            if( value != _queryResult ){
+                _queryResult = value;
+                dispatchEvent( new Event( "queryResultChanged" ) );
+            }
+        }
+
+        private var _focusedOnTerm:QueryTerm;
+
+        [Bindable(event="focusedOnTermChanged")]
+        public function get focusedOnTerm():QueryTerm{
+            return _focusedOnTerm;
+        }
+
+        public function setFocusedOnTerm( value:QueryTerm ):void{
+            CONFIG::debugging{
+                if( value is QueryRelate2Terms ){
+                    throw new Error( this + ".setFocusedOnTerm " );
+                }//debug
+            }
+            if( value != _focusedOnTerm ){
+                _focusedOnTerm = value;
+                dispatchEvent( new Event( "focusedOnTermChanged" ) );
+            }
+        }
+
+        private var _initFocusOnRoot:Boolean = false;
+
+        private function set rfrInitFocusOnRoot( ignoreVar:* ):void{
+            if( rootTerm != null && rootTerm.term && !_initFocusOnRoot ){
+                setFocusedOnTerm( rootTerm.term );
+                _initFocusOnRoot = true;
+            }
+        }
+
+        public function clone():Query{
+            var query:Query = new Query();
+            query.queryResult = queryResult;
+            query.rootTerm = rootTerm.clone( query ) as QueryRelate2Terms;
+            return  query;
+        }
+
+        public function destroy():void{
+            setFocusedOnTerm( null );
+            queryResult = null;
+            rootTerm = null;
+        }
+        ]]></fx:Script>
+    <fx:Binding source="rootTerm.term" destination="rfrInitFocusOnRoot"/>
+    <fx:Declarations>
+        <m:QueryRelate2Terms id="rootTerm" query="{this}" isVertical="true">
+            <m:term>
+                <m:QueryTermT field="{queryResult.searchModel.query_fullText}"/>
+            </m:term>
+        </m:QueryRelate2Terms>
+    </fx:Declarations>
+    <fx:Script><![CDATA[
+        public function appendTermStr( f:QueryField, s:String ):void{
+            var term:QueryTermT = queryResult.searchModel.instantiate( QueryTermT ) as QueryTermT;
+            term.field = f;
+            term.inputTxt = s.toLowerCase();
+            appendTerm( term );
+        }
+
+        public function appendTerm( term:QueryTerm ):void{
+            if( rootTerm.queryStr == null ){
+                rootTerm.term = term;
+            }
+            else{
+                if( !rootTerm.commit() ){
+                    queryResult.revert();
+                }
+                var adding:QueryRelate2Terms = queryResult.searchModel.instantiate( QueryRelate2Terms ) as QueryRelate2Terms;
+                adding.term = term;
+                rootTerm.addTerm( adding );
+            }
+            term.commit();
+        }
+
+        [Bindable]
+        public var rootQueryStr:String;
+        ]]></fx:Script>
+    <fx:Binding source="rootTerm.queryStr" destination="rootQueryStr"/>
+</as3lib:MxmlEventDispatcher>

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ehcache>
+    <diskStore path="java.io.tmpdir"/>
+    <cache name="pubMedCount"
+           eternal="false"
+           maxEntriesLocalHeap="1000"
+           maxEntriesLocalDisk="100000"
+           timeToIdleSeconds="1800"
+           memoryStoreEvictionPolicy="LRU"/>
+
+    <cache name="pubMedList"
+           eternal="false"
+           maxEntriesLocalHeap="1000"
+           maxEntriesLocalDisk="100000"
+           timeToIdleSeconds="1800"
+           memoryStoreEvictionPolicy="LRU"/>
+</ehcache>

@@ -1,0 +1,72 @@
+<?xml version="1.0"?>
+<utils:RootModelModule xmlns:fx="http://ns.adobe.com/mxml/2009"
+                       xmlns:utils="edu.umich.med.mbni.utils.*"
+                       xmlns:s="library://ns.adobe.com/flex/spark">
+    <fx:Script><![CDATA[
+        import mx.collections.ArrayList;
+
+        private var _centralPosition:Vector3D = new Vector3D();
+        [Bindable(event="centralPositionChanged")]
+        public function get centralPosition():Vector3D{
+            return _centralPosition;
+        }
+
+        public function set centralPosition( value:Vector3D ):void{
+            if( value == null ){
+                return;
+            }
+            if( value != _centralPosition ){
+                _centralPosition = value;
+                dispatchEvent( new Event( "centralPositionChanged" ) );
+            }
+        }
+
+        [Bindable]
+        public var frozen:Boolean = false;
+
+        [Bindable]
+        internal var meshScreenMouseDownPoint:Point;
+
+        public var frameNum:uint;
+
+        [ArrayElementType("edu.umich.med.mbni.pubanatomy.datadriven3dwindow.Dd3dModelMeshStructure")]
+        [Bindable]
+        public var meshDataProvider:ArrayList = new ArrayList();
+
+        [ArrayElementType("edu.umich.med.mbni.pubanatomy.datadriven3dwindow.Dd3dModelMeshPlane")]
+        [Bindable]
+        public var planeDataProvider:ArrayList = new ArrayList();
+
+        [ArrayElementType("edu.umich.med.mbni.pubanatomy.datadriven3dwindow.Dd3dModelMeshParticleSet")]
+        [Bindable]
+        public var particleDataProvider:ArrayList = new ArrayList();
+
+        [Bindable]
+        public var mouseLastPosition:Vector3D;
+
+        private var _mouseOverObj:Dd3dModelMeshBase;
+        public static const mouseAboveObj_CHANGED:String = "mouseOverObjChanged";
+
+        [Bindable(event="mouseOverObjChanged")]
+        public function get mouseOverObj():Dd3dModelMeshBase{
+            return _mouseOverObj;
+        }
+
+        public function setMouseOverObj( value:Dd3dModelMeshBase ):void{
+            if( value != _mouseOverObj ){
+                _mouseOverObj = value;
+                dispatchEvent( new Event( mouseAboveObj_CHANGED ) );
+            }
+        }
+
+        public function showMenu( from:Dd3dModelCamera = null ):void{
+            throw new Error( "override me" );
+        }
+
+        [Bindable]
+        public var focusedCamera:Dd3dModelCamera;
+        ]]></fx:Script>
+    <fx:Declarations>
+        <s:ArrayList id="allCameraModels"/>
+    </fx:Declarations>
+</utils:RootModelModule>

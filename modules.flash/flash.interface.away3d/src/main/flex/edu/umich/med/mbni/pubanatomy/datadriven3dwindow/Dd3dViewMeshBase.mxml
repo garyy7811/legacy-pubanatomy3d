@@ -1,0 +1,103 @@
+<?xml version="1.0"?>
+<entities:Mesh xmlns:fx="http://ns.adobe.com/mxml/2009" xmlns:entities="away3d.entities.*">
+    <fx:Script><![CDATA[
+        import away3d.containers.Scene3D;
+        import away3d.materials.ColorMaterial;
+        import away3d.materials.MaterialBase;
+        import away3d.materials.methods.BasicDiffuseMethod;
+        import away3d.materials.methods.FresnelSpecularMethod;
+
+        {
+            public static const model_CHANGED:String = "modelChanged";
+            protected var _model:Dd3dModelMeshBase;
+            [Bindable(event="modelChanged")]
+            public function get model():Dd3dModelMeshBase{
+                return _model;
+            }
+
+            public function set model( value:Dd3dModelMeshBase ):void{
+                if( value != _model ){
+                    _model = value;
+                    dispatchEvent( new Event( model_CHANGED ) );
+                }
+            }
+
+            [Bindable(event="materialChanged")]
+            override public function get material():MaterialBase{
+                return super.material;
+            }
+
+            override public function set material( value:MaterialBase ):void{
+                if( value != material ){
+                    super.material = value;
+                    dispatchEvent( new Event( "materialChanged" ) );
+                }
+            }
+
+            override public function set scene( value:Scene3D ):void{
+                if( value != super.scene ){
+                    super.scene = value;
+                    dispatchEvent( new Event( "sceneChanged" ) );
+                }
+            }
+
+            [Bindable(event="sceneChanged")]
+            public function get dd3dScene():Dd3dViewScene3d{
+                return super.scene as Dd3dViewScene3d;
+            }
+
+            [Bindable(event="visibleChanged")]
+            override public function get visible():Boolean{
+                return super.visible;
+            }
+
+            override public function set visible( value:Boolean ):void{
+                if( value != super.visible ){
+                    super.visible = value;
+                    dispatchEvent( new Event( "visibleChanged" ) );
+                }
+            }
+        }
+
+        protected function set rfrMat( v:* ):void{
+            dd3dScene.model.callInNext.putIn( refreshMaterial );
+        }
+
+        private function refreshMaterial():void{
+            if( _model != null && scene != null ){
+                material = getMaterial();
+            }
+        }
+
+        protected function getMaterial():ColorMaterial{
+            var mat:ColorMaterial = material as ColorMaterial;
+            if( mat == null ){
+                mat = new ColorMaterial();
+                mat.diffuseMethod = new BasicDiffuseMethod();
+                mat.specularMethod = new FresnelSpecularMethod( true );
+            }
+            mat.bothSides = _model.bothSides;
+            mat.alpha = _model.alpha;
+            mat.color = _model.color;
+            return mat;
+        }
+
+        public function getCenter():Vector3D{
+            var rt:Vector3D = new Vector3D( minX + maxX, minY + maxY, minZ + maxZ );
+            rt.scaleBy( 0.5 );
+            return rt;
+        }
+
+        public function destroy():void{
+            _model = null;
+        }
+        ]]></fx:Script>
+    <fx:Binding source="model.bothSides" destination="rfrMat"/>
+    <fx:Binding source="dd3dScene.cameraLight" destination="rfrMat"/>
+    <fx:Binding source="model.alpha" destination="rfrMat"/>
+    <fx:Binding source="model.color" destination="rfrMat"/>
+
+    <fx:Binding source="model.visible" destination="visible"/>
+    <fx:Binding source="model.mouseEnabled&amp;&amp;dd3dScene.mouseEnabled"
+                destination="mouseEnabled"/>
+</entities:Mesh>

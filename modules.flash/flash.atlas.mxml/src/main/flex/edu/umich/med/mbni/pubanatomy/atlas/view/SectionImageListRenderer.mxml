@@ -1,0 +1,95 @@
+<?xml version="1.0"?>
+<s:ItemRenderer xmlns:fx="http://ns.adobe.com/mxml/2009"
+                xmlns:s="library://ns.adobe.com/flex/spark"
+                autoDrawBackground="false" height="100%" resize="callLater( onRszd );"
+                rollOver="if( !event.buttonDown ){ image.modelSectionDs.modelGene.model.mouseOverImg = image; }"
+                rollOut="image.modelSectionDs.modelGene.model.mouseOverImg = null"
+                rightClick="image.onMenu();"
+        >
+    <fx:Script><![CDATA[
+        import edu.umich.med.mbni.pubanatomy.atlas.model.MDLISHImage;
+
+        [Bindable("dataChange")]
+        public function get image():MDLISHImage{
+            return data as MDLISHImage;
+        }
+
+        override public function set data( value:Object ):void{
+            if( value != data ){
+                super.data = value;
+            }
+        }
+
+        private function set rfrTooltip( ignoreVar:* ):void{
+            image.modelSectionDs.modelGene.model.callInNext.putIn( refreshTooltip );
+        }
+
+        private function refreshTooltip():void{
+            try{
+                if( image != null ){
+                    toolTip = "No." + image.sectionNumber + ", Allen Brain Image id:"
+                            + image.sectionImageId
+                            + ". \r\nDrag and drop in to 3D view.\r\n Right Click to see menu.";
+                }
+            }
+            catch( bindingError:Error ){
+                CONFIG::debugging{
+                    trace( this + ":" + bindingError.getStackTrace() );
+                }
+            }
+        }
+
+        private function onRszd():void{
+            if( image != null && bitmapImage.bitmapData != null ){
+                ownerLst.maxThumbSize = new Point(
+                        Math.max( ownerLst.maxThumbSize.x, bitmapImage.bitmapData.width ),
+                        Math.max( ownerLst.maxThumbSize.y, bitmapImage.bitmapData.height )
+                )
+            }
+        }
+        ]]></fx:Script>
+    <s:states>
+        <s:State name="normal"/>
+        <s:State name="hovered"/>
+        <s:State name="down"/>
+    </s:states>
+    <fx:Binding source="image.structure2Path" destination="rfrTooltip"/>
+    <fx:Binding source="image.sections.length" destination="rfrTooltip"/>
+    <s:BorderContainer minWidth="1" minHeight="1"
+                       backgroundColor="{_highlight?0x0000FF:0xffffff}"
+                       borderVisible="{image == image.modelSectionDs.modelGene.model.mouseOverImg}"
+                       borderWeight="1" borderColor="0x888888" borderAlpha="0.6"
+            >
+        <s:BitmapImage id="bitmapImage" minWidth="100" minHeight="80"
+                       top="3" bottom="3" left="3" right="3"
+                       verticalAlign="middle" horizontalAlign="center" scaleMode="zoom"
+                       source="{image.thumb.url}"/>
+    </s:BorderContainer>
+    <fx:Script><![CDATA[
+        override public function set owner( value:DisplayObjectContainer ):void{
+            if( owner != value ){
+                super.owner = value;
+                dispatchEvent( new Event( "ownerLstChanged" ) );
+            }
+        }
+
+        [Bindable(event="ownerLstChanged")]
+        public function get ownerLst():SectionImageList{
+            return owner as SectionImageList;
+        }
+
+        [Bindable]
+        private var _highlight:Boolean = false;
+
+        private function set rfrHighlight( ignoreVar:* ):void{
+            _highlight = false;
+            image.modelSectionDs.modelGene.model.callInNext.putIn( refreshHighlight );
+        }
+
+        private function refreshHighlight():void{
+            _highlight = ownerLst.highLightImgs.getItemIndex( image ) >= 0;
+        }
+        ]]></fx:Script>
+    <fx:Binding source="ownerLst.highLightImgs.length" destination="rfrHighlight"/>
+    <fx:Binding source="image.modelSectionDs.modelGene.model.callInNext" destination="rfrHighlight"/>
+</s:ItemRenderer>

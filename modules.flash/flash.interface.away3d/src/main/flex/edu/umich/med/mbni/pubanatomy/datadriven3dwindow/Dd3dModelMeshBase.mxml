@@ -1,0 +1,58 @@
+<?xml version="1.0"?>
+<as3lib:MxmlEventDispatcher xmlns:fx="http://ns.adobe.com/mxml/2009" xmlns:as3lib="com.flashflexpro.as3lib.*">
+    <fx:Script><![CDATA[
+        private var _bothSides:Boolean = false;
+
+        [Bindable(event="bothSidesChanged")]
+        public function get bothSides():Boolean{
+            return _bothSides;
+        }
+
+        public function set bothSides( value:Boolean ):void{
+            if( value != _bothSides ){
+                _bothSides = value;
+                dispatchEvent( new Event( "bothSidesChanged" ) );
+            }
+        }
+
+
+        [Bindable]
+        public var color:uint = 0xFF0000;
+
+        [Bindable]
+        public var alpha:Number = 1;
+
+        [Bindable]
+        public var position:Vector3D;
+
+        [Bindable]
+        public var scale:Number = 1;
+
+        [Bindable]
+        public var visible:Boolean = true;
+
+        [Bindable]
+        public var mouseEnabled:Boolean = true;
+
+        [Bindable]
+        public var selected:Boolean;
+
+        public function getDefaultScale():Number{
+            throw new Error();
+        }
+
+        private var _scene:DD3dModelScene3d;
+        public static const scene_CHANGED:String = "sceneChanged";
+        [Bindable(event="sceneChanged")]
+        public function get scene():DD3dModelScene3d{
+            return _scene;
+        }
+
+        public function set scene( value:DD3dModelScene3d ):void{
+            if( value != _scene ){
+                _scene = value;
+                dispatchEvent( new Event( scene_CHANGED ) );
+            }
+        }
+        ]]></fx:Script>
+</as3lib:MxmlEventDispatcher>

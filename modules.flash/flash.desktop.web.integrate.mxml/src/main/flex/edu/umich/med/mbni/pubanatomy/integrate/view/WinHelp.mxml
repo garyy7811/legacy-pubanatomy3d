@@ -1,0 +1,38 @@
+<?xml version="1.0"?>
+<view:WebWinBase xmlns:fx="http://ns.adobe.com/mxml/2009"
+                 xmlns:view="edu.umich.med.mbni.pubanatomy.integrate.view.*"
+                 xmlns:s="library://ns.adobe.com/flex/spark" xmlns:mx="library://ns.adobe.com/flex/mx"
+                 title="{model.firstLevelDisplay}" titleTooltip="{model.firstLevelDisplay}">
+    <fx:Script><![CDATA[
+        import edu.umich.med.mbni.pubanatomy.integrate.model.MDLTooltipExPub;
+
+        import mx.managers.ToolTipManager;
+
+        [Bindable(event="dataChanged")]
+        public function get model():MDLTooltipExPub{
+            return data as MDLTooltipExPub;
+        }
+
+        override protected function onCreated( event:Event ):void{
+            if( model != null ){
+                var tip:TooltipExPub = ToolTipManager.currentToolTip as TooltipExPub;
+                _scaleFrom = new Point( tip.width / width, tip.height / height );
+                _moveFrom = new Point( tip.x, tip.y );
+                _fadeFrom = 1;
+                ToolTipManager.currentToolTip = null;
+                ToolTipManager.destroyToolTip( tip );
+            }
+            super.onCreated( event );
+        }
+        ]]></fx:Script>
+    <view:layout>
+        <s:HorizontalLayout gap="5"
+                          paddingLeft="3"
+                          paddingTop="3"
+                          paddingRight="3"
+                          paddingBottom="3"
+                />
+    </view:layout>
+    <mx:Text htmlText="{model.htmlHelp}" selectable="true"
+             width="100%" height="100%" minWidth="240" minHeight="320" maxWidth="{rootView.width/3}"/>
+</view:WebWinBase>

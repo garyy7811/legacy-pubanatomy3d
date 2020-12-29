@@ -1,0 +1,84 @@
+<?xml version="1.0"?>
+<s:VGroup xmlns:fx="http://ns.adobe.com/mxml/2009" xmlns:s="library://ns.adobe.com/flex/spark"
+          xmlns:mx="library://ns.adobe.com/flex/mx" xmlns:searchView="edu.umich.med.mbni.pubanatomy.search.view.*"
+          currentState="none">
+    <fx:Script><![CDATA[
+        import edu.umich.med.mbni.pubanatomy.search.model.QueryResult;
+
+        [Bindable]
+        public var model:QueryResult;
+        ]]></fx:Script>
+
+    <mx:DividedBox width="100%" height="100%" includeIn="div" id="divBox"
+                   dividerSkin="edu.umich.med.mbni.utils.DividerSkin"
+                   direction.vdiv="vertical" direction.hdiv="horizontal">
+        <searchView:SearchViewResultHits id="hits" modelResult="{model.resultModel}"
+                                         width="100%" height="100%" includeIn="div"/>
+        <searchView:SearchViewResultStatics id="statics" modelResult="{model.resultModel}"
+                                            width="100%" height="100%" includeIn="div"/>
+    </mx:DividedBox>
+    <fx:Declarations>
+        <s:ArrayList id="tabTitles">
+            <fx:Object>Literature Results</fx:Object>
+            <fx:Object>Summary</fx:Object>
+        </s:ArrayList>
+    </fx:Declarations>
+    <s:VGroup gap="0" width="100%" height="100%" includeIn="tab">
+        <s:TabBar dataProvider="{tabTitles}" change="onTabChange( event );" selectedIndex="0"
+                  skinClass="edu.umich.med.mbni.utils.TabBarSkinKicks">
+            <fx:Script><![CDATA[
+                import spark.events.IndexChangeEvent;
+
+                private function onTabChange( ev:IndexChangeEvent ):void{
+                    _tabIndex = ev.newIndex;
+                }
+                ]]></fx:Script>
+        </s:TabBar>
+        <fx:Reparent target="hits" includeIn="tabhits"/>
+        <fx:Reparent target="statics" includeIn="tabstats"/>
+    </s:VGroup>
+    <s:states>
+        <s:State name="none"/>
+        <s:State name="hdiv" stateGroups="div,result"/>
+        <s:State name="vdiv" stateGroups="div,result"/>
+        <s:State name="tabhits" stateGroups="tab,result"/>
+        <s:State name="tabstats" stateGroups="tab,result"/>
+    </s:states>
+    <fx:Script><![CDATA[
+        import mx.containers.BoxDirection;
+
+        private function set rfrState( ignoreVar:* ):void{
+            model.searchModel.callInNext.putIn( refreshState );
+        }
+
+        private function refreshState():void{
+            if( model.resultModel.numFound < 0 ){
+                currentState = "none";
+                return;
+            }
+            var dir:String;
+            if( width < 800 ){
+                currentState = ( _tabIndex == 0 ? "tabhits" : "tabstats" );
+                dir = BoxDirection.VERTICAL;
+            }
+            else if( height > 480 ){
+                currentState = "hdiv";
+                dir = BoxDirection.VERTICAL;
+            }
+            else{
+                currentState = "vdiv";
+                dir = BoxDirection.HORIZONTAL;
+            }
+            if( statics != null ){
+                statics.setDividedBoxDirection( dir );
+            }
+        }
+
+        [Bindable]
+        private var _tabIndex:uint = 0;
+        ]]></fx:Script>
+    <fx:Binding source="_tabIndex" destination="rfrState"/>
+    <fx:Binding source="model.resultModel.numFound" destination="rfrState"/>
+    <fx:Binding source="width" destination="rfrState"/>
+    <fx:Binding source="height" destination="rfrState"/>
+</s:VGroup>

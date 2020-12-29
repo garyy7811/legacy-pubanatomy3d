@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<v:TreeGridRendererRow xmlns:fx="http://ns.adobe.com/mxml/2009"
+                       xmlns:v="edu.umich.med.mbni.treedatagrid.*"
+                       rollOver="if( structureCellData!=null) structureCellData.setMouseOverFromCell( true )"
+                       rollOut="if( structureCellData!=null)structureCellData.setMouseOverFromCell( false )"
+                       clipAndEnableScrolling="true">
+    <fx:Script><![CDATA[
+        import edu.umich.med.mbni.pubanatomy.atlas.model.StructureTreeGridDataRow;
+
+        [Bindable(event="cellDataChanged")]
+        public function get structureCellData():StructureTreeGridDataCell{
+            return cellData as StructureTreeGridDataCell;
+        }
+
+        [Bindable("dataChange")]
+        public function get structureRowData():StructureTreeGridDataRow{
+            return rowData as StructureTreeGridDataRow;
+        }
+
+        private function set rfrCurrentState( ignoreVar:* ):void{
+            if( states.length > 0 ){
+                currentState = ( structureCellData.mouseOver ? 'hovered' : 'normal' );
+            }
+        }
+        ]]></fx:Script>
+    <fx:Binding source="structureCellData.mouseOver" destination="rfrCurrentState"/>
+</v:TreeGridRendererRow>

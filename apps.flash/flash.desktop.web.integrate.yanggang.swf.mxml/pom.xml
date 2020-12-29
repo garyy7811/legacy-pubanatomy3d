@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>pubanatomy.app.pubanatomy.desktop.web.integrate.yanggang.swf.mxml</artifactId>
+    <version>0.3-SNAPSHOT</version>
+    <packaging>swf</packaging>
+
+    <parent>
+        <groupId>edu.umich.med.mbni</groupId>
+        <artifactId>pubanatomy.parent.flash.swf</artifactId>
+        <version>0.1-SNAPSHOT</version>
+        <relativePath>../../mvn.parent.flash.web/pom.xml</relativePath>
+    </parent>
+
+    <properties>
+        <!--<web.dir>../../apps.java/web.tomcat/src/main/webapp/${v0.2.secret.admin.folder}</web.dir>-->
+        <web.dir>${pubanatomy.hostSWF.webapp.dir}/${pubanatomy.hostSWF.webapp.secret.admin.dir}</web.dir>
+        <html.title>Pubanatomy.yanggang</html.title>
+    </properties>
+    <dependencies>
+        <dependency>
+            <groupId>edu.umich.med.mbni</groupId>
+            <artifactId>pubanatomy.module.desktop.web.integrate.yanggang.mxml</artifactId>
+            <version>0.1-SNAPSHOT</version>
+            <type>swc</type>
+        </dependency>
+        <dependency>
+            <groupId>edu.umich.med.mbni</groupId>
+            <artifactId>pubanatomy.module.flash.remote.data.service</artifactId>
+            <version>0.1-SNAPSHOT</version>
+            <type>swc</type>
+        </dependency>
+    </dependencies>
+</project>

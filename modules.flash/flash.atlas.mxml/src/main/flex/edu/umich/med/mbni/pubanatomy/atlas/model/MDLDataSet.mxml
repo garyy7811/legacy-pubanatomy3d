@@ -1,0 +1,301 @@
+<?xml version="1.0"?>
+<as3lib:MxmlEventDispatcher xmlns:fx="http://ns.adobe.com/mxml/2009"
+                            xmlns:s="library://ns.adobe.com/flex/spark"
+                            xmlns:as3lib="com.flashflexpro.as3lib.*">
+    <fx:Script><![CDATA[
+        import edu.umich.med.mbni.pubanatomy.flash.dto.DtoGeneExprLevel;
+
+        import mx.collections.XMLListCollection;
+
+        [Bindable]
+        public var color:uint = 0xffff00;
+
+        [Bindable]
+        public var modelGene:MDLGene;
+
+        [Bindable]
+        public var sectionDataSetId:int;
+
+        [Bindable]
+        public var dataSetXml:XML;
+
+        [Bindable]
+        public var matrix3d:Matrix3D;
+
+        [Bindable]
+        public var matrix3dInvert:Matrix3D;
+
+        [Bindable]
+        public var geneExprDistributing:Boolean = false;
+
+        [Bindable]
+        public var projectionDir:int = -1;
+
+        private function destroyImg( gImg:MDLISHImage ):void{
+            gImg.destroy();
+        }
+
+        private function xml2Image( img:XML ):MDLISHImage{
+            var rt:MDLISHImage = new MDLISHImage();
+            rt.sectionImageId = uint( img.id.toString() );
+            rt.modelSectionDs = this;
+            rt.width = uint( img["image-width"].toString() );
+            rt.height = uint( img["image-height"].toString() );
+
+            rt.sectionNumber = uint( img[ "section-number" ].toString() );
+            var sectionThickness:uint = uint( dataSetXml["section-thickness"].toString() );
+
+            rt.vz = rt.sectionNumber * sectionThickness;
+
+            var imgAl2d:XML = img.alignment2d[0];
+
+            if( imgAl2d != null ){
+                rt.matrix2d = new Matrix(
+                        Number( imgAl2d["tsv-00"].toString() ),
+                        Number( imgAl2d["tsv-02"].toString() ),
+
+                        Number( imgAl2d["tsv-01"].toString() ),
+                        Number( imgAl2d["tsv-03"].toString() ),
+
+                        Number( imgAl2d["tsv-04"].toString() ),
+                        Number( imgAl2d["tsv-05"].toString() ) );
+
+                rt.matrix2dInvert = new Matrix(
+                        Number( imgAl2d["tvs-00"].toString() ),
+                        Number( imgAl2d["tvs-02"].toString() ),
+
+                        Number( imgAl2d["tvs-01"].toString() ),
+                        Number( imgAl2d["tvs-03"].toString() ),
+
+                        Number( imgAl2d["tvs-04"].toString() ),
+                        Number( imgAl2d["tvs-05"].toString() ) );
+            }
+
+            rt.imageXml = img;
+            return rt;
+        }
+
+        public function destroy():void{
+            while( sectionImageList.length > 0 ){
+                destroyImg( sectionImageList.removeItemAt( 0 ) as MDLISHImage );
+            }
+            imgXml2Model.destroy();
+            this.modelGene = null;
+            this.dataSetXml = null;
+            this.sectionImageList = null;
+        }
+
+        private function set rfrSectionImages( ignoreVar:* ):void{
+            refreshSectionImages();
+        }
+        public function refreshSectionImages():void{
+            if( dataSetXml != null && imgXml2Model.source == null ){
+                var dsAl3d:XML = dataSetXml.alignment3d[0];
+
+                if( dsAl3d == null ){
+                    CONFIG::debugging{
+                        trace( this + ".rfrSectionImages sectionDataSetId-->" + sectionDataSetId );
+                    }
+                    return;
+                }
+
+                matrix3d = new Matrix3D( new <Number>[
+                    Number( dsAl3d["tvr-00"].toString() ),
+                    Number( dsAl3d["tvr-03"].toString() ),
+                    Number( dsAl3d["tvr-06"].toString() ),
+                    0,
+
+                    Number( dsAl3d["tvr-01"].toString() ),
+                    Number( dsAl3d["tvr-04"].toString() ),
+                    Number( dsAl3d["tvr-07"].toString() ),
+                    0,
+
+                    Number( dsAl3d["tvr-02"].toString() ),
+                    Number( dsAl3d["tvr-05"].toString() ),
+                    Number( dsAl3d["tvr-08"].toString() ),
+                    0,
+
+                    Number( dsAl3d["tvr-09"].toString() ),
+                    Number( dsAl3d["tvr-10"].toString() ),
+                    Number( dsAl3d["tvr-11"].toString() ),
+                    0
+                ] );
+                matrix3dInvert = new Matrix3D( new <Number>[
+                    Number( dsAl3d["trv-00"].toString() ),
+                    Number( dsAl3d["trv-03"].toString() ),
+                    Number( dsAl3d["trv-06"].toString() ),
+                    0,
+
+                    Number( dsAl3d["trv-01"].toString() ),
+                    Number( dsAl3d["trv-04"].toString() ),
+                    Number( dsAl3d["trv-07"].toString() ),
+                    0,
+
+                    Number( dsAl3d["trv-02"].toString() ),
+                    Number( dsAl3d["trv-05"].toString() ),
+                    Number( dsAl3d["trv-08"].toString() ),
+                    0,
+
+                    Number( dsAl3d["trv-09"].toString() ),
+                    Number( dsAl3d["trv-10"].toString() ),
+                    Number( dsAl3d["trv-11"].toString() ),
+                    0
+                ] );
+
+                imgXml2Model.source = new XMLListCollection( dataSetXml["section-images"]["section-image"] );
+            }
+        }
+        ]]></fx:Script>
+    <fx:Binding source="dataSetXml" destination="rfrSectionImages"/>
+    <fx:Declarations>
+        <fx:String id="label">
+            {
+            dataSetXml['plane-of-section'].name.toString()
+            /*+ ',ref space' + dataSetXml['reference-space-id'].toString()*/
+            + ',' + sectionImageList.length + 'images'
+            }
+        </fx:String>
+        <as3lib:Sync2Lists id="imgXml2Model"
+                           destination="{sectionImageList}" getDestInst="xml2Image"
+                           destroyInst="destroyImg"/>
+        <s:ArrayList id="sectionImageList"/>
+    </fx:Declarations>
+    <fx:Script><![CDATA[
+        [Bindable]
+        public var minAtlasPosition:int = int.MAX_VALUE;
+
+        [Bindable]
+        public var maxAtlasPosition:int = int.MIN_VALUE;
+
+        private function getSecImgPstn( img:MDLISHImage ):int{
+            var rt:int = img.projectionPosition / modelGene.model.config.unitLength;
+            minAtlasPosition = Math.min( minAtlasPosition, rt );
+            maxAtlasPosition = Math.max( maxAtlasPosition, rt );
+            return rt;
+        }
+
+        public function getClosestIndex( atlasPosition:Number ):uint{
+            var minDiv:Number = Number.MAX_VALUE;
+            var selectedIndex:uint;
+            for( var j:int = imgPositionLst.length - 1; j >= 0; j-- ){
+                var p:int = imgPositionLst.getItemAt( j ) as int;
+                var tmp:Number = Math.abs( atlasPosition - p );
+                if( tmp < minDiv ){
+                    minDiv = tmp;
+                    selectedIndex = j;
+                }
+            }
+            return selectedIndex;
+        }
+        ]]></fx:Script>
+    <fx:Declarations>
+        <as3lib:Sync2Lists source="{sectionImageList}" getDestInst="getSecImgPstn">
+            <as3lib:destination>
+                <s:ArrayList id="imgPositionLst"/>
+            </as3lib:destination>
+        </as3lib:Sync2Lists>
+    </fx:Declarations>
+
+    <fx:Script><![CDATA[
+        public static const EXPR_TYPE_density:String = "density";
+        public static const EXPR_TYPE_intensity:String = "intensity";
+        public static const EXPR_TYPE_energy:String = "energy";
+
+        public static const EXPR_Types:ArrayList = new ArrayList(
+                [ EXPR_TYPE_density, EXPR_TYPE_intensity, EXPR_TYPE_energy ] );
+
+        public function onExprLevel( dto:DtoGeneExprLevel ):void{
+            expressions.setItemAt( dto, EXPR_Types.getItemIndex( dto.type ) );
+        }
+
+        [ArrayElementType("edu.umich.med.mbni.pubanatomy.flash.dto.DtoGeneExprLevel")]
+        [Bindable]
+        public var expressions:ArrayList = new ArrayList( [ null, null, null ] );
+
+        public function getExprByType( type:String ):DtoGeneExprLevel{
+            var idx:int = EXPR_Types.getItemIndex( type );
+            CONFIG::debugging{
+                if( idx < 0 ){
+                    throw new Error( this + ".getExprByType " );
+                }
+            }
+            return expressions.getItemAt( idx ) as DtoGeneExprLevel;
+        }
+
+        public function findClosestImage( dir:uint, position:int ):MDLISHImage{
+
+            var rt:MDLISHImage;
+            for( var j:int = sectionImageList.length - 1; j >= 0; j-- ){
+                var img:MDLISHImage = sectionImageList.getItemAt( j ) as MDLISHImage;
+                if( img.modelSectionDs.projectionDir != dir ){
+                    return null;
+                }
+                if( rt == null ){
+                    rt = img;
+                }
+                else{
+                    rt = Math.abs( img.projectionPosition - position ) > Math.abs( rt.projectionPosition - position ) ? rt : img;
+                }
+            }
+            return rt;
+        }
+        ]]></fx:Script>
+    <fx:Declarations>
+        <as3lib:Sync2Lists source="{sectionImageList}" getDestInst="getImgAtlasId"
+                           propertiesReplaceOnUpdate="{ [ 'svgId' ] }">
+            <as3lib:destination>
+                <s:ArrayList id="atlasImgIdList"/>
+            </as3lib:destination>
+        </as3lib:Sync2Lists>
+    </fx:Declarations>
+    <fx:Script><![CDATA[
+        private function getImgAtlasId( img:MDLISHImage ):Number{
+            rfrAllImgIdReady = null;
+            return img.svgId;
+        }
+
+
+        private var _allImgAtlasSvgIdReady:Boolean = false;
+        [Bindable(event="allImgAtlasSvgIdReadyChanged")]
+        public function get allImgAtlasSvgIdReady():Boolean{
+            return _allImgAtlasSvgIdReady;
+        }
+
+        private function set rfrAllImgIdReady( i:* ):void{
+            modelGene.model.callInNext.putIn( refreshImgIdAndStructure );
+        }
+
+        private function refreshImgIdAndStructure():void{
+            for( var j:int = atlasImgIdList.length - 1; j >= 0; j-- ){
+                var aid:Number = atlasImgIdList.getItemAt( j ) as Number;
+                if( isNaN( aid ) ){
+                    break;
+                }
+            }
+
+            _allImgAtlasSvgIdReady = true;
+            dispatchEvent( new Event( "allImgAtlasSvgIdReadyChanged" ) );
+        }
+        ]]></fx:Script>
+    <fx:Script><![CDATA[
+        [Bindable]
+        public var exprLevelAvail:Dictionary;
+
+        private var _exAv:IsExprLevelAvail;
+
+        private function set rfrExprAvail( ignoreVar:* ):void{
+            if( sectionDataSetId > 0 && _exAv == null && exprLevelAvail == null ){
+                _exAv = new IsExprLevelAvail();
+                _exAv.sectionDataSet = this;
+                _exAv.callRemote();
+            }
+        }
+
+        public function onExprLevelAvail( r:Dictionary ):void{
+            exprLevelAvail = r;
+            _exAv = null;
+            modelGene.checkDatasetExprAvail();
+        }
+        ]]></fx:Script>
+    <fx:Binding source="sectionDataSetId" destination="rfrExprAvail"/>
+</as3lib:MxmlEventDispatcher>

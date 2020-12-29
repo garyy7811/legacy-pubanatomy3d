@@ -1,0 +1,57 @@
+<?xml version="1.0"?>
+<rs:GetXmlFromAba xmlns:fx="http://ns.adobe.com/mxml/2009"
+                  xmlns:rs="edu.umich.med.mbni.pubanatomy.flash.rs.*">
+    <fx:Script><![CDATA[
+        import edu.umich.med.mbni.pubanatomy.flash.dto.DtoGene;
+
+        [Bindable]
+        public var geneFacets:Array;
+
+        [Bindable]
+        public var modelFacetGene:ResultFacetGeneSymbols;
+
+        override protected function onXMLResult( x:XML ):void{
+            super.onXMLResult( x );
+            var gLst:XMLList = result.children()[0].children();
+            const len:int = gLst.length();
+            var lst:Array = [];
+            for( var j:int = 0; j < len; j++ ){
+                var d:DtoGene = new DtoGene();
+                var x:XML = gLst[ j ] as XML;
+                d.ensemblId = x[ "entrez-id" ].toString();
+                d.geneId = x[ "id" ].toString();
+                d.acronym = x.acronym.toString();
+                d.name = x.name.toString();
+                lst.push( d );
+            }
+            resultGenes = lst;
+            modelFacetGene.onGenesResult( this );
+        }
+
+        [Bindable]
+        public var resultGenes:Array;
+
+        override public function callRemote():Boolean{
+
+            var params:Array = [];
+            for( var i:int = geneFacets.length - 1; i >= 0; i-- ){
+                var f2c:ResultFacetTerm2CountGene = geneFacets[ i ] as ResultFacetTerm2CountGene;
+                if( modelFacetGene is ResultFacetGeneSymbols ){
+                    var ts:String = f2c.term;
+                    ts = ts.substr( 0, 1 ).toUpperCase() + ts.substr( 1 );
+                    params.push( "'" + ts + "'" );
+                }
+                else{//ResultFacetGeneIDs
+                    params.push( Number( f2c.term ) );
+                }
+            }
+            paramStrAfterQ =( ( modelFacetGene is ResultFacetGeneSymbols ) ? "criteria=model::Gene,rma::criteria[acronym$in"
+                    + params.join( ',' )
+                    + "],rma::include,products[species$eqMouse]" : "criteria=model::Gene,rma::criteria[entrez_id$in"
+                    + params.join( ',' )
+                    + "]" );
+            return super.callRemote();
+        }
+        ]]></fx:Script>
+    <fx:Binding source="modelFacetGene.fieldGene.searchModel" destination="model"/>
+</rs:GetXmlFromAba>

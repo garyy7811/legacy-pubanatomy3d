@@ -1,0 +1,235 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:SparkSkin xmlns:fx="http://ns.adobe.com/mxml/2009"
+             xmlns:s="library://ns.adobe.com/flex/spark" xmlns:wd="edu.umich.med.mbni.webdesktop.*"
+             blendMode="normal" mouseEnabled="false"
+             minWidth="131" minHeight="1" alpha.disabled="0.5">
+    <fx:Metadata>[HostComponent("edu.umich.med.mbni.webdesktop.TiBoTlePanel")]</fx:Metadata>
+    <fx:Script>
+        <![CDATA[
+        /**
+         * @private
+         */
+        override protected function initializationComplete():void{
+            useChromeColor = true;
+            super.initializationComplete();
+        }
+
+        /**
+         * @private
+         */
+        override protected function updateDisplayList( unscaledWidth:Number, unscaledHeight:Number ):void{
+            if( getStyle( "borderVisible" ) == true ){
+                if( panelBorder != null ){
+                    panelBorder.visible = true;
+                }
+                var cr:Number = getStyle( "cornerRadius" );
+
+                if( cornerRadius != cr ){
+                    cornerRadius = cr;
+
+                }
+                if( dropShadow != null ){
+                    dropShadow.tlRadius = cornerRadius;
+                    dropShadow.trRadius = cornerRadius;
+                    dropShadow.blRadius = cornerRadius;
+                    dropShadow.brRadius = cornerRadius;
+                }
+
+                setPartCornerRadii( topMaskRect );
+                setPartCornerRadii( background );
+                setPartCornerRadii( panelBorder );
+                setPartCornerRadii( bottomMaskRect );
+
+                if( borderStroke != null ){
+                    borderStroke.color = getStyle( "borderColor" );
+                    borderStroke.alpha = getStyle( "borderAlpha" );
+                    borderStroke.weight = getStyle( "borderWeight" );
+                }
+                background.left = background.top = background.right = background.bottom = borderStroke.weight;
+                contents.left = contents.top = contents.right = contents.bottom = borderStroke.weight;
+            }
+            else{
+                if( panelBorder != null ){
+                    panelBorder.visible = false;
+                }
+                background.left = background.top = background.right = background.bottom = 0;
+                contents.left = contents.top = contents.right = contents.bottom = 0;
+            }
+
+            backgroundFill.color = getStyle( "backgroundColor" );
+            backgroundFill.alpha = getStyle( "backgroundAlpha" );
+
+            if( winBorder != null ){
+                winBorder.updateStyle();
+            }
+
+            super.updateDisplayList( unscaledWidth, unscaledHeight );
+        }
+
+        /**
+         * @private
+         */
+        private function setPartCornerRadii( target:Rect ):void{
+            if( target == null ){
+                return;
+            }
+            target.topLeftRadiusX = cornerRadius;
+            target.topRightRadiusX = cornerRadius;
+            target.bottomLeftRadiusX = cornerRadius;
+            target.bottomRightRadiusX = cornerRadius;
+        }
+
+        private var cornerRadius:Number;
+        ]]>
+    </fx:Script>
+    <s:states>
+        <s:State name="normal" stateGroups="noWin,nml"/>
+        <s:State name="disabled" stateGroups="noWin,dsbl"/>
+        <s:State name="normalWin" stateGroups="win,nml"/>
+        <s:State name="disabledWin" stateGroups="win,dsbl"/>
+    </s:states>
+
+    <s:RectangularDropShadow id="dropShadow" blurX="20" blurY="20" alpha="0.32" distance="11" includeIn="win"
+                             angle="90" color="#000000" left="0" top="0" right="0" bottom="0"/>
+    <s:Group left="0" right="0" top="0" bottom="0">
+
+        <!-- top group mask -->
+        <!--- @private -->
+        <s:Group left="1" top="1" right="1" bottom="1" id="topGroupMask">
+            <!--- @private -->
+            <s:Rect id="topMaskRect" left="0" top="0" right="0" bottom="0">
+                <s:fill>
+                    <s:SolidColor alpha="0"/>
+                </s:fill>
+            </s:Rect>
+        </s:Group>
+
+        <!-- bottom group mask -->
+        <!--- @private -->
+        <s:Group left="1" top="1" right="1" bottom="1" id="bottomGroupMask">
+            <!--- @private -->
+            <s:Rect id="bottomMaskRect" left="0" top="0" right="0" bottom="0">
+                <s:fill>
+                    <s:SolidColor alpha="0"/>
+                </s:fill>
+            </s:Rect>
+        </s:Group>
+
+        <!-- layer 1: border -->
+        <!--- @private -->
+        <s:Rect id="panelBorder" left="0" right="0" top="0" bottom="0">
+            <s:stroke>
+                <!--- @private -->
+                <s:SolidColorStroke id="borderStroke" weight="1"/>
+            </s:stroke>
+        </s:Rect>
+
+        <!-- layer 2: background fill -->
+        <!--- Defines the appearance of the PanelSkin class's background. -->
+        <s:Rect id="background" left="1" top="1" right="1" bottom="1">
+            <s:fill>
+                <!--- @private
+             Defines the  PanelSkin class's background fill. The default color is 0xFFFFFF. -->
+                <s:SolidColor id="backgroundFill" color="#FFFFFF"/>
+            </s:fill>
+        </s:Rect>
+
+        <!-- layer 3: contents -->
+        <!--- Contains the vertical stack of titlebar content and controlbar. -->
+        <s:Group left="1" right="1" top="1" bottom="1" id="contents">
+            <s:layout>
+                <s:VerticalLayout gap="0" horizontalAlign="justify"/>
+            </s:layout>
+
+            <!--- @private -->
+            <s:Group id="topGroup" mask="{topGroupMask}" left="0" right="0" top="0" bottom="0">
+                <!-- layer 0: title bar fill -->
+                <!--- @private -->
+                <s:Rect id="tbFill" left="0" right="0" top="0" bottom="1">
+                    <s:fill>
+                        <s:LinearGradient rotation="90">
+                            <s:GradientEntry color="0xE2E2E2"/>
+                            <s:GradientEntry color="0xD9D9D9"/>
+                        </s:LinearGradient>
+                    </s:fill>
+                </s:Rect>
+
+                <!-- layer 1: title bar highlight -->
+                <!--- @private -->
+                <s:Rect id="tbHilite" left="0" right="0" top="0" bottom="0">
+                    <s:stroke>
+                        <s:LinearGradientStroke rotation="90" weight="1">
+                            <s:GradientEntry color="0xEAEAEA"/>
+                            <s:GradientEntry color="0xD9D9D9"/>
+                        </s:LinearGradientStroke>
+                    </s:stroke>
+                </s:Rect>
+
+                <!-- layer 2: title bar divider -->
+                <!--- @private -->
+                <s:Rect id="tbDiv" left="0" right="0" height="1" bottom="0">
+                    <s:fill>
+                        <s:SolidColor color="0xC0C0C0"/>
+                    </s:fill>
+                </s:Rect>
+
+                <s:Group id="titleGroup" left="3" right="3" top="2" bottom="2" toolTip="{hostComponent.titleTooltip}">
+                    <s:Label maxDisplayedLines="1" width="100%" id="titleLabel" text="{hostComponent.title}"
+                             verticalAlign="middle" textAlign="start" fontWeight="bold"/>
+                </s:Group>
+            </s:Group>
+
+            <!--
+                Note: setting the minimum size to 0 here so that changes to the host component's
+                size will not be thwarted by this skin part's minimum size.   This is a compromise,
+                more about it here: http://bugs.adobe.com/jira/browse/SDK-21143
+            -->
+            <!--- @copy spark.components.SkinnableContainer#contentGroup -->
+            <s:Group id="contentGroup" width="100%" height="100%" minWidth="0" minHeight="0"
+                     clipAndEnableScrolling="true"/>
+
+            <!--- @private -->
+            <s:Group id="bottomGroup" minWidth="0" minHeight="0">
+
+                <s:Group left="0" right="0" top="0" bottom="0" mask="{bottomGroupMask}">
+
+                    <!-- layer 0: control bar divider line -->
+                    <s:Rect left="0" right="0" top="0" height="1" alpha="0.22">
+                        <s:fill>
+                            <s:SolidColor color="0x000000"/>
+                        </s:fill>
+                    </s:Rect>
+
+                    <!-- layer 1: control bar highlight -->
+                    <s:Rect left="0" right="0" top="1" bottom="0">
+                        <s:stroke>
+                            <s:LinearGradientStroke rotation="90" weight="1">
+                                <s:GradientEntry color="0xE5E5E5"/>
+                                <s:GradientEntry color="0xD8D8D8"/>
+                            </s:LinearGradientStroke>
+                        </s:stroke>
+                    </s:Rect>
+
+                    <!-- layer 2: control bar fill -->
+                    <s:Rect left="1" right="1" top="2" bottom="1">
+                        <s:fill>
+                            <s:LinearGradient rotation="90">
+                                <s:GradientEntry color="0xDADADA"/>
+                                <s:GradientEntry color="0xC5C5C5"/>
+                            </s:LinearGradient>
+                        </s:fill>
+                    </s:Rect>
+                </s:Group>
+                <!-- layer 3: control bar -->
+                <!--- @copy spark.components.Panel#controlBarGroup -->
+                <s:Group id="botleGroup" left="0" right="0" top="1" bottom="1" minWidth="0" minHeight="0" toolTip="{hostComponent.botleTooltip}">
+                    <s:layout>
+                        <s:HorizontalLayout paddingLeft="0" paddingRight="0" paddingTop="0" paddingBottom="0"
+                                            gap="2"/>
+                    </s:layout>
+                </s:Group>
+            </s:Group>
+        </s:Group>
+    </s:Group>
+    <wd:WebWindowSkinResizeBorder window="{hostComponent}" id="winBorder" includeIn="win"/>
+</s:SparkSkin>

@@ -1,0 +1,76 @@
+<?xml version="1.0"?>
+<s:SkinnableContainer xmlns:fx="http://ns.adobe.com/mxml/2009"
+                      xmlns:s="library://ns.adobe.com/flex/spark"
+                      skinClass="edu.umich.med.mbni.free2dcoror.FreeCorordinate2dSkin">
+    <fx:Script><![CDATA[
+        [Bindable]
+        private var _dirVerBigHor:Boolean = true;
+
+        <!--v dir value normally bigger than h dir value-->
+        public static const dirVerBigHor_CHANGED:String = "dirVerBigHorChanged";
+
+        [Bindable]
+        public var clippingRectangle:Rectangle;
+
+        [Bindable(event="dirVerBigHorChanged")]
+        public function get dirVerBigHor():Boolean{
+            return _dirVerBigHor;
+        }
+
+        public function setDirVerBigHor( value:Boolean ):void{
+            if( value != _dirVerBigHor ){
+                _dirVerBigHor = value;
+                dispatchEvent( new Event( dirVerBigHor_CHANGED ) );
+            }
+        }
+
+
+        [Bindable]
+        private var _dirHor:Boolean = true;
+        public static const dirHor_CHANGED:String = "dirHorChanged";
+
+        [Bindable(event="dirHorChanged")]
+        public function get dirHor():Boolean{
+            return _dirHor;
+        }
+
+        internal function setDirHor( value:Boolean ):void{
+            if( value != _dirHor ){
+                _dirHor = value;
+                dispatchEvent( new Event( dirHor_CHANGED ) );
+            }
+        }
+
+        [Bindable]
+        private var _dirVer:Boolean = true;
+
+        public static const dirVer_CHANGED:String = "dirVerChanged";
+
+        [Bindable(event="dirVerChanged")]
+        public function get dirVer():Boolean{
+            return _dirVer;
+        }
+
+        internal function setDirVer( value:Boolean ):void{
+            if( value != _dirVer ){
+                _dirVer = value;
+                dispatchEvent( new Event( dirVer_CHANGED ) );
+            }
+        }
+        ]]></fx:Script>
+    <fx:Declarations>
+        <fx:int id="horDir">-1</fx:int>
+        <fx:int id="verDir">-1</fx:int>
+
+        <fx:int id="margin">20</fx:int>
+
+        <fx:uint id="lineColor">0x000000</fx:uint>
+        <fx:uint id="lineWeight">2</fx:uint>
+
+        <fx:uint id="textColor">0x000000</fx:uint>
+        <fx:String id="hTxt">x</fx:String>
+        <fx:String id="vTxt">y</fx:String>
+        <fx:String id="cTxt">z:p</fx:String>
+    </fx:Declarations>
+
+</s:SkinnableContainer>

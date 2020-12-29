@@ -1,0 +1,66 @@
+<?xml version="1.0"?>
+<as3lib:MxmlEventDispatcher xmlns:fx="http://ns.adobe.com/mxml/2009"
+                            xmlns:as3lib="com.flashflexpro.as3lib.*"
+        >
+    <fx:Script><![CDATA[
+        public function onEnterFrame():void{
+            var obj2argSkip:Dictionary;
+            for( var f:* in _func2dic ){
+                var func:Function = f as Function;
+                obj2argSkip = _func2dic[ f ];
+                var still:Boolean = false;
+                for( var thisObj:Object in obj2argSkip ){
+                    var argSkip:Array = obj2argSkip[ thisObj ];
+                    argSkip[ 1 ]--;
+                    if( argSkip[ 1 ] <= 0 ){
+                        try{
+                            func.apply( thisObj, argSkip[ 0 ] );
+                        }
+                        catch( e:Error ){
+                            CONFIG::debugging{
+                                trace( e.getStackTrace() );
+                            }
+                        }
+                        delete obj2argSkip[ thisObj ];
+                    }
+                    else{
+                        still = true;
+                    }
+                }
+                if( !still ){
+                    delete _func2dic[ f ];
+                }
+            }
+        }
+
+        private var _func2dic:Dictionary = new Dictionary();
+
+        public function putIn( func:Function, thisObj:Object = null, args:Array = null, skipFrameNum:int = 1 ):Boolean{
+            var obj2argSkip:Dictionary = _func2dic[ func ];
+            if( obj2argSkip == null ){
+                obj2argSkip = new Dictionary();
+                _func2dic[ func ] = obj2argSkip;
+            }
+            else{
+                if( obj2argSkip[ thisObj ] != null ){
+                    return false;
+                }
+            }
+
+            obj2argSkip[ thisObj ] = [ args, skipFrameNum  ];
+            return true;
+        }
+
+        public function getFunctionThisArgSkip( func:Function ):Array{
+            return _func2dic[ func ] as Array;
+        }
+
+        public function cancel( func:Function ):void{
+            delete _func2dic[ func ];
+        }
+
+        public function cancelAll():void{
+            _func2dic = new Dictionary();
+        }
+        ]]></fx:Script>
+</as3lib:MxmlEventDispatcher>

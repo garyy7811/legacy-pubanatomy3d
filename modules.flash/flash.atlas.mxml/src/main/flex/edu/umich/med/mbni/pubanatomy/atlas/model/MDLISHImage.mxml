@@ -1,0 +1,288 @@
+<?xml version="1.0"?>
+<as3lib:MxmlEventDispatcher xmlns:fx="http://ns.adobe.com/mxml/2009"
+                            xmlns:as3lib="com.flashflexpro.as3lib.*"
+                            xmlns:model="edu.umich.med.mbni.pubanatomy.atlas.model.*">
+    <fx:Script><![CDATA[
+        import edu.umich.med.mbni.utils.ModelOperationMenuChildren;
+        import edu.umich.med.mbni.utils.ModelOperationMenuItemLink;
+
+        import mx.events.PropertyChangeEvent;
+
+        [Bindable]
+        public var modelSectionDs:MDLDataSet;
+
+        [Bindable]
+        public var imageXml:XML;
+
+        //um!!!!
+        [Bindable]
+        public var projectionPosition:Number;
+
+        [Bindable]
+        public var projectionValMax:int = int.MIN_VALUE;
+
+        [Bindable]
+        public var projectionValMin:int = int.MAX_VALUE;
+
+        [Bindable]
+        public var width:uint;
+
+        [Bindable]
+        public var height:uint;
+
+        [Bindable]
+        public var sectionNumber:uint;
+
+        private function set rfrProperties( ignoreVar:* ):void{
+            if( imageXml != null ){
+                var vLT:Vector3D = point2vector3d( new Point( 0, 0 ) );
+                var vRT:Vector3D = point2vector3d( new Point( width, 0 ) );
+                var vRB:Vector3D = point2vector3d( new Point( width, height ) );
+                var vLB:Vector3D = point2vector3d( new Point( 0, height ) );
+
+                var arr:Vector.<String> = new <String>[ "x", "y", "z" ];
+                var p:int = -1;
+                var m:Number = Number.MAX_VALUE;
+                var cr:Vector3D = vLT.subtract( vRB );
+                for( var dir:int = arr.length - 1; dir >= 0; dir-- ){
+                    var xyz:String = arr[ dir ] as String;
+                    var dirMinus:Number = Math.abs( cr[ xyz ] );
+                    if( m > dirMinus ){
+                        m = dirMinus;
+                        p = dir;
+                    }
+                }
+
+                modelSectionDs.projectionDir = p;
+                var dirStr:String = arr[ p ] as String;
+                projectionPosition = ( vRB[ dirStr ] + vLT[ dirStr ] ) / 2;
+
+                var min:Number = Number.MAX_VALUE;
+                var max:Number = Number.MIN_VALUE;
+                var corners:Vector.<Vector3D> = new <Vector3D>[ vLT, vRT, vRB, vLB ];
+                for( var j:int = corners.length - 1; j >= 0; j-- ){
+                    var c:Vector3D = corners[ j ] as Vector3D;
+                    min = Math.min( c[ dirStr ], min );
+                    max = Math.max( c[ dirStr ], max );
+                }
+
+                projectionValMax = max;
+                projectionValMin = min;
+
+                //only have sagital(2) and coronal( 0 )
+                if( modelSectionDs.projectionDir != 1 ){
+                    loadAtlasSvgId();
+                }
+                else{
+                    _svgId = Number.MIN_VALUE;
+                    dispatchEvent( PropertyChangeEvent.createUpdateEvent( this, "svgId", NaN, _svgId ) );
+                }
+            }
+        }
+
+        [Bindable]
+        public var sectionImageId:Number = -1;
+
+        [Bindable]
+        public var matrix2d:Matrix;
+
+        [Bindable]
+        public var matrix2dInvert:Matrix;
+
+        public var vz:Number;
+
+        public function point2vector3d( p:Point ):Vector3D{
+            p = matrix2d.transformPoint( p );
+            return modelSectionDs.matrix3d.transformVector( new Vector3D( p.x, p.y, vz ) );
+        }
+
+        public function vector3dToPoint( vector3D:Vector3D ):Point{
+            var v:Vector3D = modelSectionDs.matrix3dInvert.transformVector( vector3D );
+            return matrix2dInvert.transformPoint( new Point( v.x, v.y ) );
+        }
+
+        public function destroy():void{
+            this.imageXml = null;
+            this.matrix2d = null;
+            this.modelSectionDs = null;
+        }
+
+        private function destroySvgLoader():void{
+            _svgLoader.removeEventListener( Event.COMPLETE, loadSvgImg );
+            _svgLoader.removeEventListener( IOErrorEvent.IO_ERROR, loadSvgImg );
+            _svgLoader = null;
+            dispatchEvent( new Event( "svgLoaderChanged" ) );
+        }
+
+        private var _atlasSvgIdLoader:URLLoader;
+
+        private function loadAtlasSvgId( event:Event = null ):void{
+            if( _atlasSvgIdLoader == null && isNaN( _svgId ) ){
+                _atlasSvgIdLoader = new URLLoader();
+                _atlasSvgIdLoader.addEventListener( Event.COMPLETE, loadAtlasSvgId );
+                _atlasSvgIdLoader.addEventListener( IOErrorEvent.IO_ERROR, loadAtlasSvgId );
+                _atlasSvgIdLoader.dataFormat = URLLoaderDataFormat.TEXT;
+                _atlasSvgIdLoader.load( new URLRequest( "http://api.brain-map.org/api/v2/image_to_atlas/" + sectionImageId + ".xml"
+                                                                + "?x=" + Math.round( width / 2 )
+                                                                + "&y=" + Math.round( height / 2 )
+                                                                + "&atlas_id=" + ( modelSectionDs.projectionDir == 0 ? "1" : "2" ) ) );
+            }
+            else if( isNaN( _svgId ) && event != null ){
+                _svgId = new XML( _atlasSvgIdLoader.data ).children()[ "section-image-id" ];
+                dispatchEvent( PropertyChangeEvent.createUpdateEvent( this, "svgId", NaN, _svgId ) );
+
+                _atlasSvgIdLoader.removeEventListener( Event.COMPLETE, loadAtlasSvgId );
+                _atlasSvgIdLoader.removeEventListener( IOErrorEvent.IO_ERROR, loadAtlasSvgId );
+                _atlasSvgIdLoader = null;
+            }
+            else{
+                throw new Error();
+            }
+        }
+
+        private var _svgId:Number = NaN;
+        [Bindable(event="svgIdChanged")]
+        public function get svgId():Number{
+            return _svgId;
+        }
+
+        public function onMenu():void{
+            var modelOperationMenuChildren:ModelOperationMenuChildren = new ModelOperationMenuChildren( [] );
+            modelOperationMenuChildren.target = this;
+            modelSectionDs.modelGene.model.setMenuOperations( modelOperationMenuChildren );
+        }
+
+        public function linkToAllenBrain():ModelOperationMenuItemLink{
+            return new ModelOperationMenuItemLink( "http://mouse.brain-map.org/experiment/siv?imageId=" + sectionImageId + "&imageType=ish",
+                                                   "See Image details on Allen Brain" )
+        }
+        ]]></fx:Script>
+    <fx:Binding source="imageXml" destination="rfrProperties"/>
+
+    <fx:Script><![CDATA[
+        private var _svgSize:Point;
+        public function get svgSize():Point{
+            return _svgSize;
+        }
+
+        private var _svgImg:XML;
+        [Bindable(event="propertyChange")]
+        public function get svgImg():XML{
+            return _svgImg;
+        }
+
+        private var _svgLoader:URLLoader;
+        [Bindable(event="svgLoaderChanged")]
+        public function get svgLoader():URLLoader{
+            return _svgLoader;
+        }
+
+        public function loadSvgImg( event:Event = null ):void{
+            if( event == null && _svgLoader == null && !isNaN( _svgId ) && _svgImg == null ){
+                _svgLoader = new URLLoader();
+                dispatchEvent( new Event( "svgLoaderChanged" ) );
+                _svgLoader.addEventListener( Event.COMPLETE, loadSvgImg );
+                _svgLoader.addEventListener( IOErrorEvent.IO_ERROR, loadSvgImg );
+                _svgLoader.dataFormat = URLLoaderDataFormat.TEXT;
+
+                _svgLoader.load( new URLRequest( "http://api.brain-map.org/api/v2/svg_download/" + _svgId + "?groups=28" ) );
+            }
+            else if( _svgImg == null && event != null ){
+                var old:XML = _svgImg;
+                _svgImg = new XML( _svgLoader.data );
+                dispatchEvent( PropertyChangeEvent.createUpdateEvent( this, "svgImg", old, _svgImg ) );
+
+                try{
+                    _svgSize = new Point( _svgImg.@width, _svgImg.@height );
+
+                    var pathes:XMLList = _svgImg.children();
+                    while( uint( pathes[ 0 ].@structure_id ) == 0 ){
+                        pathes = pathes[ 0 ].children();
+                    }
+                    if( pathes.length() > 0 ){
+                        var tmp:Dictionary = new Dictionary();
+                        for( var i:int = pathes.length() - 1; i >= 0; i-- ){
+                            var path:XML = pathes[ i ] as XML;
+                            var structureId:uint = uint( path.@structure_id );
+
+                            var ps:Vector.<XML> = tmp[ structureId ] as Vector.<XML>;
+                            if( ps == null ){
+                                ps = new Vector.<XML>();
+                                tmp[ structureId ] = ps;
+                            }
+                            ps.push( path );
+                        }
+                        _structure2Path = tmp;
+                        dispatchEvent( new Event( "dicChanged" ) );
+                    }
+                    else{
+                        _svgImg = new XML( "<n/>" );
+                    }
+                }
+                catch( e:Error ){
+                    CONFIG::debugging{
+                        trace( this + ".onLoaded: e:" + e.getStackTrace() );
+                    }
+                }
+                destroySvgLoader();
+            }
+        }
+
+        private var _structure2Path:Dictionary;
+        [Bindable(event="dicChanged")]
+        public function get structure2Path():Dictionary{
+            return _structure2Path;
+        }
+        ]]></fx:Script>
+    <fx:Script><![CDATA[
+        import mx.collections.ArrayList;
+        import mx.collections.IList;
+
+        private var _sectionsLoader:GetImageSectionsByImgId;
+        [Bindable(event="sectionsLoaderChanged")]
+        public function get sectionsLoader():GetImageSectionsByImgId{
+            return _sectionsLoader;
+        }
+
+        public function loadSections():void{
+            if( _sectionsLoader == null && _sections == null ){
+                _sectionsLoader = new GetImageSectionsByImgId();
+                dispatchEvent( new Event( "sectionsLoaderChanged" ) );
+                _sectionsLoader.sectionImage = this;
+                _sectionsLoader.model = modelSectionDs.modelGene.model;
+                _sectionsLoader.callRemote();
+            }
+        }
+
+        private var _sections:IList;
+        [Bindable(event="propertyChange")]
+        public function get sections():IList{
+            return _sections;
+        }
+
+        public function onEdges( edges:IList ):void{
+            if( _sections != edges ){
+
+                var old:IList = _sections;
+
+                if( edges != null && edges.length == 0 ){
+                    _sections = new ArrayList();
+                    CONFIG::debugging{
+                        trace( "empty Edges ---->" + sectionImageId );
+                    }
+                }
+
+                _sections = edges;
+                dispatchEvent( PropertyChangeEvent.createUpdateEvent( this, "sections", old, _sections ) );
+
+                _sectionsLoader.destroy();
+                _sectionsLoader = null;
+                dispatchEvent( new Event( "sectionsLoaderChanged" ) );
+            }
+        }
+        ]]></fx:Script>
+    <fx:Declarations>
+        <model:MDLISHImageBitmap id="thumb" downSample="99999" quality="20" sectionImage="{this}"/>
+    </fx:Declarations>
+
+</as3lib:MxmlEventDispatcher>

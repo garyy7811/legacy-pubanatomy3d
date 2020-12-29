@@ -1,0 +1,52 @@
+<?xml version="1.0"?>
+<utils:RootModelModule xmlns:fx="http://ns.adobe.com/mxml/2009"
+                       xmlns:s="library://ns.adobe.com/flex/spark"
+                       xmlns:as3lib="com.flashflexpro.as3lib.*"
+                       xmlns:utils="edu.umich.med.mbni.utils.*">
+    <fx:Script><![CDATA[
+        import edu.umich.med.mbni.pubanatomy.voxel3d.model.RootModelVoxel3d;
+        import edu.umich.med.mbni.pubanatomy.voxel3d.model.Voxel3dStructure;
+
+
+        [Bindable]
+        public var rootModelVoxel3d:RootModelVoxel3d;
+
+        private function atlasToSection2dStructure( s:Voxel3dStructure ):ModelSection2dStructure{
+            var rt:ModelSection2dStructure = new ModelSection2dStructure();
+            rt.structure3d = s;
+            rt.rootModel = this as RootModelSection2d;
+            return rt;
+        }
+
+        private function addOnSection2dStructures( s:ModelSection2dStructure ):ModelSection2dStructure{
+            if( s.onSection2d && onSection2dStructures.getItemIndex( s ) < 0 ){
+                onSection2dStructures.addItem( s );
+            }
+            return s;
+        }
+
+        private function removeOnSection2dStructures( s:ModelSection2dStructure ):void{
+            onSection2dStructures.removeItem( s );
+        }
+        ]]></fx:Script>
+    <fx:Declarations>
+        <!--{-->
+        <as3lib:Sync2Lists id="syncAtlasStructure2Section2d"
+                           source="{rootModelVoxel3d.all3dVoxel3dStructures}"
+                           getDestInst="atlasToSection2dStructure">
+            <as3lib:destination>
+                <s:ArrayList id="allSection2dStructures"/>
+            </as3lib:destination>
+        </as3lib:Sync2Lists>
+        <as3lib:Sync2Lists source="{allSection2dStructures}"
+                           getDestInst="addOnSection2dStructures"
+                           destroyInst="removeOnSection2dStructures">
+            <as3lib:destination>
+                <s:ArrayList id="__onSection2dStructuresDummy"/>
+            </as3lib:destination>
+        </as3lib:Sync2Lists>
+
+        <s:ArrayList id="onSection2dStructures"/>
+    </fx:Declarations>
+
+</utils:RootModelModule>

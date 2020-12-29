@@ -1,0 +1,82 @@
+<?xml version="1.0"?>
+<datadriven3dwindow:Dd3dViewMeshBase xmlns:fx="http://ns.adobe.com/mxml/2009"
+                                     xmlns:datadriven3dwindow="edu.umich.med.mbni.pubanatomy.datadriven3dwindow.*"
+        >
+    <fx:Script>
+        <![CDATA[
+        import away3d.core.pick.PickingColliderType;
+        import away3d.events.MouseEvent3D;
+        import away3d.materials.ColorMaterial;
+        import away3d.materials.lightpickers.StaticLightPicker;
+
+        [Bindable(event="mouseEnabledChanged")]
+        override public function get mouseEnabled():Boolean{
+            return super.mouseEnabled;
+        }
+
+        override public function set mouseEnabled( value:Boolean ):void{
+            if( value != super.mouseEnabled ){
+                super.mouseEnabled = value;
+                if( value ){
+                    addEventListener( MouseEvent3D.MOUSE_OVER, onMouse3d );
+                    addEventListener( MouseEvent3D.MOUSE_MOVE, onMouse3d );
+                    addEventListener( MouseEvent3D.MOUSE_OUT, onMouse3d );
+                }
+                else{
+                    removeEventListener( MouseEvent3D.MOUSE_OVER, onMouse3d );
+                    removeEventListener( MouseEvent3D.MOUSE_MOVE, onMouse3d );
+                    removeEventListener( MouseEvent3D.MOUSE_OUT, onMouse3d );
+                }
+                dispatchEvent( new Event( "mouseEnabledChanged" ) );
+            }
+        }
+
+        public function onMouse3d( event:MouseEvent3D ):void{
+            if( scene == null ){
+                return;
+            }
+            dd3dScene.model.mouseLastPosition = event.localPosition;
+            if( event.type == MouseEvent3D.MOUSE_OVER ){
+                dd3dScene.model.setMouseOverObj( model as Dd3dModelMeshBase );
+                _mouseOverOthers = true;
+            }
+            else if( event.type == MouseEvent3D.MOUSE_OUT ){
+                dd3dScene.model.callInNext.putIn( checkIfRemoveMe, null, null, 3 );
+                _mouseOverOthers = false;
+            }
+        }
+        private static var _mouseOverOthers:Boolean = false;
+
+        private function checkIfRemoveMe():void{
+            if( !_mouseOverOthers && dd3dScene.model.mouseOverObj == model ){
+                dd3dScene.model.setMouseOverObj( null );
+            }
+        }
+
+        override protected function getMaterial():ColorMaterial{
+            var mat:ColorMaterial = super.getMaterial();
+
+            if( mat.lightPicker == null && dd3dScene.cameraLight != null ){
+                mat.lightPicker = new StaticLightPicker( [ dd3dScene.cameraLight ] );
+                pickingCollider = PickingColliderType.PB_BEST_HIT;
+                mat.gloss = 0;
+            }
+
+            if( dd3dScene.mouseOverMesh == this ){
+                mat.ambient = 1;
+            }
+            else{
+                mat.ambient = 0.5;
+            }
+
+            if( model.selected ){
+                mat.specular = 1;
+            }
+            else{
+                mat.specular = 0;
+            }
+            return mat;
+        }
+        ]]></fx:Script>
+
+</datadriven3dwindow:Dd3dViewMeshBase>

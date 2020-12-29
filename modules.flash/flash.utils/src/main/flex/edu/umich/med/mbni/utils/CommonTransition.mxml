@@ -1,0 +1,90 @@
+<?xml version="1.0"?>
+<mx:Transition xmlns:fx="http://ns.adobe.com/mxml/2009"
+               xmlns:mx="library://ns.adobe.com/flex/mx"
+               xmlns:s="library://ns.adobe.com/flex/spark"
+               autoReverse="true">
+    <fx:Script><![CDATA[
+        import mx.core.FlexGlobals;
+        import mx.core.UIComponent;
+
+        import spark.components.Application;
+
+        [Bindable]
+        public var currentState:String;
+
+        private var _target:UIComponent;
+
+        [Bindable(event="targetChanged")]
+        public function get target():UIComponent{
+            return _target;
+        }
+
+        public function set target( value:UIComponent ):void{
+            if( value != _target ){
+                _target = value;
+                dispatchEvent( new Event( "targetChanged" ) );
+                if( _target != null ){
+                    _app = FlexGlobals.topLevelApplication as Application;
+                    _app.addEventListener( Event.ENTER_FRAME, onEnterFrame );
+                }
+                else{
+                    throw new Error( "target can't change to null!!" );
+                }
+            }
+        }
+
+        private var _app:Application;
+
+        [Bindable]
+        public var minLen:uint = 44;
+
+        [Bindable]
+        public var playing:Boolean;
+
+        private var _targetVal:Boolean = false;
+
+        private function onStart():void{
+            playing = true;
+
+            _endVisible = ( currentState == toState );
+
+            target.visible = true;
+            target.includeInLayout = true;
+        }
+
+        private var _endVisible:Boolean;
+
+        private function onEnd():void{
+            playing = false;
+            target.visible = _endVisible;
+            target.includeInLayout = _endVisible;
+        }
+        ]]></fx:Script>
+    <s:Parallel target="{target}" effectStart="onStart();" effectEnd="onEnd();" duration="432"
+                effectStop="playing = false;" suspendBackgroundProcessing="true">
+        <s:Fade alphaFrom="0.1" alphaTo="1" id="fade"/>
+        <s:Scale3D scaleXFrom="0" scaleXTo="1" autoCenterProjection="true" autoCenterTransform="true"/>
+    </s:Parallel>
+
+    <fx:Script><![CDATA[
+        private var _count:uint = 0;
+        private static const _countLimit:uint = 9;
+
+        private function onEnterFrame( ev:Event ):void{
+            if( target != null
+                    && _app != null
+                    && _app.initialized
+                    && currentState != null
+                    && currentState.length > 0 ){
+
+                target.visible = target.includeInLayout = ( toState == currentState );
+                if( _count < _countLimit ){
+                    _count++;
+                    return;
+                }
+                _app.removeEventListener( Event.ENTER_FRAME, onEnterFrame );
+                _app = null;
+            }
+        }
+        ]]></fx:Script>
+</mx:Transition>

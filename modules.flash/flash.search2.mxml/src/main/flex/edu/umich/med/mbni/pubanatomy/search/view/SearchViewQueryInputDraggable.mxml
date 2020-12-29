@@ -1,0 +1,63 @@
+<?xml version="1.0"?>
+<s:SkinnableContainer xmlns:fx="http://ns.adobe.com/mxml/2009"
+                      xmlns:s="library://ns.adobe.com/flex/spark"
+                      xmlns:view="edu.umich.med.mbni.pubanatomy.search.view.*"
+                      skinClass="edu.umich.med.mbni.pubanatomy.search.view.SearchViewQueryInputDraggableSkin"
+        >
+    <fx:Script><![CDATA[
+        import edu.umich.med.mbni.utils.RootModelModule;
+
+        import mx.core.DragSource;
+
+        import spark.components.Button;
+
+        [Bindable]
+        public var termSuggestGroup:ViewTermSuggestGroup;
+
+        [Bindable]
+        public var drdr:SearchViewQueryInputDrDr;
+
+        [SkinPart(required="true")]
+        public var topGroup:SkinnableContainer;
+
+        override protected function partAdded( partName:String, instance:Object ):void{
+            super.partAdded( partName, instance );
+            if( instance == topGroup ){
+                topGroup.addEventListener( MouseEvent.MOUSE_DOWN, onDragDown );
+                topGroup.addEventListener( MouseEvent.MOUSE_MOVE, onDragMove );
+            }
+        }
+
+        override protected function partRemoved( partName:String, instance:Object ):void{
+            super.partRemoved( partName, instance );
+            if( instance == topGroup ){
+                topGroup.removeEventListener( MouseEvent.MOUSE_DOWN, onDragDown );
+                topGroup.removeEventListener( MouseEvent.MOUSE_MOVE, onDragMove );
+            }
+        }
+
+        private var _mouseDown:Boolean;
+
+        private function onDragDown( ev:MouseEvent ):void{
+            stage.addEventListener( MouseEvent.MOUSE_UP, onDragUp, false, 0, true );
+            _mouseDown = true;
+        }
+
+        private function onDragUp( ev:MouseEvent ):void{
+            _mouseDown = false;
+        }
+
+        private function onDragMove( event:MouseEvent ):void{
+            if( event.target is Button || !_mouseDown
+                    || drdr.model.queryStr == null
+                    || drdr.model.query.queryResult.searchModel.rootApp.dragging != null ){
+                return;
+            }
+            var dragSource:DragSource = new DragSource();
+            dragSource.addData( drdr.model, RootModelModule.DRAGGING_FORMAT );
+            drdr.model.query.queryResult.searchModel.doDrag( this, dragSource, event );
+        }
+        ]]></fx:Script>
+    <view:SearchViewQueryInput2Or1 id="relate2" drdr="{drdr}" termSuggestGroup="{termSuggestGroup}"
+                                   width="100%" height="100%"/>
+</s:SkinnableContainer>

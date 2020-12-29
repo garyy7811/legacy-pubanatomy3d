@@ -1,0 +1,180 @@
+<?xml version="1.0"?>
+<m:ResultBase xmlns:fx="http://ns.adobe.com/mxml/2009" xmlns:as3lib="com.flashflexpro.as3lib.*"
+              xmlns:m="edu.umich.med.mbni.pubanatomy.search.model.*" xmlns:s="library://ns.adobe.com/flex/spark">
+    <fx:Script><![CDATA[
+        import edu.umich.med.mbni.pubanatomy.flash.dto.DtoFacetResultMedline;
+        import edu.umich.med.mbni.pubanatomy.flash.dto.DtoResultRecordMedline;
+
+        private var _query:Query;
+
+        [Bindable(event="queryChanged")]
+        public function get query():Query{
+            return _query;
+        }
+
+        public function sendQuery( q:Query ):void{
+            if( _query != null ){
+                _query.destroy();
+            }
+            discardResults();
+
+            _query = q;
+            dispatchEvent( new Event( "queryChanged" ) );
+            getMoreResults();
+        }
+
+        [Bindable]
+        public var sortField:QueryField;
+
+        [Bindable]
+        public var sortDescending:Boolean;
+
+        private var _numFound:int = -1;
+        [Bindable(event="numFoundChanged")]
+        public function get numFound():int{
+            return _numFound;
+        }
+
+        private var _result:DtoFacetResultMedline;
+
+        override public function onResult( result:DtoFacetResultMedline ):void{
+            _result = result;
+            for each( var r:DtoResultRecordMedline in result.rQueryRecords ){
+                onResultRecord( String( r.pmid ), r );
+            }
+            if( result.rFacetsRecords != null ){
+                for( var i:uint = 0; i < facets.length; i++ ){
+                    var tmp:ResultFacet = facets.getItemAt( i ) as ResultFacet;
+                    tmp.onResult( result );
+                    tmp.filterTxt = "";
+                }
+            }
+
+            _numFound = result.rNumFound;
+            dispatchEvent( new Event( "numFoundChanged" ) );
+            super.onResult( result );
+        }
+
+        override public function getMoreResults():void{
+            if( _query == null || ( resultList.length == _numFound && _numFound > 0 ) ){
+                CONFIG::debugging{
+                    if( numFound < 0 ){
+                        throw new Error( this + ".getMoreResults " );
+                    }
+                }
+                return;
+            }
+            setRpc( queryResult.searchModel.instantiate( SearchWithFacet ) as SearchWithFacet );
+            rpc.startRow = resultList.length;
+            if( resultList.length == 0 ){
+                rpc.rowNum = pageRows;
+                rpc.field2offsetLimitPrefixSort = {};
+                var f:ResultFacet;
+                for( var i:uint = 0; i < facets.length; i++ ){
+                    f = facets.getItemAt( i ) as ResultFacet;
+                    CONFIG::debugging{
+                        if( 10 > f.pageRows ){
+                            throw new Error( this + ".getMoreResults won't auto scroll and load" );
+                        }
+                    }
+                    rpc.field2offsetLimitPrefixSort[ f.field.id ] = [ 0, f.pageRows ];
+                }
+            }
+            else{
+                rpc.rowNum = pageRows;
+                rpc.field2offsetLimitPrefixSort = null;
+            }
+            rpc.sortField = sortField;
+            rpc.desc = sortDescending;
+            super.getMoreResults();
+        }
+
+        public function sortResultBy( field:QueryField, sd:Boolean ):void{
+            if( query == null ){
+                return;
+            }
+            discardResults();
+            sortField = field;
+            sortDescending = sd;
+            getMoreResults();
+        }
+
+        override public function discardResults():void{
+            super.discardResults();
+            var length:int = facetFields.length;
+            for( var i:uint = 0; i < length; i++ ){
+                ( facets.getItemAt( i ) as ResultFacet ).discardResults();
+            }
+        }
+        ]]></fx:Script>
+
+    <fx:Declarations>
+        <s:ArrayList id="facetFields">
+            <fx:Object>{queryResult.searchModel.geneSymbols}</fx:Object>
+            <fx:Object>{queryResult.searchModel.diseases}</fx:Object>
+            <fx:Object>{queryResult.searchModel.brainStructureSymbols}</fx:Object>
+        </s:ArrayList>
+
+        <s:ArrayList id="facets"/>
+        <as3lib:Sync2Lists source="{queryResult.searchModel==null?null:facetFields}"
+                           destination="{facets}"
+                           getDestInst="{field2Facet}" destroyInst="destroyFacet"/>
+    </fx:Declarations>
+    <fx:Script><![CDATA[
+        import edu.umich.med.mbni.utils.ModelOperationMenuChildren;
+
+        import mx.collections.ArrayCollection;
+
+        private function field2Facet( f:QueryField ):ResultFacet{
+            var resultFacet:ResultFacet = f.instanciateResultFacet();
+            resultFacet.field = f;
+            resultFacet.queryResult = queryResult;
+            return  resultFacet;
+        }
+
+        private function destroyFacet( f:ResultFacet ):void{
+            f.destroy();
+        }
+
+        public function showFacetsMenu():void{
+            var menus:Array = [];
+            for( var i:int = queryResult.searchModel.statisticFields.length - 1; i >= 0; i-- ){
+                var tf:QueryField = queryResult.searchModel.statisticFields.getItemAt( i ) as QueryField;
+                menus.push( new OperationAddRemoveFacet( this, tf ) );
+            }
+            var rt:ModelOperationMenuChildren = new ModelOperationMenuChildren( menus );
+            queryResult.searchModel.setMenuOperations( rt );
+        }
+
+        public function removeFacet( tf:QueryField ):void{
+            facetFields.removeItem( tf );
+        }
+        ]]></fx:Script>
+
+    <fx:Declarations>
+        <s:ArrayList id="columnFields">
+            <fx:Object>{queryResult.searchModel.pmid}</fx:Object>
+            <fx:Object>{queryResult.searchModel.articleAuthorFullNames}</fx:Object>
+            <fx:Object>{queryResult.searchModel.articleJournalPubDateYear}</fx:Object>
+            <fx:Object>{queryResult.searchModel.articleTitle}</fx:Object>
+            <fx:Object>{queryResult.searchModel.articleJournalTitle}</fx:Object>
+            <fx:Object>{queryResult.searchModel.abstractTexts}</fx:Object>
+        </s:ArrayList>
+    </fx:Declarations>
+    <fx:Script><![CDATA[
+        public function showColumnsMenu():void{
+            var allColumns:ArrayList = queryResult.searchModel.resultFields;
+            var mns:ArrayCollection = new ArrayCollection();
+            for( var i:int = allColumns.length - 1; i >= 0; i-- ){
+                var qf:QueryField = allColumns.getItemAt( i ) as QueryField;
+                mns.addItem( new OperationAddRemoveColumn( this, qf ) );
+            }
+
+            queryResult.searchModel.setMenuOperations( new ModelOperationMenuChildren( mns.toArray() ) );
+        }
+
+        public function removeColumnAt( idx:int ):void{
+            columnFields.removeItemAt( idx );
+        }
+        ]]></fx:Script>
+</m:ResultBase>

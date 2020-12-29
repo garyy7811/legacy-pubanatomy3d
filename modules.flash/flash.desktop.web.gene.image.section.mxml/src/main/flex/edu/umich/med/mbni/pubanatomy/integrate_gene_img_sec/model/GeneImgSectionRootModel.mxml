@@ -1,0 +1,95 @@
+<?xml version="1.0"?>
+<utils:RootModelApp xmlns:fx="http://ns.adobe.com/mxml/2009"
+                    xmlns:utils="edu.umich.med.mbni.utils.*"
+                    xmlns:v3dModel="edu.umich.med.mbni.pubanatomy.voxel3d.model.*"
+                    xmlns:atlasModel="edu.umich.med.mbni.pubanatomy.atlas.model.*"
+                    xmlns:section2dModel="edu.umich.med.mbni.pubanatomy.sectioninteract.model.*">
+
+    <fx:Script><![CDATA[
+        import edu.umich.med.mbni.pubanatomy.atlas.model.MDLGene;
+        import edu.umich.med.mbni.pubanatomy.flash.dto.DtoGene;
+        import edu.umich.med.mbni.pubanatomy.integrate_gene_img_sec.rs.LoadDtoGeneFromSectionImgId;
+
+        import mx.collections.ArrayList;
+
+        [Bindable]
+        public var geneDto:DtoGene;
+
+        override public function appInit():void{
+            super.appInit();
+            var loadDtoGeneFromSectionImgId:LoadDtoGeneFromSectionImgId = new LoadDtoGeneFromSectionImgId();
+            loadDtoGeneFromSectionImgId.model = this;
+            loadDtoGeneFromSectionImgId.callRemote();
+        }
+
+        [Bindable]
+        //        public var sectionImageId:Number = 73418719;
+        public var sectionImageId:Number = 73418709;
+        //        public var sectionImageId:Number = 73418717;
+
+        [Bindable]
+        public var sectionDSId:Number = -1;
+
+        private function set rfrGeneModel( ignoreVar:* ):void{
+            callInNext.putIn( refreshGeneModel );
+        }
+
+        private function refreshGeneModel():void{
+            if( _geneModelLst != null && _geneModelLst.length > 0 ){
+                CONFIG::debugging{
+                    if( _geneModelLst.length > 1 ){
+                        throw new Error( this + ".refreshGeneModel " );
+                    }
+                }
+                _theGeneModel = _geneModelLst.getItemAt( 0 ) as MDLGene;
+            }
+        }
+
+        [Bindable]
+        private var _geneModelLst:ArrayList;
+
+        [Bindable]
+        private var _theGeneModel:MDLGene;
+
+        ]]></fx:Script>
+    <fx:Binding source="rootModelAtlas.geneModelList" destination="_geneModelLst"/>
+    <fx:Binding source="_geneModelLst.length" destination="rfrGeneModel"/>
+
+    <fx:Script><![CDATA[
+        import edu.umich.med.mbni.pubanatomy.atlas.model.StructureTreeGridDataColumnGene;
+
+        private function set rfrSelectGeneCol( ignoreVar:* ):void{
+            rootModelAtlas.callInNext.putIn( refreshSelectGeneCol );
+        }
+
+        private function refreshSelectGeneCol():void{
+            if( rootModelVoxel3d != null
+                    && rootModelVoxel3d.on3dStageStructureTreeGridData.selectedGeneColumn == null
+                    && rootModelVoxel3d.on3dStageStructureTreeGridData.columns.length > 0
+                    ){
+
+                for( var j:int = rootModelVoxel3d.on3dStageStructureTreeGridData.columns.length - 1; j >= 0; j-- ){
+                    var o:StructureTreeGridDataColumnGene = rootModelVoxel3d.on3dStageStructureTreeGridData.columns.getItemAt( j ) as StructureTreeGridDataColumnGene;
+                    if( o != null ){
+                        rootModelVoxel3d.on3dStageStructureTreeGridData.selectedGeneColumn = o;
+                        break;
+                    }
+
+                }
+
+            }
+        }
+        ]]></fx:Script>
+    <fx:Binding source="rootModelVoxel3d.on3dStageStructureTreeGridData.columns.length" destination="rfrSelectGeneCol"/>
+    <fx:Declarations>
+        <section2dModel:RootModelSection2d id="rootModelSection2d" parent="{this}">
+            <section2dModel:rootModelVoxel3d>
+                <v3dModel:RootModelVoxel3d id="rootModelVoxel3d" parent="{this}">
+                    <v3dModel:rootModelAtlas>
+                        <atlasModel:RootModelAtlas id="rootModelAtlas" parent="{this}"/>
+                    </v3dModel:rootModelAtlas>
+                </v3dModel:RootModelVoxel3d>
+            </section2dModel:rootModelVoxel3d>
+        </section2dModel:RootModelSection2d>
+    </fx:Declarations>
+</utils:RootModelApp>

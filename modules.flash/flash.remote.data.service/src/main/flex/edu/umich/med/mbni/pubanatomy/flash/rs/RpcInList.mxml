@@ -1,0 +1,142 @@
+<?xml version="1.0"?>
+<rs:RpcBase xmlns:fx="http://ns.adobe.com/mxml/2009" xmlns:rs="edu.umich.med.mbni.pubanatomy.flash.rs.*">
+    <fx:Script><![CDATA[
+        import mx.collections.ArrayList;
+
+        [Bindable]
+        public var exemptFromMaxNum:Boolean = false;
+
+        [Bindable]
+        public var listOnWaiting:ArrayList;
+
+        [Bindable]
+        public var lstOnAir:ArrayList;
+
+        [Bindable]
+        public var singletonByUrl:Boolean = false;
+
+        public function getSameUrlRpcFromListOnAir():Vector.<RpcInList>{
+            return getSameUrlFromList( lstOnAir, _request.url );
+        }
+
+        public function getSameUrlFromWaitingQue():Vector.<RpcInList>{
+            return getSameUrlFromList( listOnWaiting, _request.url );
+        }
+
+        public static function getSameUrlFromList( lst:ArrayList, url:String ):Vector.<RpcInList>{
+            if( lst == null ){
+                return null;
+            }
+            var rt:Vector.<RpcInList> = new Vector.<RpcInList>();
+            for( var j:int = lst.length - 1; j >= 0; j-- ){
+                var rpcInList:RpcInList = lst.getItemAt( j ) as RpcInList;
+                if( rpcInList._request.url == url ){
+                    rt.push( rpcInList );
+                }
+            }
+            return rt;
+        }
+
+        override public function callRemote():Boolean{
+
+            CONFIG::debugging{
+                if( lstOnAir == null ){
+                    throw new Error( this + ".onInvoke " );
+                }
+            }
+
+            if( lstOnAir.getItemIndex( this ) >= 0 ){
+                throw new Error( "existing!!!!!" );
+            }
+
+            if( singletonByUrl ){
+                var snmLstOnAir:Vector.<RpcInList> = getSameUrlRpcFromListOnAir();
+                if( snmLstOnAir != null && snmLstOnAir.length > 0 ){
+                    CONFIG::debugging{
+                        if( snmLstOnAir.length > 1 ){
+                            throw new Error( this + ".callRemote " );
+                        }
+                    }
+                    if( listOnWaiting.getItemIndex( this ) < 0 ){
+                        listOnWaiting.addItem( this );
+                    }
+                    return false;
+                }
+            }
+
+            if( lstOnAir.length > model.rootApp.maxConcurrentRpcNum && !exemptFromMaxNum ){
+                if( listOnWaiting.getItemIndex( this ) < 0 ){
+                    listOnWaiting.addItem( this );
+                }
+                return false;
+            }
+
+            var rt:Boolean = super.callRemote();
+            if( rt ){
+                lstOnAir.addItem( this );
+            }
+            else{
+                if( listOnWaiting.getItemIndex( this ) < 0 ){
+                    listOnWaiting.addItem( this );
+                }
+            }
+            return rt;
+        }
+
+        override protected function onRawResult( result:Object ):void{
+            super.onRawResult( result );
+            removeMeAndTrigerNext();
+        }
+
+        override protected function onFault( event:ErrorEvent ):void{
+            super.onFault( event );
+            removeMeAndTrigerNext();
+        }
+
+        private function removeMeAndTrigerNext():void{
+            if( lstOnAir != null && lstOnAir.length > 0 ){
+                var myIndex:int = lstOnAir.getItemIndex( this );
+                CONFIG::debugging{
+                    if( myIndex < 0 && _lastFault == null){
+                        throw new Error( this + ".removeMeAndTrigerNext " );
+                    }
+                }
+                if( myIndex >= 0 ){
+                    lstOnAir.removeItemAt( myIndex );
+                }
+            }
+
+            if( listOnWaiting != null && listOnWaiting.length > 0 ){
+                var tmp:Array = listOnWaiting.toArray();
+                tmp.sortOn( "priority", Array.NUMERIC | Array.DESCENDING );
+
+                const len:int = tmp.length;
+                for( var j:int = 0; j < len; j++ ){
+                    var r:RpcInList = tmp[j] as RpcInList;
+                    if( r.callRemote() ){
+                        listOnWaiting.removeItem( r );
+                        return;
+                    }
+                }
+            }
+        }
+
+        override public function destroy():void{
+            super.destroy();
+            if( lstOnAir != null ){
+                var airIdx:int = lstOnAir.getItemIndex( this );
+                if( airIdx >= 0 ){
+                    lstOnAir.removeItemAt( airIdx );
+                }
+            }
+            if( listOnWaiting != null ){
+                var wIdx:int = listOnWaiting.getItemIndex( this );
+                if( wIdx >= 0 ){
+                    lstOnAir.removeItemAt( wIdx );
+                }
+            }
+        }
+        ]]></fx:Script>
+    <fx:Binding source="model.rpcOnAir" destination="lstOnAir"/>
+    <fx:Binding source="model.rpcWaitQue" destination="listOnWaiting"/>
+</rs:RpcBase>

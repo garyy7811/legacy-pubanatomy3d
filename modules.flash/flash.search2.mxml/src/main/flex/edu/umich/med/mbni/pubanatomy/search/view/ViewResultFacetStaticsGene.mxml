@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<sv:ViewResultFacetStatics xmlns:fx="http://ns.adobe.com/mxml/2009"
+                           xmlns:sv="edu.umich.med.mbni.pubanatomy.search.view.*">
+    <fx:Script><![CDATA[
+        override protected function onStaticsInit():void{
+            facetGrid = new ViewResultFacetStaticsGridGene();
+            facetGrid.facet = model;
+            facetGrid.percentHeight = 100;
+            facetGrid.percentWidth = 100;
+            addElement( facetGrid );
+        }
+        ]]></fx:Script>
+</sv:ViewResultFacetStatics>

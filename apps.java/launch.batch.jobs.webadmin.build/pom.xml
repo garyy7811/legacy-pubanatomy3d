@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+    <modelVersion>4.0.0</modelVersion>
+
+
+    <groupId>edu.umich.med.mbni</groupId>
+    <artifactId>pubanatomy.apps.launch.jobs.webadmin.build</artifactId>
+    <version>0.1-SNAPSHOT</version>
+    <packaging>pom</packaging>
+    <modules>
+        <module>../../mvn.parent.solr</module>
+        <module>../../mvn.parent.spring.batch</module>
+
+        <module>../../modules.java/java.utils</module>
+        <module>../../modules.java/java.dto</module>
+
+
+        <module>../../modules.java/java.solr.common</module>
+        <module>../../modules.java/java.solr.pmid2concept</module>
+        <module>../../modules.java/java.solr.medline</module>
+
+        <module>../../modules.java/java.batch.jobs.mongo</module>
+
+        <module>../../modules.java/java.batch.jobs.export</module>
+        <module>../launch.batch.jobs.webadmin</module>
+    </modules>
+</project>

@@ -1,0 +1,135 @@
+<?xml version="1.0"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009"
+         xmlns:s="library://ns.adobe.com/flex/spark"
+         xmlns:mx="library://ns.adobe.com/flex/mx"
+         xmlns:v="edu.umich.med.mbni.pubanatomy.integrate.view.*"
+         dragOver.s="onDragOverEnterDropExit( event );"
+         dragEnter.s="onDragOverEnterDropExit( event );"
+         dragDrop.s="onDragOverEnterDropExit( event );"
+         dragExit.s="onDragOverEnterDropExit( event );"
+        >
+    <fx:Script><![CDATA[
+        import edu.umich.med.mbni.pubanatomy.integrate.model.MDLDividableWidget;
+        import edu.umich.med.mbni.pubanatomy.voxel3d.view.V3dScene;
+
+        [Bindable]
+        public var model:MDLDividableWidget;
+
+        [Bindable]
+        public var scene:V3dScene;
+
+        private function set rfrState( v:* ):void{
+            if( model == null ){
+                return;
+            }
+            if( model.child1 != null && model.child2 != null ){
+                currentState = model.isVerticalOrHorizontal ? "vd" : "hd";
+            }
+            else if( model.sectionPlane != null ){
+                currentState = "sSec";
+            }
+            else{
+                currentState = "s3d";
+            }
+        }
+        ]]></fx:Script>
+    <fx:Binding source="model.child1" destination="rfrState"/>
+    <fx:Binding source="model.child2" destination="rfrState"/>
+    <fx:Binding source="model.isVerticalOrHorizontal" destination="rfrState"/>
+    <fx:Binding source="model.sectionPlane" destination="rfrState"/>
+    <s:states>
+        <s:State name="s3d" stateGroups="s"/>
+        <s:State name="sSec" stateGroups="s"/>
+        <s:State name="hd" stateGroups="d"/>
+        <s:State name="vd" stateGroups="d"/>
+    </s:states>
+
+    <v:WidgetCamera includeIn="s3d" width="100%" height="100%"
+                    model="{model}" scene="{scene}"/>
+    <v:WidgetSection includeIn="sSec" width="100%" height="100%"
+                     model="{model}"/>
+    <mx:DividedBox includeIn="d" width="100%" height="100%"
+                   dividerSkin="edu.umich.med.mbni.utils.DividerSkin"
+                   direction.hd="horizontal" direction.vd="vertical">
+        <v:WidgetDividable model="{model.child1}" width="100%" height="100%" scene="{scene}"/>
+        <v:WidgetDividable model="{model.child2}" width="100%" height="100%" scene="{scene}"/>
+    </mx:DividedBox>
+
+    <s:Rect id="dragOver">
+        <fx:Script><![CDATA[
+            import edu.umich.med.mbni.pubanatomy.atlas.model.MDLISHImage;
+            import edu.umich.med.mbni.pubanatomy.sectioninteract.model.ModelSectionPlane;
+            import edu.umich.med.mbni.utils.RootModelModule;
+
+            import mx.core.UIComponent;
+            import mx.events.DragEvent;
+            import mx.managers.DragManager;
+
+            private function onDragOverEnterDropExit( ev:DragEvent ):void{
+                dragOver.visible = false;
+
+                var dragging:Object = ev.dragSource.dataForFormat( RootModelModule.DRAGGING_FORMAT );
+                if( !( dragging is MDLISHImage) && !( dragging is ModelSectionPlane ) ){
+                    DragManager.showFeedback( DragManager.NONE );
+                    return;
+                }
+                if( dragging is ModelSectionPlane
+                        && model.getChildBySection( dragging as ModelSectionPlane ) != null ){
+                    DragManager.showFeedback( DragManager.NONE );
+                    return;
+                }
+
+                DragManager.showFeedback( DragManager.MOVE );
+                DragManager.acceptDragDrop( ev.target as UIComponent );
+
+                if( ev.type != DragEvent.DRAG_EXIT ){
+                    var isVer:Boolean;
+                    var newInFront:Boolean;
+                    var a:Number = Math.atan2( mouseY - height / 2, mouseX - width / 2 );
+                    if( Math.abs( a ) < Math.PI / 4 ){
+                        dragOver.top = 0;
+                        dragOver.bottom = 0;
+                        dragOver.right = 0;
+                        dragOver.left = width / 2;
+                        isVer = false;
+                        newInFront = false;
+                    }
+                    else if( Math.abs( a ) > 3 * Math.PI / 4 ){
+                        dragOver.top = 0;
+                        dragOver.bottom = 0;
+                        dragOver.right = width / 2;
+                        dragOver.left = 0;
+                        isVer = false;
+                        newInFront = true;
+                    }
+                    else if( a > Math.PI / 4 && a < 3 * Math.PI / 4 ){
+                        dragOver.top = height / 2;
+                        dragOver.bottom = 0;
+                        dragOver.right = 0;
+                        dragOver.left = 0;
+                        isVer = true;
+                        newInFront = false;
+                    }
+                    else if( a < -Math.PI / 4 && a > -3 * Math.PI / 4 ){
+                        dragOver.top = 0;
+                        dragOver.bottom = height / 2;
+                        dragOver.right = 0;
+                        dragOver.left = 0;
+                        isVer = true;
+                        newInFront = true;
+                    }
+
+                    if( ev.type == DragEvent.DRAG_DROP ){
+                        model.rootApp.cameraDiv.onDrop( model, isVer, newInFront, dragging );
+                    }
+                    else{
+                        dragOver.visible = true;
+                    }
+                }
+            }
+            ]]></fx:Script>
+        <s:fill>
+            <s:SolidColor alpha="0.5" color="0x888888"/>
+        </s:fill>
+    </s:Rect>
+</s:Group>

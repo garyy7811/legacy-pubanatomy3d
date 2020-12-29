@@ -1,0 +1,60 @@
+<?xml version="1.0"?>
+<v:TreeGridRendererHeader xmlns:fx="http://ns.adobe.com/mxml/2009"
+                          xmlns:s="library://ns.adobe.com/flex/spark"
+                          xmlns:v="edu.umich.med.mbni.treedatagrid.*"
+                          xmlns:view="edu.umich.med.mbni.pubanatomy.atlas.view.*"
+        >
+    <fx:Metadata>
+        [ResourceBundle("TextAtlas")]
+    </fx:Metadata>
+    <fx:Script><![CDATA[
+        import edu.umich.med.mbni.pubanatomy.atlas.model.StructureTreeGridData;
+        import edu.umich.med.mbni.pubanatomy.atlas.model.StructureTreeGridDataColumnGene;
+        import edu.umich.med.mbni.utils.RootModelModule;
+
+        import mx.core.DragSource;
+
+        [Bindable(event="treeGridDataChanged")]
+        public function get strTreeGridData():StructureTreeGridData{
+            return treeGridData as StructureTreeGridData;
+        }
+
+        [Bindable(event="treeGridColDataChanged")]
+        public function get colGeneModel():StructureTreeGridDataColumnGene{
+            return treeGridColData as StructureTreeGridDataColumnGene;
+        }
+        ]]></fx:Script>
+    <v:states>
+        <s:State name="normal"/>
+        <s:State name="hovered"/>
+    </v:states>
+    <fx:Script><![CDATA[
+        override protected function getDragSource():DragSource{
+            var rt:DragSource = new DragSource();
+            rt.addData( colGeneModel.gene.dtoGene, RootModelModule.DRAGGING_FORMAT );
+            return rt;
+        }
+        ]]></fx:Script>
+    <s:Rect width="100%" height="100%">
+        <s:stroke>
+            <s:Stroke color="0xFFFFFF" weight="3"/>
+        </s:stroke>
+        <s:fill>
+            <s:LinearGradient rotation="90">
+                <s:GradientEntry color="0xcccccc"/>
+                <s:GradientEntry color="0xffffff"/>
+            </s:LinearGradient>
+        </s:fill>
+    </s:Rect>
+    <view:StructureTreeGridColumnGeneHeaderExtr width="100%" height="100%" colGeneModel="{colGeneModel}"/>
+    <s:Rect height="100%" width="10" visible="false" id="leftDropIndicator" left="0">
+        <s:fill>
+            <s:SolidColor color="0x000000"/>
+        </s:fill>
+    </s:Rect>
+    <s:Rect height="100%" width="10" visible="false" id="rightDropIndicator" right="0">
+        <s:fill>
+            <s:SolidColor color="0x000000"/>
+        </s:fill>
+    </s:Rect>
+</v:TreeGridRendererHeader>

@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+<s:GridItemRenderer xmlns:fx="http://ns.adobe.com/mxml/2009" xmlns:s="library://ns.adobe.com/flex/spark">
+
+    <fx:Script><![CDATA[
+        import edu.umich.med.mbni.pubanatomy.search.model.ResultFacetTerm2Count;
+
+        [Bindable("dataChange")]
+        public function get facetCount():ResultFacetTerm2Count{
+            return data as ResultFacetTerm2Count;
+        }
+        ]]></fx:Script>
+    <s:states>
+        <s:State name="normal"/>
+        <s:State name="hovered"/>
+    </s:states>
+    <s:layout>
+        <s:HorizontalLayout verticalAlign="middle" horizontalAlign="center"/>
+    </s:layout>
+    <s:DataGroup dataProvider="{facetCount.equalTerms}" height="100%"
+                 itemRenderer="edu.umich.med.mbni.pubanatomy.search.view.SearchViewResultFacetGridRendererInQR">
+        <s:layout>
+            <s:HorizontalLayout verticalAlign="middle" gap="2"/>
+        </s:layout>
+    </s:DataGroup>
+    <s:Button label="Filter" includeIn="hovered" toolTip="refine search with this term"
+              skinClass="edu.umich.med.mbni.utils.UpLabelOverBtnSkin"
+              click="facetCount.onFilter();"/>
+</s:GridItemRenderer>

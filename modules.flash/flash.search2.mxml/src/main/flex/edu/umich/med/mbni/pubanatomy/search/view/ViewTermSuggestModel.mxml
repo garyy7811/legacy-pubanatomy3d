@@ -1,0 +1,96 @@
+<?xml version="1.0"?>
+<as3lib:MxmlEventDispatcher xmlns:fx="http://ns.adobe.com/mxml/2009" xmlns:as3lib="com.flashflexpro.as3lib.*">
+    <fx:Script><![CDATA[
+        import edu.umich.med.mbni.pubanatomy.search.model.*;
+        import edu.umich.med.mbni.pubanatomy.search.view.ViewTermSuggestRpc;
+
+        import mx.collections.ArrayCollection;
+
+        [Bindable]
+        public var queryTerm:QueryTermT;
+
+        private var _latestCompletingSuggestions:ArrayCollection;
+        public static const latestCompletingSuggestions_CHANGED:String = "latestCompletingSuggestionsChanged";
+
+        [Bindable(event="latestCompletingSuggestionsChanged")]
+        public function get latestCompletingSuggestions():ArrayCollection{
+            return _latestCompletingSuggestions;
+        }
+
+        private function setLatestCompletingSuggestions( value:ArrayCollection ):void{
+            if( value != _latestCompletingSuggestions ){
+                _latestCompletingSuggestions = value;
+                dispatchEvent( new Event( latestCompletingSuggestions_CHANGED ) );
+            }
+        }
+
+
+        /**
+         * prefix's result list or the rpc who is getting the list.
+         */
+        private var _prefixPointingTo:Object;
+        [Bindable(event="prefixOnGoingChanged")]
+        public function get prefixPointingTo():Object{
+            return _prefixPointingTo;
+        }
+
+        private function setPrefixOnGoing( value:Object ):void{
+            if( value != _prefixPointingTo ){
+                _prefixPointingTo = value;
+                dispatchEvent( new Event( "prefixOnGoingChanged" ) );
+                setLatestCompletingSuggestions( prefixPointingTo as ArrayCollection );
+            }
+        }
+
+        private var _prefix:String;
+        public function get prefix():String{
+            return _prefix;
+        }
+
+        public function refreshSuggestions( prefix:String ):void{
+            _prefix = prefix;
+            if( _prefix.length >= ( queryTerm.field as QueryFieldT ).minimalChar ){
+                searchModel.callInNext.putIn( callRemoteForTerms, this, [ prefix ] );
+            }
+        }
+
+        [Bindable]
+        public var searchModel:SearchModel;
+
+        /**
+         * QueryField can become null when rpc.
+         */
+        private var _tf:QueryTermT;
+
+        private function callRemoteForTerms( prefix:String ):void{
+            CONFIG::debugging{
+                if( queryTerm == null ){
+                    throw new Error( this + ".callRemoteForTerms " );
+                }
+            }
+
+            setPrefixOnGoing( queryTerm.autoCompleteDic[ prefix ] );
+            if( prefixPointingTo == null ){
+                var sgst:ViewTermSuggestRpc = new ViewTermSuggestRpc();
+                sgst.autoListModel = this;
+                sgst.prefixStr = prefix;
+                sgst.callRemote();
+                queryTerm.autoCompleteDic[ prefix ] = sgst;
+                _tf = queryTerm;
+                setPrefixOnGoing( sgst );
+                _latestPrefix = prefix;
+            }
+        }
+
+        private var _latestPrefix:String;
+
+        public function onResult( prefix:String, suggestions:ArrayCollection ):void{
+            if( suggestions != null ){
+                _tf.autoCompleteDic[ prefix ] = suggestions;
+            }
+            if( prefix == _latestPrefix ){
+                setPrefixOnGoing( suggestions );
+            }
+        }
+        ]]></fx:Script>
+</as3lib:MxmlEventDispatcher>

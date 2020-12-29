@@ -1,0 +1,66 @@
+<?xml version="1.0"?>
+<atlas:StructureTreeGrid xmlns:fx="http://ns.adobe.com/mxml/2009"
+                         xmlns:atlas="edu.umich.med.mbni.pubanatomy.atlas.view.*"
+                         width="380">
+    <fx:Script><![CDATA[
+        import edu.umich.med.mbni.pubanatomy.atlas.view.StructureTreeGridColumnGeneHeader;
+        import edu.umich.med.mbni.pubanatomy.voxel3d.model.RootModelVoxel3d;
+        import edu.umich.med.mbni.pubanatomy.voxel3d.model.Voxel3dStructureOn3dTreeGridData;
+        import edu.umich.med.mbni.pubanatomy.voxel3d.model.Voxel3dStructureTreeGridDataColumnGene;
+        import edu.umich.med.mbni.pubanatomy.voxel3d.model.Voxel3dStructureTreeGridDataColumnVisible;
+        import edu.umich.med.mbni.treedatagrid.TreeGridColumn;
+        import edu.umich.med.mbni.treedatagrid.TreeGridDataColumn;
+        import edu.umich.med.mbni.treedatagrid.TreeGridDataColumnTree;
+
+        import mx.events.DragEvent;
+        import mx.managers.DragManager;
+
+        [Bindable]
+        public var rootVoxelModel:RootModelVoxel3d;
+
+        override protected function onDragEnterOverDrop( event:DragEvent ):void{
+            super.onDragEnterOverDrop( event );
+            if( rootVoxelModel.on3dStageStructureTreeGridData.droppingV3dStructures != null ){
+                DragManager.showFeedback( DragManager.COPY );
+            }
+        }
+
+        [Bindable(event="treeGridDataChanged")]
+        public function get v3dTreeGridData():Voxel3dStructureOn3dTreeGridData{
+            return treeGridData as Voxel3dStructureOn3dTreeGridData;
+        }
+
+        override protected function columnModel2View( m:TreeGridDataColumn ):TreeGridColumn{
+            var rt:TreeGridColumn = super.columnModel2View( m );
+            if( m is Voxel3dStructureTreeGridDataColumnVisible ){
+                rt.headerRenderer = new ClassFactory( V3dStructureTreeGridColumnVisibleHeader );
+                rt.itemRenderer = new ClassFactory( V3dStructureTreeGridColumnVisibleRenderer );
+                rt.maxWidth = 80;
+                rt.minWidth = 40;
+                rt.width = 80;
+            }
+            else if( m is Voxel3dStructureTreeGridDataColumnGene ){
+                rt.headerRenderer = new ClassFactory( StructureTreeGridColumnGeneHeader );
+                rt.itemRenderer = new ClassFactory( V3dStructureTreeGridColumnGeneRenderer );
+            }
+            else if( m is TreeGridDataColumnTree ){
+                rt.itemRenderer = new ClassFactory( V3dStructureTreeGridColumnTreeItemRenderer );
+            }
+
+            return rt;
+        }
+        ]]></fx:Script>
+    <fx:Binding source="rootVoxelModel.on3dStageStructureTreeGridData" destination="treeGridData"/>
+    <fx:Script><![CDATA[
+
+        private function set rfrAjustSelectionAlpha( ignoreVar:* ):void{
+            if( v3dTreeGridData != null && v3dTreeGridData.isAjustingSelectedItemsAlpha ){
+                var c:V3dStructureTreeGridMultiAlphaAjust = new V3dStructureTreeGridMultiAlphaAjust();
+                c.v3dtreegriddata = v3dTreeGridData;
+                c.show();
+            }
+        }
+
+        ]]></fx:Script>
+    <fx:Binding source="v3dTreeGridData.isAjustingSelectedItemsAlpha" destination="rfrAjustSelectionAlpha"/>
+</atlas:StructureTreeGrid>

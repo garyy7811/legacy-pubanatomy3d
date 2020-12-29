@@ -1,0 +1,46 @@
+<?xml version="1.0"?>
+<view:WebWinBase xmlns:fx="http://ns.adobe.com/mxml/2009"
+                 xmlns:s="library://ns.adobe.com/flex/spark"
+                 xmlns:view="edu.umich.med.mbni.pubanatomy.integrate.view.*"
+                 title="Search Data Set from AllenBrain by Structure differential"
+        >
+    <fx:Script><![CDATA[
+        import edu.umich.med.mbni.pubanatomy.integrate.model.MDLTempAbaDatasetSearchRpcDiff;
+
+        [Bindable(event="dataChanged")]
+        public function get model():MDLTempAbaDatasetSearchRpcDiff{
+            return data as MDLTempAbaDatasetSearchRpcDiff;
+        }
+        ]]></fx:Script>
+    <view:layout>
+        <s:VerticalLayout paddingLeft="3" paddingBottom="3" paddingTop="3" paddingRight="3"/>
+    </view:layout>
+    <s:Form>
+        <s:FormItem label="Target Structures">
+            <s:layout>
+                <s:HorizontalLayout verticalAlign="middle"/>
+            </s:layout>
+            <view:TmpStructureListH id="str1" rootModel="{model.model}" dataProvider="@{model.structures1IdLst}"/>
+            <s:Label text="threshold:"/>
+            <s:HSlider minimum="0" maximum="7" value="@{model.threshold1}" stepSize="0.1" snapInterval="0.1"/>
+        </s:FormItem>
+        <s:FormItem label="Contrast Structures">
+            <s:layout>
+                <s:HorizontalLayout verticalAlign="middle"/>
+            </s:layout>
+            <view:TmpStructureListH id="str2" rootModel="{model.model}" dataProvider="@{model.structures2IdLst}"/>
+            <s:Label text="threshold:"/>
+            <s:HSlider minimum="0" maximum="7" value="@{model.threshold2}" stepSize="0.1" snapInterval="0.1"/>
+        </s:FormItem>
+    </s:Form>
+    <s:HGroup width="100%" horizontalAlign="right">
+        <s:CheckBox selected="@{model.coronalOnly}" label="Coronal data Only"/>
+        <s:Button label="Submit" click="model.callRemote()"
+                  enabled="{
+                      model.paramStrAfterQ != null
+                      &amp;&amp; model.paramStrAfterQ != model.lastParamStrAfterQ
+                      &amp;&amp; model.urlLoader == null
+                  }"/>
+    </s:HGroup>
+    <view:TmpGeneDataSetDataGrid model="{model}"/>
+</view:WebWinBase>

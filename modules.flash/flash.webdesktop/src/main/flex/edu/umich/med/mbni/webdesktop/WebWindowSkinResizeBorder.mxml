@@ -1,0 +1,160 @@
+<?xml version="1.0"?>
+<mx:UIComponent xmlns:fx="http://ns.adobe.com/mxml/2009" xmlns:s="library://ns.adobe.com/flex/spark"
+                xmlns:mx="library://ns.adobe.com/flex/mx" left="0" right="0" top="0" bottom="0"
+                mouseOver="onMouseOver();"
+                mouseDown="onMouseDown();"
+                mouseOut="onMouseOut();"
+        >
+    <fx:Script><![CDATA[
+        import mx.managers.CursorManager;
+
+        [Bindable]
+        [Embed(source="../../../../../../resources/resize-pie.png")]
+        private static var _resizeImgClsPie:Class;
+
+
+        [Bindable]
+        [Embed(source="../../../../../../resources/resize-nai.png")]
+        private static var _resizeImgClsNai:Class;
+
+
+        [Bindable]
+        [Embed(source="../../../../../../resources/resize-heng.png")]
+        private static var _resizeImgClsHeng:Class;
+
+
+        [Bindable]
+        [Embed(source="../../../../../../resources/resize-shu.png")]
+        private static var _resizeImgClsShu:Class;
+
+
+        [Bindable]
+        public var window:WebWindow;
+
+        private static const mouseRadius:int = 5;
+
+        private function onMouseOver():void{
+            if( _mouseDown == null ){
+                if( !hasEventListener( MouseEvent.MOUSE_MOVE ) ){
+                    addEventListener( MouseEvent.MOUSE_MOVE, onOverMove );
+                }
+                onOverMove();
+            }
+            updateStyle();
+        }
+
+        private function onMouseOut():void{
+            removeEventListener( MouseEvent.MOUSE_MOVE, onOverMove );
+            if( _mouseDown == null ){
+                updateStyle();
+                CursorManager.removeAllCursors();
+                _resizeDirection = null;
+            }
+            updateStyle();
+        }
+
+        private static var _windowDown:Rectangle;
+        private static var _mouseDown:Point;
+
+        private function onMouseDown():void{
+            onOverMove();
+            removeEventListener( MouseEvent.MOUSE_MOVE, onOverMove );
+            _mouseDown = new Point( stage.mouseX, stage.mouseY );
+            _windowDown = new Rectangle( window.x, window.y, window.width, window.height );
+            stage.addEventListener( MouseEvent.MOUSE_MOVE, onDragging );
+            stage.addEventListener( MouseEvent.MOUSE_UP, onMouseUp );
+        }
+
+        private function onMouseUp( event:MouseEvent ):void{
+            _mouseDown = null;
+            _windowDown = null;
+            stage.removeEventListener( MouseEvent.MOUSE_MOVE, onDragging );
+            stage.removeEventListener( MouseEvent.MOUSE_UP, onMouseUp );
+            CursorManager.removeAllCursors();
+            _resizeDirection = null;
+            updateStyle();
+        }
+
+        private var _resizeDirection:Point;
+
+        private function onOverMove( event:MouseEvent = null ):void{
+            var dir:Point = null;
+            if( mouseY > mouseRadius && window.height - mouseY > mouseRadius ){
+                CursorManager.setCursor( _resizeImgClsHeng, 1, -16, -16 );
+                dir = new Point( mouseX - window.width / 2, 0 );
+            }
+            else if( mouseX > mouseRadius && window.width - mouseX > mouseRadius ){
+                CursorManager.setCursor( _resizeImgClsShu, 1, -16, -16 );
+                dir = new Point( 0, mouseY - window.height / 2 );
+            }
+            else if( ( Math.abs( mouseX ) <= mouseRadius && Math.abs( mouseY ) <= mouseRadius ) ||
+                    ( Math.abs( mouseY - window.height ) <= mouseRadius &&
+                            Math.abs( mouseX - window.width ) <= mouseRadius ) ){
+                CursorManager.setCursor( _resizeImgClsNai, 1, -16, -16 );
+            }
+            else if( ( Math.abs( mouseX - window.width ) <= mouseRadius && Math.abs( mouseY ) <= mouseRadius) ||
+                    ( Math.abs( mouseX ) <= mouseRadius && Math.abs( window.height - mouseY ) <= mouseRadius ) ){
+                CursorManager.setCursor( _resizeImgClsPie, 1, -16, -16 );
+            }
+            if( dir == null ){
+                dir = new Point( mouseX - window.width / 2, mouseY - window.height / 2 );
+            }
+            _resizeDirection = dir;
+        }
+
+        private function onDragging( event:MouseEvent ):void{
+            var mdx:int = stage.mouseX - _mouseDown.x;
+            var mdy:int = stage.mouseY - _mouseDown.y;
+
+            var wdx:int;
+            var wdw:int;
+            var wdy:int;
+            var wdh:int;
+            if( _resizeDirection.x < 0 ){
+                if( mdx > _windowDown.width - window.minWidth ){
+                    mdx = _windowDown.width - window.minWidth;
+                }
+                wdx = mdx;
+                wdw = -mdx;
+            }
+            else if( _resizeDirection.x > 0 ){
+                if( mdx < window.minWidth - _windowDown.width ){
+                    mdx = window.minWidth - _windowDown.width;
+                }
+                wdw = mdx;
+            }
+
+            if( _resizeDirection.y < 0 ){
+                if( mdy > _windowDown.height - window.minHeight ){
+                    mdy = _windowDown.height - window.minHeight;
+                }
+                wdy = mdy;
+                wdh = -mdy;
+            }
+            else if( _resizeDirection.y > 0 ){
+                if( mdy < window.minHeight - _windowDown.height ){
+                    mdy = window.minHeight - _windowDown.height;
+                }
+                wdh = mdy;
+            }
+            window.x = _windowDown.x + wdx;
+            window.y = _windowDown.y + wdy;
+            window.width = _windowDown.width + wdw;
+            window.height = _windowDown.height + wdh;
+
+            window.setStatus( WebWindowStatus.RESIZED );
+            updateStyle();
+        }
+
+        internal function updateStyle():void{
+            graphics.clear();
+            if( _resizeDirection != null ){
+                graphics.lineStyle( 2, 0xFFFFFF, 1 );
+            }
+            else{
+                graphics.lineStyle( 2, 0x000000, 0.1 );
+            }
+            graphics.drawRoundRect( 0, 0, window.width, window.height, window.getStyle( "cornerRadius" ) );
+        }
+        ]]></fx:Script>
+</mx:UIComponent>

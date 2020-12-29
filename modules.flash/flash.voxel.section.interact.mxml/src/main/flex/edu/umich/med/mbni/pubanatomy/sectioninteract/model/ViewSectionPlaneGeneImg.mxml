@@ -1,0 +1,8 @@
+<?xml version="1.0"?>
+<g:MDLISHImageBitmap xmlns:fx="http://ns.adobe.com/mxml/2009" xmlns:g="edu.umich.med.mbni.pubanatomy.atlas.model.*">
+    <fx:Script><![CDATA[
+        [Bindable]
+        public var sectionPlane:ModelSectionPlane;
+        ]]></fx:Script>
+    <fx:Binding source="sectionPlane.v3dPlane.image" destination="sectionImage"/>
+</g:MDLISHImageBitmap>

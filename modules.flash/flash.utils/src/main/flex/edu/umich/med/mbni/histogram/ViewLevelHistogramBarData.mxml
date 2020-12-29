@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+<as3lib:MxmlEventDispatcher xmlns:fx="http://ns.adobe.com/mxml/2009"
+                            xmlns:as3lib="com.flashflexpro.as3lib.*">
+
+    <fx:Script><![CDATA[
+        import mx.collections.ArrayList;
+
+        [Bindable]
+        public var inputBars:Vector.<Vector.<Number>>;
+
+        [Bindable]
+        public var model:ModelLevelHistogram;
+
+        [Bindable]
+        public var index:uint;
+
+        private function set rfrDataprovider( ignoreVar:* ):void{
+            var dp:ArrayList = new ArrayList();
+            const len:int = inputBars.length;
+            for( var j:int = 0; j < len; j ++ ){
+                dp.addItem( inputBars[j] );
+            }
+            outputBars = dp;
+        }
+
+        [Bindable]
+        public var outputBars:ArrayList;
+        ]]></fx:Script>
+    <fx:Binding source="inputBars" destination="rfrDataprovider"/>
+</as3lib:MxmlEventDispatcher>

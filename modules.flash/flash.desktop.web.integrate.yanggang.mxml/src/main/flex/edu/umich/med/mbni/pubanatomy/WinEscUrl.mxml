@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<view:WebWinBase xmlns:fx="http://ns.adobe.com/mxml/2009" xmlns:s="library://ns.adobe.com/flex/spark"
+                 title="Search" xmlns:view="edu.umich.med.mbni.pubanatomy.integrate.view.*">
+    <fx:Script><![CDATA[
+
+        [Bindable]
+        private var _input:String;
+
+        ]]></fx:Script>
+    <view:layout>
+        <s:VerticalLayout/>
+    </view:layout>
+    <s:TextArea editable="false" text="{unescape( _input )}"/>
+    <s:TextArea editable="false"  text="{escape( _input )}"/>
+    <s:TextInput text="@{_input}"/>
+</view:WebWinBase>

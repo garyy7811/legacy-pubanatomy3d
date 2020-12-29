@@ -1,0 +1,55 @@
+<?xml version="1.0"?>
+<v2t:TermToCount xmlns:fx="http://ns.adobe.com/mxml/2009"
+                 xmlns:v2t="edu.umich.med.mbni.pubanatomy.flash.v02tmp.*">
+    <fx:Script><![CDATA[
+        import mx.collections.ArrayList;
+
+        private var _facet:ResultFacet;
+        [Bindable(event="fromChanged")]
+        public function get facet():ResultFacet{
+            return _facet;
+        }
+
+        public function set facet( value:ResultFacet ):void{
+            if( value != _facet ){
+                _facet = value;
+                dispatchEvent( new Event( "fromChanged" ) );
+            }
+        }
+
+        private function set rfrInQuery( ignoreVar:* ):void{
+            _facet.queryResult.searchModel.callInNext.putIn( refreshInQuery );
+        }
+
+        private function refreshInQuery():void{
+            if( _facet.queryResult.queryModel.rootTerm == null ){
+                return;
+            }
+            var tmpTerm:QueryTermT = _facet.field.instanciateTermClass() as QueryTermT;
+            tmpTerm.inputTxt = term;
+            tmpTerm.query = _facet.queryResult.resultModel.query;//so it can commit without error
+            tmpTerm.commit();
+            equalTerms = _facet.queryResult.queryModel.rootTerm.findEqualTerms( tmpTerm );
+            CONFIG::debugging{
+                if( equalTerms != null ){
+                    for( var j:int = equalTerms.length - 1; j >= 0; j-- ){
+                        var r2:QueryRelate2Terms = equalTerms.getItemAt( j ) as QueryRelate2Terms;
+
+                        if( r2 == null ){
+                            throw new Error( this + ".refreshInQuery " );
+                        }
+                    }
+                }
+            }//debug
+        }
+
+        [Bindable]
+        public var equalTerms:ArrayList;
+
+        public function onFilter():void{
+            _facet.queryResult.queryModel.appendTermStr( _facet.field, term );
+            _facet.queryResult.sendQuery();
+        }
+        ]]></fx:Script>
+    <fx:Binding source="facet.queryResult.queryModel.rootQueryStr" destination="rfrInQuery"/>
+</v2t:TermToCount>

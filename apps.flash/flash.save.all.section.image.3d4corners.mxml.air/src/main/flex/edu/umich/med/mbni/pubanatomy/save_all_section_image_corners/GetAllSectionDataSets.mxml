@@ -1,0 +1,75 @@
+<?xml version="1.0"?>
+<as3lib:MxmlEventDispatcher xmlns:fx="http://ns.adobe.com/mxml/2009"
+                            xmlns:as3lib="com.flashflexpro.as3lib.*">
+
+    <fx:Script><![CDATA[
+        import edu.umich.med.mbni.pubanatomy.flash.dto.DtoGene;
+
+        public var model:SaveAllSectionImgCornerModel;
+
+        private var _stream:URLStream;
+
+        public function callRemote():void{
+            URLRequestDefaults.idleTimeout = 99000000;
+            var url:String = "http://api.brain-map.org/api/v2/data/query.xml" +
+                    "?criteria=model::Gene" +
+                    ",rma::include,data_sets[reference_space_id$eq9][plane_of_section_id$eq1],[failed$eqfalse]" +
+                    ",rma::options[num_rows$eq99999]";
+            _stream = new URLStream();
+            configureListeners( _stream );
+            _stream.load( new URLRequest( url ) );
+        }
+
+        private function completeHandler( event:Event ):void{
+            var _result:XML = new XML( _stream.readUTFBytes( _stream.bytesAvailable ) );
+
+            var tmp:XMLList = _result.children()[0].children();
+            const len:int = tmp.length();
+            for( var j:int = 0; j < len; j++ ){
+                var x:XML = tmp[j] as XML;
+
+                ssss( x[ "id" ] );
+
+            }
+        }
+
+        public function ssss( geneId:int ):void{
+            var dtoGene:DtoGene = new DtoGene();
+            dtoGene.geneId = geneId;
+            var gw:GeneImageWorker = new GeneImageWorker();
+            gw.dtoGene = dtoGene;
+            gw.model = model;
+            model.waiting.addItem( gw );
+        }
+
+
+        private function configureListeners( dispatcher:EventDispatcher ):void{
+            dispatcher.addEventListener( Event.COMPLETE, completeHandler );
+            dispatcher.addEventListener( HTTPStatusEvent.HTTP_STATUS, httpStatusHandler );
+            dispatcher.addEventListener( IOErrorEvent.IO_ERROR, ioErrorHandler );
+            dispatcher.addEventListener( Event.OPEN, openHandler );
+            dispatcher.addEventListener( ProgressEvent.PROGRESS, progressHandler );
+            dispatcher.addEventListener( SecurityErrorEvent.SECURITY_ERROR, securityErrorHandler );
+        }
+
+        private function openHandler( event:Event ):void{
+            trace( "openHandler: " + event );
+        }
+
+        private function progressHandler( event:Event ):void{
+            trace( "progressHandler: " + event );
+        }
+
+        private function securityErrorHandler( event:SecurityErrorEvent ):void{
+            trace( "securityErrorHandler: " + event );
+        }
+
+        private function httpStatusHandler( event:HTTPStatusEvent ):void{
+            trace( "httpStatusHandler: " + event );
+        }
+
+        private function ioErrorHandler( event:IOErrorEvent ):void{
+            trace( "ioErrorHandler: " + event );
+        }
+        ]]></fx:Script>
+</as3lib:MxmlEventDispatcher>

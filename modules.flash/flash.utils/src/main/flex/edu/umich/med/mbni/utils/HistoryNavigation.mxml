@@ -1,0 +1,70 @@
+<?xml version="1.0"?>
+<as3lib:MxmlEventDispatcher xmlns:fx="http://ns.adobe.com/mxml/2009"
+                            xmlns:as3lib="com.flashflexpro.as3lib.*">
+    <fx:Script><![CDATA[
+        import mx.collections.ArrayList;
+
+        [Bindable]
+        public var is2equals:Function;
+
+        [Bindable]
+        public var destroyIt:Function;
+
+        public function execute( target:Object ):void{
+            var newQuery:Boolean = true;
+            if( navIndex >= 0 && history.length > 0 ){
+                newQuery = !is2equals( history.getItemAt( navIndex ), target );
+            }
+            if( newQuery && history.length - 1 > navIndex ){
+                while( history.length - 1 > navIndex ){
+                    var removed:Object = history.removeItemAt( history.length - 1 );
+                    if( destroyIt != null ){
+                        destroyIt( removed );
+                    }
+                }
+            }
+
+            if( newQuery ){
+                history.addItem( target );
+                setNavIndex( history.length - 1 );
+            }
+        }
+
+        public function goBack():Object{
+            setNavIndex( navIndex - 1 );
+            return history.getItemAt( navIndex );
+        }
+
+        public function goForward():Object{
+            setNavIndex( navIndex + 1 );
+            return history.getItemAt( navIndex );
+        }
+
+        private var _history:ArrayList = new ArrayList();
+
+        [Bindable(event="historyChanged")]
+        public function get history():ArrayList{
+            return _history;
+        }
+
+        protected function setHistory( value:ArrayList ):void{
+            if( value != _history ){
+                _history = value;
+                dispatchEvent( new Event( "historyChanged" ) );
+            }
+        }
+
+        private var _navIndex:int = -1;
+        [Bindable(event="navIndexChanged")]
+        public function get navIndex():int{
+            return _navIndex;
+        }
+
+        protected function setNavIndex( value:int ):void{
+            if( value != _navIndex ){
+                _navIndex = value;
+                dispatchEvent( new Event( "navIndexChanged" ) );
+            }
+        }
+        ]]></fx:Script>
+</as3lib:MxmlEventDispatcher>

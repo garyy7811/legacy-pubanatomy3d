@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<!--
+  Created by garyyang on 4/17/2014.
+-->
+<as3lib:MxmlEventDispatcher xmlns:fx="http://ns.adobe.com/mxml/2009" xmlns:as3lib="com.flashflexpro.as3lib.*">
+
+    <fx:Script><![CDATA[
+        [Bindable]
+        public var geneCol:StructureTreeGridDataColumnGene;
+
+        public var owner:StructureGeneLevelHistogram;
+
+        public function destroy():void{
+            geneCol = null;
+            owner = null;
+        }
+        ]]></fx:Script>
+    <fx:Binding source="geneCol.selectedDataSet.geneExprDistributing" destination="owner.rfrInput"/>
+</as3lib:MxmlEventDispatcher>

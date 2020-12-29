@@ -1,0 +1,231 @@
+<?xml version="1.0"?>
+<utils:RootModelModule xmlns:fx="http://ns.adobe.com/mxml/2009"
+                       xmlns:utils="edu.umich.med.mbni.utils.*"
+                       xmlns:model="edu.umich.med.mbni.pubanatomy.atlas.model.*"
+                       xmlns:as3lib="com.flashflexpro.as3lib.*"
+                       xmlns:s="library://ns.adobe.com/flex/spark">
+    <fx:Script><![CDATA[
+        import edu.umich.med.mbni.pubanatomy.flash.dto.Dto3DConfig;
+
+        [Bindable]
+        public var rootStructure:StructureItem;
+
+        [Bindable]
+        public var config:Dto3DConfig;
+
+        private var _getRootOrgan:GetAppInitArgs;
+
+        private function set rfrInit( v:* ):void{
+            if( callInNext != null ){
+                callInNext.putIn( initRpc );
+            }
+        }
+
+        private function initRpc():void{
+            if( _getRootOrgan == null ){
+                _getRootOrgan = new GetAppInitArgs();
+                _getRootOrgan.model = this;
+                _getRootOrgan.callRemote();
+            }
+        }
+
+        private function addIntoSelectedLst( s:StructureItem ):StructureItem{
+            if( s.selected && selectedStructures.getItemIndex( s ) < 0 ){
+                selectedStructures.addItem( s );
+            }
+            return s;
+        }
+
+        private function removeFromSelected( s:StructureItem ):void{
+            selectedStructures.removeItem( s );
+        }
+
+        [Bindable]
+        public var mouseOverStructure:StructureItem;
+        ]]></fx:Script>
+    <fx:Binding source="callInNext" destination="rfrInit"/>
+    <fx:Declarations>
+        <model:AllStructuresTreeGridData id="allStructuresTreeGridData" rootModelAtlas="{this}"/>
+        <as3lib:Sync2Lists source="{rootStructure.allChildren}"
+                           propertiesReplaceOnUpdate="{ [ 'selected' ] }"
+                           getDestInst="addIntoSelectedLst"
+                           destroyInst="removeFromSelected"
+                >
+            <as3lib:destination>
+                <s:ArrayList id="__selectedStructuresDummy"/>
+            </as3lib:destination>
+        </as3lib:Sync2Lists>
+        <s:ArrayList id="selectedStructures"/>
+    </fx:Declarations>
+
+
+    <fx:Script><![CDATA[
+        import edu.umich.med.mbni.pubanatomy.flash.dto.DtoGene;
+        import edu.umich.med.mbni.pubanatomy.flash.dto.DtoGeneExprAnnotation;
+
+        [Bindable]
+        public var geneAnnotation:DtoGeneExprAnnotation;
+
+        public function addGene( dtoGene:DtoGene ):int{
+            for( var i:int = geneDtoList.length - 1; i >= 0; i-- ){
+                var m:DtoGene = geneDtoList.getItemAt( i ) as DtoGene;
+                if( m.geneId == dtoGene.geneId ){
+                    return i;
+                }
+            }
+            geneDtoList.addItem( dtoGene );
+            return geneDtoList.length - 1;
+        }
+
+        private function getGeneModel( dg:DtoGene ):MDLGene{
+            var rt:MDLGene = new MDLGene();
+            rt.model = this;
+            rt.dtoGene = dg;
+            return rt;
+        }
+
+        private function destryGene( g:MDLGene ):void{
+            g.destroy();
+        }
+
+        public function onRemoveGene( geneId:int ):Boolean{
+            for( var i:int = geneDtoList.length - 1; i >= 0; i-- ){
+                var m:DtoGene = geneDtoList.getItemAt( i ) as DtoGene;
+                if( m.geneId == geneId ){
+                    geneDtoList.removeItem( m );
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        [Bindable]
+        private var genesExprs:Vector.<Vector.<Number>>;
+
+        public function getGeneModelByGeneId( geneId:int ):MDLGene{
+            for( var j:int = geneModelList.length - 1; j >= 0; j-- ){
+                var gexm:MDLGene = geneModelList.getItemAt( j ) as MDLGene;
+                if( gexm.dtoGene.geneId == geneId ){
+                    return gexm;
+                }
+            }
+            return null;
+        }
+
+        [Bindable]
+        public var mouseOverImg:MDLISHImage;
+
+        public function findClosestImages( dir:int, position:Number ):Dictionary{
+            var rt:Dictionary;
+            for( var k:int = geneDataSetModelList.length - 1; k >= 0; k-- ){
+                var ds:MDLDataSet = geneDataSetModelList.getItemAt( k ) as MDLDataSet;
+                var img:MDLISHImage = ds.findClosestImage( dir, position );
+                if( img != null ){
+                    if( rt == null ){
+                        rt = new Dictionary();
+                    }
+                    rt[ ds ] = img;
+                }
+            }
+            return rt;
+        }
+        ]]></fx:Script>
+    <fx:Declarations>
+        <as3lib:Sync2Lists id="syncGeneDto2Model"
+                           source="{geneDtoList}" destination="{geneModelList}"
+                           getDestInst="getGeneModel" destroyInst="destryGene"/>
+        <s:ArrayList id="geneDtoList"/>
+        <s:ArrayList id="geneModelList"/>
+        <s:ArrayList id="geneDataSetModelList"/>
+    </fx:Declarations>
+    <fx:Script><![CDATA[
+        import edu.umich.med.mbni.pubanatomy.atlas.view.StructureTreeGrid;
+        import edu.umich.med.mbni.pubanatomy.flash.dto.DtoStructure;
+        import edu.umich.med.mbni.pubanatomy.flash.v02tmp.TermToCount;
+
+        import mx.core.DragSource;
+        import mx.core.IFlexDisplayObject;
+        import mx.core.IUIComponent;
+
+        [Bindable]
+        public var draggingStructure2Count:Vector.<TermToCount>;
+
+        [Bindable]
+        public var draggingStructureItems:Vector.<StructureItem>;
+
+        [Bindable]
+        public var draggingGene:DtoGene;
+
+        override public function doDrag( dragInitiator:IUIComponent, dragSource:DragSource, mouseEvent:MouseEvent, dragImage:IFlexDisplayObject = null, xOffset:Number = 0, yOffset:Number = 0, imageAlpha:Number = 0.5, allowMove:Boolean = true ):void{
+            if( dragInitiator is StructureTreeGrid ){
+                var originalDragging:Vector.<Object> = dragSource.dataForFormat( RootModelModule.DRAGGING_FORMAT ) as Vector.<Object>;
+                if( originalDragging != null ){
+                    originalDragging.forEach( function ( row:Object, idx:int, v:Vector.<Object> ):void{
+                        originalDragging[ idx ] = ( row as StructureTreeGridDataRow ).structure.dtoStructure;
+                    } )
+                }
+            }
+            super.doDrag( dragInitiator, dragSource, mouseEvent, dragImage, xOffset, yOffset, imageAlpha, allowMove );
+        }
+
+
+        private function set rfrDragging( ignoreVar:* ):void{
+            callInNext.putIn( refreshDragging );
+        }
+
+        private function refreshDragging():void{
+            if( rootApp.dragging == null ){
+                draggingStructureItems = null;
+                draggingStructure2Count = null;
+                draggingGene = null;
+                return;
+            }
+            //todo: structureDto to structure should be in this class
+            var tmpDragging:Object = rootApp.dragging.dataForFormat( RootModelModule.DRAGGING_FORMAT );
+            if( tmpDragging is DtoGene ){
+                draggingGene = tmpDragging as DtoGene;
+                return;
+            }
+
+            if( tmpDragging is Vector.<Object> ){
+                var tmpDragginV:Vector.<Object> = tmpDragging as Vector.<Object>;
+                if( tmpDragginV != null && tmpDragginV.length > 0 ){
+                    if( tmpDragginV[ 0 ] is DtoStructure ){
+                        var tmpDraggingStructureItems:Vector.<StructureItem> = new Vector.<StructureItem>( tmpDragginV.length, true );
+                        tmpDragginV.forEach( function ( dr:Object, idx:int, v:Vector.<Object> ):void{
+                            CONFIG::debugging{
+                                if( !( dr is DtoStructure) ){
+                                    throw new Error( this + ".draging not structure " );
+                                }//debug
+                            }
+                            tmpDraggingStructureItems[ idx ] = DtoStructure.structureSymbol2Item[ dr.acronym.toLowerCase() ];
+                        } )
+                        draggingStructureItems = tmpDraggingStructureItems;
+                    }
+                    else if( tmpDragginV[ 0 ] is TermToCount ){
+                        var tmpDraggingStructure2Count:Vector.<TermToCount> = new Vector.<TermToCount>( tmpDragginV.length, true );
+                        tmpDragginV.forEach( function ( i:Object, idx:int, v:Vector.<Object> ):void{
+                            tmpDraggingStructure2Count[ idx ] = v[ idx ] as TermToCount;
+                        } );
+                        draggingStructure2Count = tmpDraggingStructure2Count;
+                    }
+                }
+            }
+
+        }
+
+        public function format( n:Number ):String{
+            return nf.format( config.unitLength * n / 1000 ) + "mm";
+        }
+
+        ]]></fx:Script>
+    <fx:Binding source="rootApp.dragging" destination="rfrDragging"/>
+    <fx:Declarations>
+        <s:NumberFormatter id="nf"
+                           fractionalDigits="2"
+                           decimalSeparator="."
+                           groupingSeparator=","
+                           useGrouping="true"
+                           negativeNumberFormat="0"/>
+    </fx:Declarations>
+</utils:RootModelModule>

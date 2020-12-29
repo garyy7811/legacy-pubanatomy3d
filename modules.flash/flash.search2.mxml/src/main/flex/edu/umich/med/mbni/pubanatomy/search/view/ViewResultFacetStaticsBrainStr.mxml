@@ -1,0 +1,78 @@
+<?xml version="1.0"?>
+<sv:ViewResultFacetStatics xmlns:fx="http://ns.adobe.com/mxml/2009"
+                           xmlns:sv="edu.umich.med.mbni.pubanatomy.search.view.*"
+                           borderWeight="3" borderVisible="true" borderColor="0x440099"
+                           removedFromStage="stage.removeEventListener( MouseEvent.MOUSE_MOVE, onMouseUp );">
+    <fx:Script><![CDATA[
+        import edu.umich.med.mbni.pubanatomy.search.model.ResultFacetBrainStrSymbols;
+        import edu.umich.med.mbni.pubanatomy.search.model.ResultFacetTerm2Count;
+        import edu.umich.med.mbni.utils.RootModelModule;
+
+        import mx.collections.ArrayList;
+
+        import mx.core.DragSource;
+
+        override protected function partAdded( partName:String, instance:Object ):void{
+            super.partAdded( partName, instance );
+            if( instance == titleGroup ){
+                titleGroup.addEventListener( MouseEvent.MOUSE_DOWN, onMouseDown );
+            }
+        }
+
+        private function onMouseDown( event:MouseEvent ):void{
+            titleGroup.addEventListener( MouseEvent.MOUSE_MOVE, onMouseMove );
+            stage.addEventListener( MouseEvent.MOUSE_MOVE, onMouseUp );
+        }
+
+        private function onMouseUp( event:MouseEvent ):void{
+            titleGroup.removeEventListener( MouseEvent.MOUSE_MOVE, onMouseMove );
+            if( stage != null ){
+                stage.removeEventListener( MouseEvent.MOUSE_MOVE, onMouseUp );
+            }
+        }
+
+        private function onMouseMove( event:MouseEvent ):void{
+            if( model.queryResult.searchModel.rootApp.dragging != null ){
+                return;
+            }
+
+            var lst:ArrayList = ( model as ResultFacetBrainStrSymbols ).resultList;
+            if( lst.length == 0 ){
+                return;
+            }
+
+            var tmp:Vector.<Object> = new Vector.<Object>( lst.length, true );
+            for( var i:int = lst.length - 1; i >= 0; i-- ){
+                tmp[ i ] = lst.getItemAt( i ) as ResultFacetTerm2Count;
+            }
+
+            var src:DragSource = new DragSource();
+            src.addData( tmp, RootModelModule.DRAGGING_FORMAT );
+            model.queryResult.searchModel.doDrag( this, src, event );
+
+        }
+
+        override protected function partRemoved( partName:String, instance:Object ):void{
+            super.partRemoved( partName, instance );
+            if( instance == titleGroup ){
+
+            }
+        }
+
+        override protected function onStaticsInit():void{
+            facetGrid = new ViewResultFacetStaticsGridBrStr();
+            facetGrid.facet = model;
+            facetGrid.percentHeight = 100;
+            facetGrid.percentWidth = 100;
+            addElement( facetGrid );
+        }
+
+
+        override protected function refreshTitle():void{
+            super.refreshTitle();
+            if( model.lastResult != null && model.resultList.length > 0 ){
+                title += " Drag Here and drop into tree grid!";
+            }
+        }
+        ]]></fx:Script>
+</sv:ViewResultFacetStatics>

@@ -1,0 +1,41 @@
+<?xml version="1.0"?>
+<rs:RpcSpringMvcGet xmlns:fx="http://ns.adobe.com/mxml/2009"
+                    xmlns:rs="edu.umich.med.mbni.pubanatomy.flash.rs.*"
+                    path="search" remoteMethodName="count">
+    <fx:Script><![CDATA[
+        import edu.umich.med.mbni.pubanatomy.search.model.QueryRelate2Terms;
+
+        [Bindable]
+        public var queryTerm:QueryRelate2Terms;
+
+        private static const _dic:Dictionary = new Dictionary();
+
+        override protected function onObjResult( r:* = null ):void{
+            var count:uint = uint( r );
+            _dic[ _queryStr ] = count;
+            if( _queryStr == queryTerm.queryStr ){
+                queryTerm.onCountResult( count );
+            }
+            queryTerm = null;
+        }
+
+        private var _queryStr:String;
+
+        override public function callRemote():Boolean{
+            if( _dic[ queryTerm.queryStr ] is uint ){
+                queryTerm.onCountResult( _dic[ queryTerm.queryStr ] as uint );
+                queryTerm = null;
+                return true;
+            }
+
+            model = queryTerm.query.queryResult.searchModel;
+
+            _queryStr = queryTerm.queryStr;
+            args = [ _queryStr ];
+            CONFIG::debugging{
+                trace( this + ".callRemote: " + _queryStr );
+            }//debug
+            return super.callRemote();
+        }
+        ]]></fx:Script>
+</rs:RpcSpringMvcGet>

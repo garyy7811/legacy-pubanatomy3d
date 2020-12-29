@@ -1,0 +1,52 @@
+<?xml version="1.0"?>
+<datadriven3dwindow:Dd3dViewMeshInteract xmlns:fx="http://ns.adobe.com/mxml/2009"
+                                     staticNode="true"
+                                     xmlns:datadriven3dwindow="edu.umich.med.mbni.pubanatomy.datadriven3dwindow.*">
+    <fx:Script>
+        <![CDATA[
+        import away3d.core.base.Geometry;
+        import away3d.core.base.SubGeometry;
+
+        import edu.umich.med.mbni.pubanatomy.flash.dto.DtoModelMesh;
+
+
+        [Bindable(event="modelChanged")]
+        public function get modelStructure():Dd3dModelMeshStructure{
+            return _model as Dd3dModelMeshStructure;
+        }
+
+        private function set rfrMesh( ignoreVar:* ):void{
+            try{
+                if( geometry == null || geometry.subGeometries.length == 0){
+                    var tg:Geometry = new Geometry();
+                    for each ( var dtoMsh:DtoModelMesh in modelStructure.dtoModelMeshArr.flashMeshes ){
+                        var subGeo:SubGeometry = new SubGeometry();
+                        subGeo.updateVertexData( dtoMsh.getVertices() );
+                        subGeo.updateIndexData( dtoMsh.getIndexes() );
+                        subGeo.updateVertexNormalData( dtoMsh.getNormals() );
+                        subGeo.updateUVData( dtoMsh.getUVs() );
+
+                        tg.addSubGeometry( subGeo );
+                    }
+                    geometry = tg;
+                    geometry.convertToSeparateBuffers();
+                }
+
+            }
+            catch( bindingError:Error ){
+                CONFIG::debugging{
+                    trace( this + ":" + bindingError.getStackTrace() );
+                }
+            }
+        }
+        ]]></fx:Script>
+
+    <fx:Binding source="modelStructure.dtoModelMeshArr" destination="rfrMesh"/>
+    <fx:Binding source="dd3dScene.mouseOverMesh" destination="rfrMat"/>
+    <fx:Binding source="model.selected" destination="rfrMat"/>
+
+    <fx:Binding source="model.position" destination="position"/>
+    <fx:Binding source="model.scale" destination="scaleX"/>
+    <fx:Binding source="model.scale" destination="scaleY"/>
+    <fx:Binding source="model.scale" destination="scaleZ"/>
+</datadriven3dwindow:Dd3dViewMeshInteract>

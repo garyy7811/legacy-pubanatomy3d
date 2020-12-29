@@ -1,0 +1,80 @@
+<?xml version="1.0"?>
+<view:WebWinBase xmlns:fx="http://ns.adobe.com/mxml/2009" xmlns:s="library://ns.adobe.com/flex/spark"
+                 title="Search" xmlns:view="edu.umich.med.mbni.pubanatomy.integrate.view.*">
+    <fx:Script><![CDATA[
+        import away3d.materials.ColorMaterial;
+
+        import edu.umich.med.mbni.pubanatomy.datadriven3dwindow.Dd3dViewScene3d;
+
+        [Bindable]
+        private var scene:Dd3dViewScene3d;
+
+
+        private function set rfrMat( ignoreVar:* ):void{
+            var tmp:ColorMaterial = scene.mouseOverMesh.material as ColorMaterial;
+            if( tmp != null ){
+                mat = tmp;
+            }
+        }
+
+        override protected function onClose():void{
+            close();
+        }
+        ]]></fx:Script>
+    <fx:Binding source="rootView.dividedLCR.centralTreeScene.v3dScene" destination="scene"/>
+    <fx:Binding source="scene.cameraLight" destination="light"/>
+    <fx:Binding source="scene.mouseOverMesh.material" destination="rfrMat"/>
+    <view:layout>
+        <s:HorizontalLayout/>
+    </view:layout>
+    <s:BorderContainer>
+        <fx:Script><![CDATA[
+            [Bindable]
+            public var mat:ColorMaterial;
+
+            private function onInput():void{
+                mat.ambient = Number( amb.text );
+                mat.specular = Number( spe.text );
+                mat.gloss = Number( glo.text );
+            }
+            ]]></fx:Script>
+        <s:layout>
+            <s:VerticalLayout/>
+        </s:layout>
+        <s:FormItem label="amb">
+            <s:TextInput text="{mat.ambient}" change="onInput();" id="amb"/>
+        </s:FormItem>
+        <s:FormItem label="spe">
+            <s:TextInput text="{mat.specular}" change="onInput();" id="spe"/>
+        </s:FormItem>
+        <s:FormItem label="glo">
+            <s:TextInput text="{mat.gloss}" change="onInput();" id="glo"/>
+        </s:FormItem>
+    </s:BorderContainer>
+    <s:BorderContainer>
+        <fx:Script><![CDATA[
+            import away3d.lights.DirectionalLight;
+
+            [Bindable]
+            public var light:DirectionalLight;
+
+            private function onLightInput():void{
+                light.ambient = Number( lamb.text );
+                light.specular = Number( lspe.text );
+                light.diffuse = Number( ldif.text );
+            }
+            ]]></fx:Script>
+        <s:layout>
+            <s:VerticalLayout/>
+        </s:layout>
+        <s:FormItem label="amb">
+            <s:TextInput text="{light.ambient}" change="onLightInput();" id="lamb"/>
+        </s:FormItem>
+        <s:FormItem label="spe">
+            <s:TextInput text="{light.specular}" change="onLightInput();" id="lspe"/>
+        </s:FormItem>
+        <s:FormItem label="dif">
+            <s:TextInput text="{light.diffuse}" change="onLightInput();" id="ldif"/>
+        </s:FormItem>
+    </s:BorderContainer>
+</view:WebWinBase>

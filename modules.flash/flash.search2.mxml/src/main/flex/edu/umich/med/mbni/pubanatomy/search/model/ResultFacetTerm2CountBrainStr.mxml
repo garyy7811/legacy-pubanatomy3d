@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<model:ResultFacetTerm2Count xmlns:fx="http://ns.adobe.com/mxml/2009"
+                             xmlns:model="edu.umich.med.mbni.pubanatomy.search.model.*">
+
+    <fx:Script><![CDATA[
+        import edu.umich.med.mbni.pubanatomy.flash.dto.DtoStructure;
+
+        [Bindable]
+        public var structure:DtoStructure;
+
+        [Bindable(event="fromChanged")]
+        public function get facetBrainStr():ResultFacetBrainStrSymbols{
+            return facet as ResultFacetBrainStrSymbols;
+        }
+
+        ]]></fx:Script>
+</model:ResultFacetTerm2Count>

@@ -1,0 +1,67 @@
+<?xml version="1.0"?>
+<as3lib:MxmlEventDispatcher xmlns:fx="http://ns.adobe.com/mxml/2009" xmlns:as3lib="com.flashflexpro.as3lib.*">
+    <fx:Script><![CDATA[
+        private var _target:Object;
+
+        [Bindable(event="targetChanged")]
+        public function get target():Object{
+            return _target;
+        }
+
+        public function set target( value:Object ):void{
+            if( value != _target ){
+                _target = value;
+                dispatchEvent( new Event( "targetChanged" ) );
+            }
+        }
+
+        [Bindable]
+        public var available:Boolean;
+
+        public function execute():void{
+            if( _rootModel != null && _rootModel.rootApp.executingOperations != null ){
+                _rootModel.rootApp.executingOperations.addItem( this );
+            }
+            try{
+                onExecute();
+            }
+            catch( e:Error ){
+                CONFIG::debugging{
+                    trace( e.getStackTrace() );
+                    throw e;
+                }
+            }
+            if( _rootModel != null && _rootModel.rootApp.executingOperations != null ){
+                _rootModel.rootApp.executingOperations.removeItem( this );
+            }
+        }
+
+        public var toExe:Function;
+
+        protected function onExecute():void{
+            if( toExe == null ){
+                throw  new Error();
+            }
+            toExe.apply( this );
+        }
+
+        private var _rootModel:RootModelModule;
+        public static const rootModel_CHANGED:String = "rootModelChanged";
+
+        [Bindable(event="rootModelChanged")]
+        public function get rootModel():RootModelModule{
+            return _rootModel;
+        }
+
+        public function set rootModel( value:RootModelModule ):void{
+            if( value != _rootModel ){
+                _rootModel = value;
+                dispatchEvent( new Event( rootModel_CHANGED ) );
+            }
+        }
+
+        public function destroy():void{
+            rootModel = null;
+        }
+        ]]></fx:Script>
+</as3lib:MxmlEventDispatcher>

@@ -1,0 +1,34 @@
+<?xml version="1.0"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009"
+         xmlns:s="library://ns.adobe.com/flex/spark"
+         xmlns:utils="edu.umich.med.mbni.utils.*"
+         creationComplete="rfrState=null;"
+        >
+    <fx:Script><![CDATA[
+        import edu.umich.med.mbni.pubanatomy.sectioninteract.model.ModelSectionPlane;
+
+        [Bindable]
+        public var sectionPlane:ModelSectionPlane;
+
+
+        private function set rfrState( ignoreVar:* ):void{
+            sectionPlane.rootModelAtlas.callInNext.putIn( refreshState );
+        }
+
+        private function refreshState():void{
+            if( initialized ){
+                currentState = sectionPlane.showSectionTree ? "n" : "show";
+            }
+        }
+        ]]></fx:Script>
+    <fx:Binding source="sectionPlane.showSectionTree" destination="rfrState"/>
+    <s:states>
+        <s:State name="n"/>
+        <s:State name="show"/>
+    </s:states>
+    <s:Button id="btn" toolTip="Click to Show Section Structures' Tree View"
+              label="Tree View" click="sectionPlane.showSectionTree = true;"/>
+    <s:transitions>
+        <utils:CommonTransition target="{btn}" fromState="n" toState="show"  currentState="{currentState}"/>
+    </s:transitions>
+</s:Group>

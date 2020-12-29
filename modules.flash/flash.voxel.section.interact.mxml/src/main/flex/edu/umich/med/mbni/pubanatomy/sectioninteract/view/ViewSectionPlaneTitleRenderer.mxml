@@ -1,0 +1,49 @@
+<?xml version="1.0"?>
+<s:DataRenderer xmlns:fx="http://ns.adobe.com/mxml/2009"
+                xmlns:s="library://ns.adobe.com/flex/spark">
+    <fx:Script><![CDATA[
+        import edu.umich.med.mbni.utils.ModelOperationMenuItem;
+        import edu.umich.med.mbni.utils.RootModelModule;
+
+        import mx.core.DragSource;
+
+        [Bindable("dataChange")]
+        public function get menuItem():ModelOperationMenuItem{
+            return  data as ModelOperationMenuItem;
+        }
+
+        private var _dragDown:Boolean = false;
+
+        private function onMouseDown():void{
+            if( menuItem != null ){
+                _dragDown = true;
+                stage.addEventListener( MouseEvent.MOUSE_UP, onMouseUp );
+            }
+        }
+
+        private function onMouseUp( ev:MouseEvent ):void{
+            _dragDown = false;
+        }
+
+        private function onDragMove( event:MouseEvent ):void{
+            if( _dragDown && menuItem != null && menuItem.rootModel.rootApp.dragging == null ){
+                var src:DragSource = new DragSource();
+                src.addData( menuItem.target, RootModelModule.DRAGGING_FORMAT );
+                menuItem.rootModel.doDrag( this, src, event );
+            }
+        }
+
+        private function set rfrState( v:* ):void{
+            currentState = ( menuItem == null ? "next" : "drag" );
+        }
+        ]]></fx:Script>
+    <fx:Binding source="menuItem" destination="rfrState"/>
+    <s:Label text="&gt;" includeIn="next" height="100%" textAlign="center" maxDisplayedLines="1"/>
+    <s:Button skinClass="edu.umich.med.mbni.utils.UpLabelOverBtnSkin" includeIn="drag"
+              label="{menuItem.label}" toolTip="{menuItem.toolTip + '\r\n'}" fontWeight="bold"
+              mouseDown="onMouseDown()" mouseMove="onDragMove( event )"/>
+    <s:states>
+        <s:State name="drag"/>
+        <s:State name="next"/>
+    </s:states>
+</s:DataRenderer>

@@ -1,0 +1,160 @@
+<?xml version="1.0"?>
+<containers:Scene3D xmlns:fx="http://ns.adobe.com/mxml/2009"
+                    xmlns:containers="away3d.containers.*"
+                    implements="mx.core.IMXMLObject">
+    <fx:Script><![CDATA[
+        import away3d.debug.Trident;
+        import away3d.entities.SegmentSet;
+        import away3d.lights.DirectionalLight;
+        import away3d.primitives.LineSegment;
+
+        private var _id:String;
+        [Bindable(event="idChanged")]
+        public function get id():String{
+            return _id;
+        }
+
+        private function setId( value:String ):void{
+            if( value != _id ){
+                _id = value;
+                dispatchEvent( new Event( "idChanged" ) );
+            }
+        }
+
+        public function initialized( document:Object, id:String ):void{
+            setId( id );
+            _trident = new Trident( 512 );
+            addChild( _trident );
+            _cameraLight = new DirectionalLight();
+            _cameraLight.color = 0xFFFFFF;
+            _cameraLight.specular = 1;
+            _cameraLight.diffuse = 0.5;
+            _cameraLight.ambient = 0.5;
+            addChild( _cameraLight );
+        }
+
+        private var _cameraLight:DirectionalLight;
+
+        [Bindable(event="ignore")]
+        public function get cameraLight():DirectionalLight{
+            CONFIG::debugging{
+                if( _cameraLight == null ){
+                    throw new Error( this + ".cameraLight " );
+                }
+            }
+            return _cameraLight;
+        }
+
+        private var _trident:Trident;
+        public function get trident():Trident{
+            CONFIG::debugging{
+                if( _trident == null ){
+                    throw new Error( this + ".trident " );
+                }
+            }
+            return _trident;
+        }
+
+        {
+            private var _model:DD3dModelScene3d;
+            [Bindable(event="modelChanged")]
+            public function get model():DD3dModelScene3d{
+                return _model;
+            }
+
+            public function set model( value:DD3dModelScene3d ):void{
+                if( value != _model ){
+                    _model = value;
+                    dispatchEvent( new Event( "modelChanged" ) );
+                }
+
+            }
+        }
+
+        public static function getPositionSegments( p:Vector3D, halfLen:uint = 300, color:uint = 0xffffff ):SegmentSet{
+            var _aidCenter:SegmentSet = new SegmentSet();
+            _aidCenter.addSegment( new away3d.primitives.LineSegment(
+                    new Vector3D( p.x, p.y, p.z - halfLen ),
+                    new Vector3D( p.x, p.y, p.z + halfLen ),
+                    color
+            ) );
+            _aidCenter.addSegment( new away3d.primitives.LineSegment(
+                    new Vector3D( p.x, p.z - halfLen, p.z ),
+                    new Vector3D( p.x, p.z + halfLen, p.z ),
+                    color
+            ) );
+            _aidCenter.addSegment( new away3d.primitives.LineSegment(
+                    new Vector3D( p.z - halfLen, p.y, p.z ),
+                    new Vector3D( p.z + halfLen, p.y, p.z ),
+                    color
+            ) );
+            return _aidCenter;
+        }
+        ]]></fx:Script>
+
+    <fx:Script><![CDATA[
+        private function set rfrMouseLastPosition( ignoreVar:* ):void{
+            model.callInNext.putIn( refreshMouseLastPosition );
+        }
+
+        private function refreshMouseLastPosition():void{
+            if( _lastMouse != null ){
+                removeChild( _lastMouse );
+                _lastMouse = null;
+            }
+            var p:Vector3D = model.mouseLastPosition;
+            if( p != null ){
+                _lastMouse = getPositionSegments( p );
+                addChild( _lastMouse );
+            }
+        }
+
+        private var _lastMouse:SegmentSet;
+        public function get lastMouse():SegmentSet{
+            return _lastMouse;
+        }
+        ]]></fx:Script>
+    <fx:Binding source="model.mouseLastPosition" destination="rfrMouseLastPosition"/>
+
+    <fx:Script><![CDATA[
+        private function set rfrAidCameraAndCenter( ignoreVar:* ):void{
+            model.callInNext.putIn( refreshAidCameraAndCenter );
+        }
+
+        private function refreshAidCameraAndCenter():void{
+            if( _aidCamera != null ){
+                removeChild( _aidCamera );
+                _aidCamera = null;
+            }
+            if( _aidCenter != null ){
+                removeChild( _aidCenter );
+                _aidCenter = null;
+            }
+            if( _model.focusedCamera != null && _model.focusedCamera.cameraPosition != null && _model.centralPosition != null ){
+                _aidCamera = new SegmentSet();
+                _aidCamera.addSegment( new away3d.primitives.LineSegment( _model.centralPosition, _model.focusedCamera.cameraPosition, 0xffffff ) );
+
+                addChild( _aidCamera );
+            }
+            if( _model.centralPosition != null ){
+                _aidCenter = getPositionSegments( _model.centralPosition, 2000 )
+                addChild( _aidCenter );
+            }
+        }
+
+        private var _aidCamera:SegmentSet;
+
+
+        public function get aidCamera():SegmentSet{
+            return _aidCamera;
+        }
+
+        public function get aidCenter():SegmentSet{
+            return _aidCenter;
+        }
+
+        private var _aidCenter:SegmentSet;
+        ]]></fx:Script>
+    <fx:Binding source="model.centralPosition" destination="rfrAidCameraAndCenter"/>
+    <fx:Binding source="model.focusedCamera.cameraPosition" destination="rfrAidCameraAndCenter"/>
+</containers:Scene3D>

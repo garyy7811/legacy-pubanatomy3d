@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+    <modelVersion>4.0.0</modelVersion>
+
+
+    <groupId>edu.umich.med.mbni</groupId>
+    <artifactId>pubanatomy.apps.web.socket.tomcat.build</artifactId>
+    <version>0.1-SNAPSHOT</version>
+    <packaging>pom</packaging>
+    <modules>
+        <module>../../modules.java/java.utils</module>
+        <module>../../modules.java/java.dto</module>
+        <module>../../modules.java/java.solr.common</module>
+        <module>../../modules.java/java.solr.medline</module>
+        <module>../../modules.java/java.solr.gene</module>
+        <module>../../modules.java/web.api</module>
+        <module>../web.socket.tomcat</module>
+    </modules>
+</project>

@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009"
+         xmlns:s="library://ns.adobe.com/flex/spark"
+         xmlns:view="edu.umich.med.mbni.pubanatomy.sectioninteract.view.*"
+        >
+    <fx:Script><![CDATA[
+        import edu.umich.med.mbni.pubanatomy.sectioninteract.model.ModelSectionPlane;
+        import edu.umich.med.mbni.pubanatomy.voxel3d.model.Voxel3dPlane;
+
+        [Bindable]
+        public var sectionPlane:ModelSectionPlane;
+
+        private function set rfrState( ignoreVar:* ):void{
+            currentState = ( sectionPlane.v3dPlane.imageSectionMode == Voxel3dPlane.IMG_SECTION_MODE_XYZ ) ? "xyz" : "img";
+        }
+        ]]></fx:Script>
+    <fx:Binding source="sectionPlane.v3dPlane.imageSectionMode" destination="rfrState"/>
+    <s:states>
+        <s:State name="xyz"/>
+        <s:State name="img"/>
+    </s:states>
+    <s:layout>
+        <s:HorizontalLayout verticalAlign="middle"/>
+    </s:layout>
+    <view:ViewSectionPlaneBotileShowTree sectionPlane="{sectionPlane}"/>
+    <s:Spacer width="8"/>
+    <s:Label text="Perspective Position:" height="100%" verticalAlign="middle"/>
+    <view:ViewSectionPlanePerspImgSlider includeIn="img" width="100%" v3dPlane="{sectionPlane.v3dPlane}"/>
+    <view:ViewSectionPlanePerspPstnSlider includeIn="xyz" width="100%" v3dPlane="{sectionPlane.v3dPlane}"/>
+</s:Group>

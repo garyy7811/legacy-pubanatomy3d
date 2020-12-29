@@ -1,0 +1,56 @@
+<?xml version="1.0"?>
+<s:VSlider xmlns:fx="http://ns.adobe.com/mxml/2009" xmlns:s="library://ns.adobe.com/flex/spark"
+           creationComplete="onCreated();"
+           removedFromStage="onRemovedFromStage();"
+           focusEnabled="true"
+           mouseDownOutside="onFocusOut();"
+           focusOut="onFocusOut();"
+        >
+    <fx:Script><![CDATA[
+        import mx.core.FlexGlobals;
+        import mx.managers.PopUpManager;
+
+        import spark.components.Application;
+
+        private static var _single:PopupSlider;
+
+        public function show():void{
+            if( _single != null ){
+                if( _single == this ){
+                    return;
+                }
+
+                PopUpManager.removePopUp( _single );
+            }
+
+            var p:Application = FlexGlobals.topLevelApplication as Application;
+            _single = this;
+            PopUpManager.addPopUp( _single, p );
+            move( p.mouseX + width, p.mouseY );
+            setFocus();
+        }
+
+        private function onCreated():void{
+            setFocus();
+            var far:Point = localToGlobal( new Point( 0, 0 ) ).add( new Point( width, height ) );
+
+            var a:Application = FlexGlobals.topLevelApplication as Application;
+            if( far.y >= a.height - 10 ){
+                y = a.height - height - 10;
+            }
+            if( far.x >= a.width - 10){
+                x = a.width - height - 10;
+            }
+        }
+
+        private function onRemovedFromStage():void{
+            focusEnabled = false;
+            ( FlexGlobals.topLevelApplication as Application ).setFocus();
+            _single = null;
+        }
+
+        private function onFocusOut():void{
+            PopUpManager.removePopUp( this );
+        }
+        ]]></fx:Script>
+</s:VSlider>

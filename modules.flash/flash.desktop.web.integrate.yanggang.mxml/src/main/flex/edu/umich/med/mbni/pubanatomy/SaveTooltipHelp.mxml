@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<rs:RpcSpringMvcPost xmlns:fx="http://ns.adobe.com/mxml/2009"
+            xmlns:rs="edu.umich.med.mbni.pubanatomy.flash.rs.*"
+            path="help">
+    <fx:Script><![CDATA[
+        import edu.umich.med.mbni.pubanatomy.integrate.model.MDLTooltipExPub;
+
+        [Bindable]
+        public var tipModel:MDLTooltipExPub;
+
+        public var htmlHelp:String;
+
+        public var shortTip:String;
+
+        override public function callRemote():Boolean{
+            args = [ tipModel.toolTipId, shortTip, htmlHelp ];
+            return super.callRemote();
+        }
+
+        override protected function onObjResult( r:* = null ):void{
+            model.log( path + "->" + remoteMethodName + "->" + tipModel.toolTipId + "|" + tipModel.toolTipId );
+            tipModel.shortTip = shortTip;
+            tipModel.htmlHelp = htmlHelp;
+        }
+        ]]></fx:Script>
+    <fx:Binding source="tipModel.rootModel" destination="model"/>
+</rs:RpcSpringMvcPost>

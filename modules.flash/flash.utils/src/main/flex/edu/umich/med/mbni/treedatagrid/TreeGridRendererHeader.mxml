@@ -1,0 +1,97 @@
+<?xml version="1.0"?>
+<v:TreeGridRenderer xmlns:fx="http://ns.adobe.com/mxml/2009"
+                    xmlns:v="edu.umich.med.mbni.treedatagrid.*"
+                    dragEnter="onDragEnterOverDropExit( event );"
+                    dragOver="onDragEnterOverDropExit( event );"
+                    dragDrop="onDragEnterOverDropExit( event );"
+                    dragExit="onDragEnterOverDropExit( event )"
+
+                    clipAndEnableScrolling="true"
+
+                    mouseDown="onMouseDown( event );"
+                    mouseMove="onMouseMove( event );"
+                    dragComplete="treeGrid.draggingHeader = null;"
+        >
+    <fx:Script><![CDATA[
+        import mx.core.DragSource;
+        import mx.core.UIComponent;
+        import mx.events.DragEvent;
+        import mx.managers.DragManager;
+
+        import spark.primitives.supportClasses.GraphicElement;
+
+        public var leftDropIndicator:GraphicElement;
+        public var rightDropIndicator:GraphicElement;
+
+        private function onDragEnterOverDropExit( event:DragEvent ):void{
+            leftDropIndicator.visible = false;
+            rightDropIndicator.visible = false;
+            if( event.type == DragEvent.DRAG_EXIT || treeGrid.draggingHeader == null || treeGrid.draggingHeader == this ){
+                DragManager.showFeedback( DragManager.NONE );
+                return;
+            }
+
+            if( event.type == DragEvent.DRAG_DROP ){
+                treeGrid.dropColumnOn( treeGridColumn, mouseX < width / 2 );
+            }
+            else{
+                if( mouseX < width / 2 ){
+                    if( treeGrid.draggingHeader.treeGridColumn.data.next == treeGridColumn.data ){
+                        DragManager.showFeedback( DragManager.NONE );
+                        return;
+                    }
+                    leftDropIndicator.visible = true;
+                }
+                else{
+                    if( treeGridColumn.data.next == treeGrid.draggingHeader.treeGridColumn.data ){
+                        DragManager.showFeedback( DragManager.NONE );
+                        return;
+                    }
+                    rightDropIndicator.visible = true;
+                }
+                DragManager.showFeedback( DragManager.MOVE );
+                DragManager.acceptDragDrop( event.target as UIComponent );
+            }
+        }
+
+        private var _mouseDown:MouseEvent;
+
+        protected function onMouseDown( event:MouseEvent ):void{
+            //not mess up with resizing
+            if( ( mouseX > 12 ) && ( ( width - mouseX ) > 12 ) ){
+                stage.addEventListener( MouseEvent.MOUSE_UP, onMouseUpAnyWhere );
+                _mouseDown = event;
+            }
+        }
+
+        private function onMouseUpAnyWhere( event:MouseEvent ):void{
+            event.currentTarget.removeEventListener( MouseEvent.MOUSE_UP, onMouseUpAnyWhere );
+            _mouseDown = null;
+            treeGrid.draggingHeader = null;
+        }
+
+        private function onMouseMove( event:MouseEvent ):void{
+            if( _mouseDown != null && treeGrid.treeGridData.rootModel.rootApp.dragging == null ){
+                treeGrid.treeGridData.rootModel.doDrag( this, getDragSource(), event );
+                treeGrid.draggingHeader = this;
+            }
+        }
+
+        protected function getDragSource():DragSource{
+            return new DragSource();
+        }
+
+        private function set rfrDraggingIndicator( ignoreVar:* ):void{
+            treeGrid.treeGridData.rootModel.callInNext.putIn( refreshDraggingIndicator );
+        }
+
+        private function refreshDraggingIndicator():void{
+            if( treeGrid.draggingHeader == null ){
+                leftDropIndicator.visible = false;
+                rightDropIndicator.visible = false;
+            }
+        }
+
+        ]]></fx:Script>
+    <fx:Binding source="treeGrid.draggingHeader" destination="rfrDraggingIndicator"/>
+</v:TreeGridRenderer>

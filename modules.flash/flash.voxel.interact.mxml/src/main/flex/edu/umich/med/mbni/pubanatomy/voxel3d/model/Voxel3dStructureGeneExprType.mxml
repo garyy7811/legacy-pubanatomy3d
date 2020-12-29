@@ -1,0 +1,98 @@
+<?xml version="1.0"?>
+<datadriven3dwindow:Dd3dModelMeshParticleSet xmlns:fx="http://ns.adobe.com/mxml/2009"
+                                             xmlns:datadriven3dwindow="edu.umich.med.mbni.pubanatomy.datadriven3dwindow.*"
+                                             color="{_geneCol.selectedDataSet.color}" alpha="0.5">
+    <fx:Binding source="v3dStructureGeneExpr.v3dStructure.model.on3dStageStructureTreeGridData"
+                destination="_treeData"/>
+    <fx:Script><![CDATA[
+        import edu.umich.med.mbni.pubanatomy.atlas.model.StructureGeneExprTypeDs;
+        import edu.umich.med.mbni.pubanatomy.atlas.model.StructureTreeGridDataColumnGene;
+        import edu.umich.med.mbni.pubanatomy.flash.dto.DtoVoxelLevel;
+
+        import mx.collections.ArrayList;
+
+        [Bindable]
+        public var on3dStage:Boolean;
+
+        [Bindable]
+        public var atlasGeneTypeDs:StructureGeneExprTypeDs;
+
+        [Bindable]
+        public var v3dStructureGeneExpr:Voxel3dStructureGeneExpr;
+
+        [Bindable]
+        private var _treeData:Voxel3dStructureOn3dTreeGridData;
+
+
+        private function set rfrLevels( ignoreVar:* ):void{
+            v3dStructureGeneExpr.v3dStructure.model.callInNext.putIn( refreshLevels, null, null, v3dStructureGeneExpr.v3dStructure.atlasStructure.depth * 5 + 2 );
+        }
+
+        private function refreshLevels():void{
+            if( atlasGeneTypeDs.voxelLevels != null ){
+                var lst:ArrayList = v3dStructureGeneExpr.v3dStructure.model.on3dStageGeneLevelSets;
+                if( on3dStage /*&& v3dStructureGeneExpr.v3dStructure.on3dStage*/
+                        && atlasGeneTypeDs.exprType == _treeData.selectedGeneExprType
+                        && _geneCol != null ){
+                    if( levels == null ){
+                        levels = level2particles();
+                    }
+
+                    if( lst.getItemIndex( this ) < 0 ){
+                        lst.addItem( this );
+                    }
+                }
+                else{
+                    lst.removeItem( this );
+                }
+            }
+        }
+
+        private function level2particles():Vector.<Vector3D>{
+            var tmp:Vector.<Vector3D> = new Vector.<Vector3D>();
+            var dtoVoxelLevels:Vector.<DtoVoxelLevel> = atlasGeneTypeDs.voxelLevels;
+            for( var k:int = dtoVoxelLevels.length - 1; k >= 0; k-- ){
+                var dtoVoxelLevel:DtoVoxelLevel = dtoVoxelLevels[k] as DtoVoxelLevel;
+
+                var s:Number = ( dtoVoxelLevel.level - _treeData.geneLevelHistogram.levelMinimum ) / ( _treeData.geneLevelHistogram.levelMaximum - _treeData.geneLevelHistogram.levelMinimum );
+
+                tmp.push( new Vector3D( dtoVoxelLevel.voxel.x * 8, dtoVoxelLevel.voxel.y * 8, dtoVoxelLevel.voxel.z * 8, 0.1 + 3.8 * s ) );
+            }
+            return tmp;
+        }
+
+        public function equals( o:Voxel3dStructureGeneExprType ):Boolean{
+            if( o == null || o.atlasGeneTypeDs == null || o.v3dStructureGeneExpr == null ){
+                return false;
+            }
+            return o.atlasGeneTypeDs.exprType == atlasGeneTypeDs.exprType
+                    && o.v3dStructureGeneExpr.structureGene.gene.dtoGene.geneId == v3dStructureGeneExpr.structureGene.gene.dtoGene.geneId
+                    && o.v3dStructureGeneExpr.v3dStructure.atlasStructure.dtoStructure.structureId == v3dStructureGeneExpr.v3dStructure.atlasStructure.dtoStructure.structureId;
+        }
+
+        public function destroy():void{
+        }
+        ]]></fx:Script>
+
+    <fx:Binding source="on3dStage" destination="rfrLevels"/>
+    <!--<fx:Binding source="v3dStructureGeneExpr.v3dStructure.on3dStage" destination="rfrLevels"/>-->
+    <fx:Binding source="atlasGeneTypeDs.voxelLevels" destination="rfrLevels"/>
+    <fx:Binding source="_treeData.selectedGeneExprType" destination="rfrLevels"/>
+
+    <fx:Script><![CDATA[
+        [Bindable]
+        private var _geneCol:StructureTreeGridDataColumnGene;
+
+        private function set rfrGeneCol( v:* ):void{
+            _treeData.rootModelVoxel3d.callInNext.putIn( refreshGeneCol );
+        }
+
+        private function refreshGeneCol():void{
+            _geneCol = _treeData.getGeneColByDataSet( atlasGeneTypeDs.sectionDataSet ) as StructureTreeGridDataColumnGene;
+
+            rfrLevels = null;
+        }
+        ]]></fx:Script>
+    <fx:Binding source="atlasGeneTypeDs.sectionDataSet" destination="rfrGeneCol"/>
+    <fx:Binding source="_treeData.geneColumns.length" destination="rfrGeneCol"/>
+</datadriven3dwindow:Dd3dModelMeshParticleSet>

@@ -1,0 +1,195 @@
+<?xml version="1.0"?>
+<s:DataGrid xmlns:fx="http://ns.adobe.com/mxml/2009"
+            xmlns:s="library://ns.adobe.com/flex/spark"
+            xmlns:as3lib="com.flashflexpro.as3lib.*"
+            skinClass="edu.umich.med.mbni.treedatagrid.TreeGridSkin"
+            rowHeight="15" selectionMode="multipleRows"
+            gridMouseDrag="startDragDrop(event)" cachePolicy="on"
+            keyUp="if( event.keyCode == Keyboard.ESCAPE ){ selectedIndex = -1 ;}"
+            selectionChanging="onSelectionChanging( event );"
+            resize="treeGridData.rootModel.callInNext.putIn( onResized, this, null, 5 );"
+        >
+    <fx:Script><![CDATA[
+        import edu.umich.med.mbni.utils.RootModelModule;
+
+        import mx.collections.IList;
+        import mx.core.DragSource;
+
+        import spark.events.GridEvent;
+        import spark.events.GridSelectionEvent;
+        import spark.events.GridSelectionEventKind;
+
+        CONFIG::debugging{
+            override public function set dataProvider( value:IList ):void{
+                throw new Error( "" );
+            }
+        }
+
+        private var _treeGridData:TreeGridData;
+        [Bindable(event="treeGridDataChanged")]
+        public function get treeGridData():TreeGridData{
+            return _treeGridData;
+        }
+
+        public function set treeGridData( value:TreeGridData ):void{
+            if( value != _treeGridData ){
+                _treeGridData = value;
+                dispatchEvent( new Event( "treeGridDataChanged" ) );
+            }
+        }
+
+        private function startDragDrop( event:GridEvent ):void{
+            if( selectedItems != null
+                    && selectedItems.length > 0
+                    && event.rowIndex >= 0
+                    && selectedIndices.indexOf( event.rowIndex ) >= 0
+                    && treeGridData.rootModel.rootApp.dragging == null ){
+                var dragSource:DragSource = new DragSource();
+                dragSource.addData( selectedItems, RootModelModule.DRAGGING_FORMAT );
+                treeGridData.rootModel.doDrag( this, dragSource, event );
+            }
+        }
+
+        protected function onSelectionChanging( event:GridSelectionEvent ):void{
+            if( event.kind == GridSelectionEventKind.SET_ROW &&
+                    selectedIndices.indexOf( event.selectionChange.rowIndex ) >= 0 &&
+                    event.selectionChange.rowCount == 1 ){
+                event.preventDefault();
+            }
+        }
+
+        private function set rfrDataProvider( ignoreVar:* ):void{
+            super.dataProvider = treeGridData.dataGridDataProvider;
+        }
+
+        public function dropColumnOn( gridCol:TreeGridColumn, leftOrRight:Boolean ):void{
+            var draggingIndex:int = columns.getItemIndex( draggingHeader.column );
+            var droppingIndex:int = columns.getItemIndex( gridCol );
+
+            var newIndex:int = -1;
+            if( draggingIndex > droppingIndex ){
+                newIndex = leftOrRight ? droppingIndex : droppingIndex + 1;
+            }
+            else{
+                newIndex = leftOrRight ? droppingIndex - 1 : droppingIndex;
+            }
+            treeGridData.columns.addItemAt( treeGridData.columns.removeItemAt( draggingIndex ), newIndex );
+        }
+
+        [Bindable]
+        public var draggingHeader:TreeGridRendererHeader;
+
+        [Bindable]
+        public var depthIndent:uint = 16;
+
+        protected function columnModel2View( m:TreeGridDataColumn ):TreeGridColumn{
+            var treeGridColumn:TreeGridColumn = _treeGridData.rootModel.instantiate( TreeGridColumn ) as TreeGridColumn;
+            treeGridColumn.data = m;
+            return treeGridColumn;
+        }
+
+        private function getOrderColFromCol( o:TreeGridColumn ):TreeGridDataColumn{
+            return o.data;
+        }
+        ]]></fx:Script>
+    <fx:Binding source="treeGridData.dataGridDataProvider.length" destination="rfrDataProvider"/>
+    <s:selectedItems>@{treeGridData.selectedItems}</s:selectedItems>
+
+    <fx:Declarations>
+        <as3lib:Sync2Lists source="{treeGridData.columns}" destination="{columns}"
+                           getDestInst="columnModel2View"
+                />
+        <as3lib:Sync2Lists source="{columns}" destination="{treeGridData.colOrderList}"
+                           getDestInst="getOrderColFromCol"/>
+    </fx:Declarations>
+    <s:columns>
+        <s:ArrayList id="__treeGridColumns"/>
+    </s:columns>
+    <fx:Script><![CDATA[
+        private function set rfrEnSureVis( ignoreVar:* ):void{
+            treeGridData.rootModel.callInNext.putIn( refreshEnSureVis );
+        }
+
+        private function refreshEnSureVis():void{
+            if( treeGridData.ensureVisibleRow != null ){
+                var idx:int = treeGridData.dataGridDataProvider.getItemIndex( treeGridData.ensureVisibleRow );
+                if( idx >= 0 ){
+                    ensureCellIsVisible( idx );
+                    treeGridData.ensureVisibleRow = null;
+                }
+            }
+        }
+        ]]></fx:Script>
+    <fx:Binding source="treeGridData.ensureVisibleRow" destination="rfrEnSureVis"/>
+
+    <fx:Script><![CDATA[
+        private function onResized():void{
+            var j:int;
+            var col:TreeGridColumn;
+
+            var colSumWidth:uint = ( scroller.verticalScrollBar == null ? 0 : scroller.verticalScrollBar.width );
+
+            var maxWidthCols:Vector.<TreeGridColumn> = new <TreeGridColumn>[];
+            var maxAvrgCols:Vector.<TreeGridColumn> = new <TreeGridColumn>[];
+
+            var minWidthCols:Vector.<TreeGridColumn> = new <TreeGridColumn>[];
+            var minAvrgCols:Vector.<TreeGridColumn> = new <TreeGridColumn>[];
+
+            for( j = columns.length - 1; j >= 0; j-- ){
+                col = columns.getItemAt( j ) as TreeGridColumn;
+                colSumWidth += col.width;
+
+                if( isNaN( col.maxWidth ) ){
+                    maxAvrgCols.push( col );
+                }
+                else{
+                    maxWidthCols.push( col );
+                }
+
+                if( isNaN( col.minWidth ) ){
+                    minAvrgCols.push( col );
+                }
+                else{
+                    minWidthCols.push( col );
+                }
+            }
+
+            var toDistr:int = width - colSumWidth;
+            if( toDistr > 0 ){
+                for( j = maxWidthCols.length - 1; j >= 0; j-- ){
+                    var jCol:TreeGridColumn = maxWidthCols[j] as TreeGridColumn;
+                    var jToAdd:Number = Math.min( toDistr, jCol.maxWidth - jCol.width );
+                    jCol.width += jToAdd;
+                    toDistr -= jToAdd;
+                    if( toDistr <= 0 ){
+                        return;
+                    }
+                }
+                var avgDistr:Number = toDistr / maxAvrgCols.length;
+                for( var j:int = maxAvrgCols.length - 1; j >= 0; j-- ){
+                    ( maxAvrgCols[j] as TreeGridColumn ).width += avgDistr;
+                }
+            }
+            else if( toDistr < 0 ){
+
+                toDistr = -toDistr;
+
+                for( j = minWidthCols.length - 1; j >= 0; j-- ){
+                    var jCol:TreeGridColumn = minWidthCols[j] as TreeGridColumn;
+                    var jToMin:Number = Math.min( toDistr, jCol.width - jCol.minWidth );
+                    jCol.width -= jToMin;
+                    toDistr -= jToMin;
+                    if( toDistr <= 0 ){
+                        return;
+                    }
+                }
+
+                var avgDistr:Number = toDistr / minAvrgCols.length;
+                for( var j:int = minAvrgCols.length - 1; j >= 0; j-- ){
+                    ( minAvrgCols[j] as TreeGridColumn ).width -= avgDistr;
+                }
+            }
+
+        }
+        ]]></fx:Script>
+</s:DataGrid>

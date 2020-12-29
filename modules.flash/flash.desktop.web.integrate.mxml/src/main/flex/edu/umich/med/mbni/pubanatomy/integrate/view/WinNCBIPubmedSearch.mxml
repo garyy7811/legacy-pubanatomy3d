@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<view:WebWinBase xmlns:fx="http://ns.adobe.com/mxml/2009"
+                 xmlns:view="edu.umich.med.mbni.pubanatomy.integrate.view.*"
+                 xmlns:ncbi="edu.umich.med.mbni.pubanatomy.ncbipubmedsearch.*"
+                 xmlns:s="library://ns.adobe.com/flex/spark" title="NCBI PubMed Search">
+    <fx:Script><![CDATA[
+        import edu.umich.med.mbni.pubanatomy.ncbipubmedsearch.MDLNCBIPubmedQueryResult;
+
+        [Bindable(event="dataChanged")]
+        public function get model():MDLNCBIPubmedQueryResult{
+            return data as MDLNCBIPubmedQueryResult;
+        }
+
+        override public function onCloseButtonClicked():void{
+            rootView.rootAppModel.webWinModels.removeItem( model );
+        }
+
+        ]]></fx:Script>
+    <ncbi:ViewNCBIPubmedQueryResult model="{model}"
+                                  width="100%" height="100%"/>
+    <view:botleGroupContent>
+        <s:Label visible="{model.listError!= null}" includeInLayout="{model.listError != null}"
+                text="unexpect error encountered, please change term."/>
+    </view:botleGroupContent>
+</view:WebWinBase>

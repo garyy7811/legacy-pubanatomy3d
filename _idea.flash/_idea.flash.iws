@@ -1,0 +1,2076 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ChangeListManager">
+    <list default="true" id="d8e27e83-6b7e-47d7-8876-3edd44e50fc7" name="Default" comment="">
+      <change afterPath="$PROJECT_DIR$/../.gitignore" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../README.md" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="CreatePatchCommitExecutor">
+    <option name="PATCH_PATH" value="" />
+  </component>
+  <component name="DebuggerManager">
+    <breakpoint_any default_suspend_policy="SuspendAll" default_condition_enabled="true" converted="true">
+      <breakpoint>
+        <option name="NOTIFY_CAUGHT" value="true" />
+        <option name="NOTIFY_UNCAUGHT" value="true" />
+        <option name="ENABLED" value="false" />
+        <option name="LOG_ENABLED" value="false" />
+        <option name="LOG_EXPRESSION_ENABLED" value="false" />
+        <option name="REMOVE_AFTER_HIT" value="false" />
+        <option name="SUSPEND_POLICY" value="SuspendAll" />
+        <option name="SUSPEND" value="true" />
+        <option name="COUNT_FILTER_ENABLED" value="false" />
+        <option name="COUNT_FILTER" value="0" />
+        <option name="CONDITION_ENABLED" value="true" />
+        <option name="CLASS_FILTERS_ENABLED" value="false" />
+        <option name="INSTANCE_FILTERS_ENABLED" value="false" />
+        <option name="CONDITION" value="" />
+        <option name="LOG_MESSAGE" value="" />
+      </breakpoint>
+      <breakpoint>
+        <option name="NOTIFY_CAUGHT" value="true" />
+        <option name="NOTIFY_UNCAUGHT" value="true" />
+        <option name="ENABLED" value="false" />
+        <option name="LOG_ENABLED" value="false" />
+        <option name="LOG_EXPRESSION_ENABLED" value="false" />
+        <option name="REMOVE_AFTER_HIT" value="false" />
+        <option name="SUSPEND_POLICY" value="SuspendAll" />
+        <option name="SUSPEND" value="true" />
+        <option name="COUNT_FILTER_ENABLED" value="false" />
+        <option name="COUNT_FILTER" value="0" />
+        <option name="CONDITION_ENABLED" value="true" />
+        <option name="CLASS_FILTERS_ENABLED" value="false" />
+        <option name="INSTANCE_FILTERS_ENABLED" value="false" />
+        <option name="CONDITION" value="" />
+        <option name="LOG_MESSAGE" value="" />
+      </breakpoint>
+    </breakpoint_any>
+    <ui_properties converted="true" />
+    <breakpoint_rules converted="true" />
+  </component>
+  <component name="FavoritesManager">
+    <favorites_list name="_idea.flash" />
+  </component>
+  <component name="FileEditorManager">
+    <splitter split-orientation="horizontal" split-proportion="0.5105438">
+      <split-first>
+        <leaf>
+          <file leaf-file-name="Dd3dViewMeshParticleSet.mxml" pinned="false" current="false" current-in-tab="false">
+            <entry file="file://$PROJECT_DIR$/../modules.flash/flash.interface.away3d/src/main/flex/edu/umich/med/mbni/pubanatomy/datadriven3dwindow/Dd3dViewMeshParticleSet.mxml">
+              <provider selected="true" editor-type-id="text-editor">
+                <state vertical-scroll-proportion="-13.076923" vertical-offset="85" max-vertical-offset="782">
+                  <caret line="25" column="56" selection-start-line="25" selection-start-column="56" selection-end-line="25" selection-end-column="56" />
+                  <folding>
+                    <marker date="1383833503281" expanded="true" signature="273:344" placeholder="..." />
+                    <marker date="1383833503281" expanded="true" signature="451:517" placeholder="{...}" />
+                    <marker date="1383833503281" expanded="true" signature="575:1421" placeholder="{...}" />
+                    <marker date="1383833503281" expanded="true" signature="592:1231" placeholder="{...}" />
+                    <marker date="1383833503281" expanded="true" signature="670:1216" placeholder="{...}" />
+                    <marker date="1383833503281" expanded="true" signature="1271:1411" placeholder="{...}" />
+                    <marker date="1383833503281" expanded="true" signature="1289:1397" placeholder="{...}" />
+                  </folding>
+                </state>
+              </provider>
+            </entry>
+          </file>
+          <file leaf-file-name="Voxel3dOperation3dModelAlpha.as" pinned="false" current="false" current-in-tab="false">
+            <entry file="file://$PROJECT_DIR$/../modules.flash/flash.voxel.interact.mxml/src/main/flex/edu/umich/med/mbni/pubanatomy/voxel3d/model/Voxel3dOperation3dModelAlpha.as">
+              <provider selected="true" editor-type-id="text-editor">
+                <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="527">
+                  <caret line="20" column="38" selection-start-line="20" selection-start-column="38" selection-end-line="20" selection-end-column="38" />
+                  <folding>
+                    <element signature="n#!!doc" expanded="true" />
+                  </folding>
+                </state>
+              </provider>
+            </entry>
+          </file>
+          <file leaf-file-name="V3dStructureTreeGridMultiAlphaAjust.mxml" pinned="false" current="false" current-in-tab="false">
+            <entry file="file://$PROJECT_DIR$/../modules.flash/flash.voxel.interact.mxml/src/main/flex/edu/umich/med/mbni/pubanatomy/voxel3d/view/V3dStructureTreeGridMultiAlphaAjust.mxml">
+              <provider selected="true" editor-type-id="text-editor">
+                <state vertical-scroll-proportion="-9.153846" vertical-offset="0" max-vertical-offset="493">
+                  <caret line="15" column="63" selection-start-line="15" selection-start-column="63" selection-end-line="15" selection-end-column="63" />
+                  <folding>
+                    <marker date="1403625195457" expanded="false" signature="545:705" placeholder="..." />
+                    <marker date="1403625195457" expanded="true" signature="837:1047" placeholder="{...}" />
+                    <marker date="1403625195457" expanded="true" signature="944:1034" placeholder="{...}" />
+                    <marker date="1403625195457" expanded="true" signature="1102:1161" placeholder="{...}" />
+                  </folding>
+                </state>
+              </provider>
+            </entry>
+          </file>
+          <file leaf-file-name="StructureItem.mxml" pinned="false" current="false" current-in-tab="false">
+            <entry file="file://$PROJECT_DIR$/../modules.flash/flash.atlas.mxml/src/main/flex/edu/umich/med/mbni/pubanatomy/atlas/model/StructureItem.mxml">
+              <provider selected="true" editor-type-id="text-editor">
+                <state vertical-scroll-proportion="-8.038462" vertical-offset="233" max-vertical-offset="1564">
+                  <caret line="26" column="20" selection-start-line="26" selection-start-column="20" selection-end-line="26" selection-end-column="20" />
+                  <folding>
+                    <marker date="1383833506632" expanded="true" signature="633:688" placeholder="{...}" />
+                    <marker date="1383833506632" expanded="true" signature="856:980" placeholder="{...}" />
+                    <marker date="1383833506632" expanded="true" signature="896:970" placeholder="{...}" />
+                    <marker date="1383833506632" expanded="true" signature="1185:1341" placeholder="{...}" />
+                    <marker date="1383833506632" expanded="true" signature="1421:1458" placeholder="{...}" />
+                    <marker date="1383833506632" expanded="true" signature="1551:1873" placeholder="{...}" />
+                    <marker date="1383833506632" expanded="true" signature="1613:1832" placeholder="{...}" />
+                    <marker date="1383833506632" expanded="true" signature="1746:1818" placeholder="{...}" />
+                    <marker date="1383833506632" expanded="true" signature="2510:2552" placeholder="{...}" />
+                    <marker date="1383833506632" expanded="true" signature="2609:2839" placeholder="{...}" />
+                    <marker date="1383833506632" expanded="true" signature="2714:2829" placeholder="{...}" />
+                  </folding>
+                </state>
+              </provider>
+            </entry>
+          </file>
+          <file leaf-file-name="Voxel3dStructureModel.mxml" pinned="false" current="false" current-in-tab="false">
+            <entry file="file://$PROJECT_DIR$/../modules.flash/flash.voxel.interact.mxml/src/main/flex/edu/umich/med/mbni/pubanatomy/voxel3d/model/Voxel3dStructureModel.mxml">
+              <provider selected="true" editor-type-id="text-editor">
+                <state vertical-scroll-proportion="-16.576923" vertical-offset="351" max-vertical-offset="952">
+                  <caret line="48" column="75" selection-start-line="48" selection-start-column="75" selection-end-line="48" selection-end-column="75" />
+                  <folding>
+                    <marker date="1383833507160" expanded="false" signature="226:422" placeholder="..." />
+                    <marker date="1383833507160" expanded="true" signature="558:946" placeholder="{...}" />
+                    <marker date="1383833507160" expanded="true" signature="681:936" placeholder="{...}" />
+                    <marker date="1383833507160" expanded="true" signature="1087:1126" placeholder="{...}" />
+                    <marker date="1383833507160" expanded="true" signature="1185:1235" placeholder="{...}" />
+                    <marker date="1383833507160" expanded="true" signature="1294:1360" placeholder="{...}" />
+                    <marker date="1383833507160" expanded="true" signature="1447:1598" placeholder="{...}" />
+                  </folding>
+                </state>
+              </provider>
+            </entry>
+          </file>
+          <file leaf-file-name="Dd3dModelMeshBase.mxml" pinned="false" current="false" current-in-tab="false">
+            <entry file="file://$PROJECT_DIR$/../modules.flash/flash.interface.away3d/src/main/flex/edu/umich/med/mbni/pubanatomy/datadriven3dwindow/Dd3dModelMeshBase.mxml">
+              <provider selected="true" editor-type-id="text-editor">
+                <state vertical-scroll-proportion="-14.384615" vertical-offset="0" max-vertical-offset="1088">
+                  <caret line="22" column="20" selection-start-line="22" selection-start-column="20" selection-end-line="22" selection-end-column="20" />
+                  <folding>
+                    <marker date="1383833503289" expanded="true" signature="299:341" placeholder="{...}" />
+                    <marker date="1383833503289" expanded="true" signature="402:568" placeholder="{...}" />
+                    <marker date="1383833503289" expanded="true" signature="441:558" placeholder="{...}" />
+                    <marker date="1383833503289" expanded="true" signature="1041:1083" placeholder="{...}" />
+                    <marker date="1383833503289" expanded="true" signature="1290:1328" placeholder="{...}" />
+                    <marker date="1383833503289" expanded="true" signature="1394:1547" placeholder="{...}" />
+                    <marker date="1383833503289" expanded="true" signature="1429:1537" placeholder="{...}" />
+                  </folding>
+                </state>
+              </provider>
+            </entry>
+          </file>
+          <file leaf-file-name="Dd3dModelMeshParticleSet.mxml" pinned="false" current="false" current-in-tab="false">
+            <entry file="file://$PROJECT_DIR$/../modules.flash/flash.interface.away3d/src/main/flex/edu/umich/med/mbni/pubanatomy/datadriven3dwindow/Dd3dModelMeshParticleSet.mxml">
+              <provider selected="true" editor-type-id="text-editor">
+                <state vertical-scroll-proportion="-0.65384614" vertical-offset="0" max-vertical-offset="2091">
+                  <caret line="1" column="0" selection-start-line="1" selection-start-column="0" selection-end-line="1" selection-end-column="0" />
+                  <folding>
+                    <marker date="1397766873625" expanded="true" signature="473:514" placeholder="{...}" />
+                    <marker date="1397766873625" expanded="true" signature="605:645" placeholder="{...}" />
+                    <marker date="1397766873625" expanded="true" signature="734:774" placeholder="{...}" />
+                    <marker date="1397766873625" expanded="true" signature="889:4668" placeholder="{...}" />
+                    <marker date="1397766873625" expanded="true" signature="923:4658" placeholder="{...}" />
+                    <marker date="1397766873625" expanded="true" signature="1194:4454" placeholder="{...}" />
+                    <marker date="1397766873625" expanded="true" signature="4718:4799" placeholder="{...}" />
+                  </folding>
+                </state>
+              </provider>
+            </entry>
+          </file>
+          <file leaf-file-name="Voxel3dStructureGeneExprType.mxml" pinned="false" current="true" current-in-tab="true">
+            <entry file="file://$PROJECT_DIR$/../modules.flash/flash.voxel.interact.mxml/src/main/flex/edu/umich/med/mbni/pubanatomy/voxel3d/model/Voxel3dStructureGeneExprType.mxml">
+              <provider selected="true" editor-type-id="text-editor">
+                <state vertical-scroll-proportion="0.6296296" vertical-offset="0" max-vertical-offset="1768">
+                  <caret line="21" column="59" selection-start-line="21" selection-start-column="0" selection-end-line="21" selection-end-column="0" />
+                  <folding>
+                    <marker date="1404309233824" expanded="true" signature="508:776" placeholder="..." />
+                    <marker date="1404309233824" expanded="true" signature="1145:1319" placeholder="{...}" />
+                    <marker date="1404309233824" expanded="true" signature="1366:2102" placeholder="{...}" />
+                    <marker date="1404309233824" expanded="true" signature="1421:2092" placeholder="{...}" />
+                    <marker date="1404309233824" expanded="true" signature="1553:1603" placeholder="/*...*/" />
+                    <marker date="1404309233824" expanded="true" signature="1735:1994" placeholder="{...}" />
+                    <marker date="1404309233824" expanded="true" signature="1777:1852" placeholder="{...}" />
+                    <marker date="1404309233824" expanded="true" signature="1908:1976" placeholder="{...}" />
+                    <marker date="1404309233824" expanded="true" signature="2015:2078" placeholder="{...}" />
+                    <marker date="1404309233824" expanded="true" signature="2164:2854" placeholder="{...}" />
+                    <marker date="1404309233824" expanded="true" signature="2385:2820" placeholder="{...}" />
+                    <marker date="1404309233824" expanded="true" signature="2928:3464" placeholder="{...}" />
+                    <marker date="1404309233824" expanded="true" signature="3020:3065" placeholder="{...}" />
+                    <marker date="1404309233824" expanded="true" signature="3504:3515" placeholder="{...}" />
+                    <marker date="1404309233824" expanded="true" signature="4024:4110" placeholder="{...}" />
+                    <marker date="1404309233824" expanded="true" signature="4158:4323" placeholder="{...}" />
+                  </folding>
+                </state>
+              </provider>
+            </entry>
+          </file>
+          <file leaf-file-name="Voxel3dStructureOn3dTreeGridData.mxml" pinned="false" current="false" current-in-tab="false">
+            <entry file="file://$PROJECT_DIR$/../modules.flash/flash.voxel.interact.mxml/src/main/flex/edu/umich/med/mbni/pubanatomy/voxel3d/model/Voxel3dStructureOn3dTreeGridData.mxml">
+              <provider selected="true" editor-type-id="text-editor">
+                <state vertical-scroll-proportion="-8.115385" vertical-offset="2611" max-vertical-offset="4964">
+                  <caret line="171" column="34" selection-start-line="171" selection-start-column="34" selection-end-line="171" selection-end-column="34" />
+                  <folding>
+                    <marker date="1401890405401" expanded="false" signature="313:631" placeholder="..." />
+                    <marker date="1401890405401" expanded="true" signature="1020:1245" placeholder="{...}" />
+                    <marker date="1401890405401" expanded="true" signature="1135:1174" placeholder="{...}" />
+                    <marker date="1401890405401" expanded="true" signature="1296:2118" placeholder="{...}" />
+                    <marker date="1401890405401" expanded="true" signature="1313:1928" placeholder="{...}" />
+                    <marker date="1401890405401" expanded="true" signature="1486:1713" placeholder="{...}" />
+                    <marker date="1401890405401" expanded="true" signature="1812:1914" placeholder="{...}" />
+                    <marker date="1401890405401" expanded="true" signature="1968:2108" placeholder="{...}" />
+                    <marker date="1401890405401" expanded="true" signature="1986:2094" placeholder="{...}" />
+                    <marker date="1401890405401" expanded="true" signature="2168:3326" placeholder="{...}" />
+                    <marker date="1401890405401" expanded="true" signature="2392:2485" placeholder="{...}" />
+                    <marker date="1401890405401" expanded="true" signature="2677:2819" placeholder="{...}" />
+                    <marker date="1401890405401" expanded="true" signature="3015:3225" placeholder="{...}" />
+                    <marker date="1401890405401" expanded="true" signature="3066:3157" placeholder="{...}" />
+                    <marker date="1401890405401" expanded="true" signature="3475:3529" placeholder="{...}" />
+                    <marker date="1401890405401" expanded="true" signature="3585:4568" placeholder="{...}" />
+                    <marker date="1401890405401" expanded="true" signature="3711:3753" placeholder="{...}" />
+                    <marker date="1401890405401" expanded="true" signature="3814:4401" placeholder="{...}" />
+                    <marker date="1401890405401" expanded="true" signature="3946:4384" placeholder="{...}" />
+                    <marker date="1401890405401" expanded="true" signature="4118:4366" placeholder="{...}" />
+                    <marker date="1401890405401" expanded="true" signature="4180:4286" placeholder="{...}" />
+                    <marker date="1401890405401" expanded="true" signature="4418:4463" placeholder="{...}" />
+                    <marker date="1401890405401" expanded="true" signature="4636:4959" placeholder="{...}" />
+                    <marker date="1401890405401" expanded="true" signature="4736:4949" placeholder="{...}" />
+                    <marker date="1401890405401" expanded="true" signature="4819:4902" placeholder="{...}" />
+                    <marker date="1401890405401" expanded="true" signature="5038:5107" placeholder="{...}" />
+                    <marker date="1401890405401" expanded="true" signature="5636:5865" placeholder="{...}" />
+                    <marker date="1401890405401" expanded="true" signature="6034:6082" placeholder="{...}" />
+                    <marker date="1401890405401" expanded="true" signature="6175:6419" placeholder="{...}" />
+                    <marker date="1401890405401" expanded="true" signature="6585:7423" placeholder="{...}" />
+                    <marker date="1401890405401" expanded="true" signature="6678:7413" placeholder="{...}" />
+                    <marker date="1401890405401" expanded="true" signature="6727:6910" placeholder="{...}" />
+                    <marker date="1401890405401" expanded="true" signature="7112:7292" placeholder="{...}" />
+                    <marker date="1401890405401" expanded="false" signature="7573:7753" placeholder="..." />
+                    <marker date="1401890405401" expanded="true" signature="7795:9294" placeholder="{...}" />
+                    <marker date="1401890405401" expanded="true" signature="7923:8052" placeholder="{...}" />
+                    <marker date="1401890405401" expanded="true" signature="8234:8395" placeholder="{...}" />
+                    <marker date="1401890405401" expanded="true" signature="8690:9195" placeholder="{...}" />
+                    <marker date="1401890405401" expanded="true" signature="8986:9058" placeholder="{...}" />
+                    <marker date="1401890405401" expanded="true" signature="9109:9181" placeholder="{...}" />
+                    <marker date="1401890405401" expanded="true" signature="9346:10026" placeholder="{...}" />
+                    <marker date="1401890405401" expanded="true" signature="9503:9571" placeholder="{...}" />
+                    <marker date="1401890405401" expanded="true" signature="9714:9944" placeholder="{...}" />
+                    <marker date="1401890405401" expanded="true" signature="10207:11164" placeholder="{...}" />
+                    <marker date="1401890405401" expanded="true" signature="10252:11077" placeholder="{...}" />
+                    <marker date="1401890405401" expanded="true" signature="10608:11063" placeholder="{...}" />
+                    <marker date="1401890405401" expanded="true" signature="10802:10884" placeholder="{...}" />
+                    <marker date="1401890405401" expanded="true" signature="10975:11045" placeholder="{...}" />
+                    <marker date="1401890405401" expanded="true" signature="11203:11489" placeholder="{...}" />
+                    <marker date="1401890405401" expanded="true" signature="11528:11626" placeholder="{...}" />
+                    <marker date="1401890405401" expanded="true" signature="11742:11904" placeholder="{...}" />
+                    <marker date="1401890405401" expanded="true" signature="11956:12446" placeholder="{...}" />
+                    <marker date="1401890405401" expanded="true" signature="12130:12248" placeholder="{...}" />
+                    <marker date="1401890405401" expanded="true" signature="12277:12436" placeholder="{...}" />
+                  </folding>
+                </state>
+              </provider>
+            </entry>
+          </file>
+          <file leaf-file-name="Dd3dViewMeshInteract.mxml" pinned="false" current="false" current-in-tab="false">
+            <entry file="file://$PROJECT_DIR$/../modules.flash/flash.interface.away3d/src/main/flex/edu/umich/med/mbni/pubanatomy/datadriven3dwindow/Dd3dViewMeshInteract.mxml">
+              <provider selected="true" editor-type-id="text-editor">
+                <state vertical-scroll-proportion="-0.0" vertical-offset="0" max-vertical-offset="1445">
+                  <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+                  <folding>
+                    <marker date="1383943504919" expanded="false" signature="274:465" placeholder="..." />
+                    <marker date="1383943504919" expanded="true" signature="574:624" placeholder="{...}" />
+                    <marker date="1383943504919" expanded="true" signature="697:1432" placeholder="{...}" />
+                    <marker date="1383943504919" expanded="true" signature="744:1422" placeholder="{...}" />
+                    <marker date="1383943504919" expanded="true" signature="817:1063" placeholder="{...}" />
+                    <marker date="1383943504919" expanded="true" signature="1084:1339" placeholder="{...}" />
+                    <marker date="1383943504919" expanded="true" signature="1494:2037" placeholder="{...}" />
+                    <marker date="1383943504919" expanded="true" signature="1527:1566" placeholder="{...}" />
+                    <marker date="1383943504919" expanded="true" signature="1691:1826" placeholder="{...}" />
+                    <marker date="1383943504919" expanded="true" signature="1886:2027" placeholder="{...}" />
+                    <marker date="1383943504919" expanded="true" signature="2147:2307" placeholder="{...}" />
+                    <marker date="1383943504919" expanded="true" signature="2225:2297" placeholder="{...}" />
+                    <marker date="1383943504919" expanded="true" signature="2372:3054" placeholder="{...}" />
+                    <marker date="1383943504919" expanded="true" signature="2506:2705" placeholder="{...}" />
+                    <marker date="1383943504919" expanded="true" signature="2756:2804" placeholder="{...}" />
+                    <marker date="1383943504919" expanded="true" signature="2821:2871" placeholder="{...}" />
+                    <marker date="1383943504919" expanded="true" signature="2905:2954" placeholder="{...}" />
+                    <marker date="1383943504919" expanded="true" signature="2971:3020" placeholder="{...}" />
+                  </folding>
+                </state>
+              </provider>
+            </entry>
+          </file>
+        </leaf>
+      </split-first>
+      <split-second>
+        <leaf>
+          <file leaf-file-name="StructureTreeGridDataColumnGene.mxml" pinned="false" current="false" current-in-tab="true">
+            <entry file="file://$PROJECT_DIR$/../modules.flash/flash.atlas.mxml/src/main/flex/edu/umich/med/mbni/pubanatomy/atlas/model/StructureTreeGridDataColumnGene.mxml">
+              <provider selected="true" editor-type-id="text-editor">
+                <state vertical-scroll-proportion="2.5681446" vertical-offset="0" max-vertical-offset="4046">
+                  <caret line="97" column="44" selection-start-line="97" selection-start-column="44" selection-end-line="97" selection-end-column="44" />
+                  <folding>
+                    <marker date="1403727772833" expanded="false" signature="301:413" placeholder="..." />
+                    <marker date="1403727772833" expanded="true" signature="536:605" placeholder="{...}" />
+                    <marker date="1403727772833" expanded="true" signature="777:829" placeholder="{...}" />
+                    <marker date="1403727772833" expanded="true" signature="900:1096" placeholder="{...}" />
+                    <marker date="1403727772833" expanded="true" signature="949:1086" placeholder="{...}" />
+                    <marker date="1403727772833" expanded="true" signature="1243:1912" placeholder="{...}" />
+                    <marker date="1403727772833" expanded="true" signature="1635:1822" placeholder="{...}" />
+                    <marker date="1403727772833" expanded="true" signature="1851:1866" placeholder="{...}" />
+                    <marker date="1403727772833" expanded="true" signature="1978:2511" placeholder="{...}" />
+                    <marker date="1403727772833" expanded="true" signature="2024:2074" placeholder="{...}" />
+                    <marker date="1403727772833" expanded="true" signature="2109:2167" placeholder="{...}" />
+                    <marker date="1403727772833" expanded="true" signature="2202:2260" placeholder="{...}" />
+                    <marker date="1403727772833" expanded="true" signature="2287:2345" placeholder="{...}" />
+                    <marker date="1403727772833" expanded="true" signature="2376:2434" placeholder="{...}" />
+                    <marker date="1403727772833" expanded="true" signature="2451:2501" placeholder="{...}" />
+                    <marker date="1403727772833" expanded="false" signature="2577:2809" placeholder="..." />
+                    <marker date="1403727772833" expanded="true" signature="2870:3516" placeholder="{...}" />
+                    <marker date="1403727772833" expanded="true" signature="2913:2952" placeholder="{...}" />
+                    <marker date="1403727772833" expanded="true" signature="3571:4708" placeholder="{...}" />
+                    <marker date="1403727772833" expanded="true" signature="3701:4471" placeholder="{...}" />
+                    <marker date="1403727772833" expanded="true" signature="3776:4457" placeholder="{...}" />
+                    <marker date="1403727772833" expanded="true" signature="3949:4245" placeholder="[...]" />
+                    <marker date="1403727772833" expanded="true" signature="4488:4606" placeholder="{...}" />
+                    <marker date="1403727772833" expanded="true" signature="5137:5182" placeholder="{...}" />
+                    <marker date="1403727772833" expanded="true" signature="5240:5307" placeholder="{...}" />
+                    <marker date="1403727772833" expanded="true" signature="5352:6682" placeholder="{...}" />
+                    <marker date="1403727772833" expanded="true" signature="5401:5440" placeholder="{...}" />
+                    <marker date="1403727772833" expanded="true" signature="5603:5761" placeholder="{...}" />
+                    <marker date="1403727772833" expanded="true" signature="5665:5747" placeholder="{...}" />
+                    <marker date="1403727772833" expanded="true" signature="5841:6672" placeholder="{...}" />
+                    <marker date="1403727772833" expanded="true" signature="6027:6448" placeholder="{...}" />
+                    <marker date="1403727772833" expanded="true" signature="6524:6658" placeholder="{...}" />
+                    <marker date="1403727772833" expanded="true" signature="7121:7189" placeholder="{...}" />
+                    <marker date="1403727772833" expanded="true" signature="7235:8943" placeholder="{...}" />
+                    <marker date="1403727772833" expanded="true" signature="7296:7385" placeholder="{...}" />
+                    <marker date="1403727772833" expanded="true" signature="7458:8616" placeholder="{...}" />
+                    <marker date="1403727772833" expanded="true" signature="7580:8578" placeholder="{...}" />
+                    <marker date="1403727772833" expanded="true" signature="7698:8223" placeholder="{...}" />
+                    <marker date="1403727772833" expanded="true" signature="7881:8201" placeholder="{...}" />
+                    <marker date="1403727772833" expanded="true" signature="7946:8070" placeholder="{...}" />
+                    <marker date="1403727772833" expanded="true" signature="8103:8175" placeholder="{...}" />
+                    <marker date="1403727772833" expanded="true" signature="8273:8560" placeholder="{...}" />
+                    <marker date="1403727772833" expanded="true" signature="8315:8392" placeholder="{...}" />
+                    <marker date="1403727772833" expanded="true" signature="8421:8538" placeholder="{...}" />
+                    <marker date="1403727772833" expanded="true" signature="8656:8741" placeholder="{...}" />
+                    <marker date="1403727772833" expanded="true" signature="9641:9695" placeholder="{...}" />
+                  </folding>
+                </state>
+              </provider>
+            </entry>
+          </file>
+          <file leaf-file-name="ModelOperationMenuChildren.as" pinned="false" current="false" current-in-tab="false">
+            <entry file="file://$PROJECT_DIR$/../modules.flash/flash.utils/src/main/flex/edu/umich/med/mbni/utils/ModelOperationMenuChildren.as">
+              <provider selected="true" editor-type-id="text-editor">
+                <state vertical-scroll-proportion="0.0" vertical-offset="238" max-vertical-offset="1190">
+                  <caret line="14" column="20" selection-start-line="14" selection-start-column="20" selection-end-line="14" selection-end-column="20" />
+                  <folding />
+                </state>
+              </provider>
+            </entry>
+          </file>
+          <file leaf-file-name="ModelOperationMenuItem.as" pinned="false" current="false" current-in-tab="false">
+            <entry file="file://$PROJECT_DIR$/../modules.flash/flash.utils/src/main/flex/edu/umich/med/mbni/utils/ModelOperationMenuItem.as">
+              <provider selected="true" editor-type-id="text-editor">
+                <state vertical-scroll-proportion="0.0" vertical-offset="153" max-vertical-offset="816">
+                  <caret line="9" column="13" selection-start-line="9" selection-start-column="13" selection-end-line="9" selection-end-column="13" />
+                  <folding />
+                </state>
+              </provider>
+            </entry>
+          </file>
+          <file leaf-file-name="OperationColumnGeneDataSelect.as" pinned="false" current="false" current-in-tab="false">
+            <entry file="file://$PROJECT_DIR$/../modules.flash/flash.atlas.mxml/src/main/flex/edu/umich/med/mbni/pubanatomy/atlas/model/OperationColumnGeneDataSelect.as">
+              <provider selected="true" editor-type-id="text-editor">
+                <state vertical-scroll-proportion="0.0" vertical-offset="238" max-vertical-offset="867">
+                  <caret line="14" column="38" selection-start-line="14" selection-start-column="38" selection-end-line="14" selection-end-column="38" />
+                  <folding />
+                </state>
+              </provider>
+            </entry>
+          </file>
+        </leaf>
+      </split-second>
+    </splitter>
+  </component>
+  <component name="FindManager">
+    <FindUsagesManager>
+      <setting name="OPEN_NEW_TAB" value="false" />
+    </FindUsagesManager>
+  </component>
+  <component name="FlexIdeProjectLevelCompilerOptionsHolder">
+    <compiler-options />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_BRANCH_BY_REPOSITORY">
+      <map>
+        <entry key="$PROJECT_DIR$/../.." value="master" />
+      </map>
+    </option>
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/.." />
+  </component>
+  <component name="GitLogSettings">
+    <option name="myDateState">
+      <MyDateState />
+    </option>
+  </component>
+  <component name="IdeDocumentHistory">
+    <option name="changedFiles">
+      <list>
+        <option value="$PROJECT_DIR$/../modules.flash/flash.search2.mxml/src/main/flex/edu/umich/med/mbni/pubanatomy/search/model/QueryTerm.mxml" />
+        <option value="$PROJECT_DIR$/../apps.flash/flash.desktop.web.integrate.swf.mxml/src/main/flex/AppCompiledConfig.mxml" />
+        <option value="$PROJECT_DIR$/../modules.flash/flash.utils/src/main/flex/edu/umich/med/mbni/utils/RootModelModule.mxml" />
+        <option value="$PROJECT_DIR$/../modules.flash/flash.atlas.mxml/src/main/flex/edu/umich/med/mbni/pubanatomy/atlas/view/SectionImageList.mxml" />
+        <option value="$PROJECT_DIR$/../modules.flash/flash.search2.mxml/src/main/flex/edu/umich/med/mbni/pubanatomy/search/view/SearchViewRecordGridColum.mxml" />
+        <option value="$PROJECT_DIR$/../modules.flash/flash.desktop.web.integrate.mxml/src/main/flex/edu/umich/med/mbni/pubanatomy/integrate/model/MDLTooltipExPub.mxml" />
+        <option value="$PROJECT_DIR$/../modules.flash/flash.atlas.mxml/src/main/flex/edu/umich/med/mbni/pubanatomy/atlas/model/GetGeneSectionDataSetImage.mxml" />
+        <option value="$PROJECT_DIR$/../modules.flash/flash.atlas.mxml/src/main/flex/edu/umich/med/mbni/pubanatomy/atlas/view/StructureTreeGridColumnGeneHeaderExtr.mxml" />
+        <option value="$PROJECT_DIR$/../apps.flash/flash.test.air/src/main/air-desc.xml" />
+        <option value="$PROJECT_DIR$/../modules.flash/flash.atlas.mxml/src/main/flex/edu/umich/med/mbni/pubanatomy/atlas/model/HistogramWatchGeneSelectedDataSet.mxml" />
+        <option value="$PROJECT_DIR$/../modules.flash/flash.atlas.mxml/src/main/flex/edu/umich/med/mbni/pubanatomy/atlas/model/StructureGeneLevelHistogram.mxml" />
+        <option value="$PROJECT_DIR$/../modules.flash/flash.interface.away3d/src/main/flex/edu/umich/med/mbni/pubanatomy/datadriven3dwindow/Dd3dModelMeshParticleSet.mxml" />
+        <option value="$PROJECT_DIR$/../modules.flash/flash.voxel.interact.mxml/src/main/flex/edu/umich/med/mbni/pubanatomy/voxel3d/model/Voxel3dSceneModel.mxml" />
+        <option value="$PROJECT_DIR$/../apps.flash/flash.desktop.web.integrate.swf.mxml/src/main/flex/AppMain.mxml" />
+        <option value="$PROJECT_DIR$/../modules.flash/flash.voxel.interact.mxml/src/main/flex/edu/umich/med/mbni/pubanatomy/voxel3d/model/Voxel3dOperationAddMoreStructures.as" />
+        <option value="$PROJECT_DIR$/../modules.flash/flash.atlas.mxml/src/main/flex/edu/umich/med/mbni/pubanatomy/atlas/model/MDLGene.mxml" />
+        <option value="$PROJECT_DIR$/../modules.flash/flash.atlas.mxml/src/main/flex/edu/umich/med/mbni/pubanatomy/atlas/model/MDLDataSet.mxml" />
+        <option value="$PROJECT_DIR$/../modules.flash/flash.remote.data.service/src/main/flex/edu/umich/med/mbni/pubanatomy/flash/rs/GetXmlFromAba.mxml" />
+        <option value="$PROJECT_DIR$/../modules.flash/flash.remote.data.service/src/main/flex/edu/umich/med/mbni/pubanatomy/flash/rs/RpcInList.mxml" />
+        <option value="$PROJECT_DIR$/../modules.flash/flash.utils/src/main/flex/edu/umich/med/mbni/utils/RootModelApp.mxml" />
+        <option value="$PROJECT_DIR$/../modules.flash/flash.voxel.interact.mxml/src/main/flex/edu/umich/med/mbni/pubanatomy/voxel3d/model/RootModelVoxel3dBase.mxml" />
+        <option value="$PROJECT_DIR$/../modules.flash/flash.search2.mxml/src/main/flex/edu/umich/med/mbni/pubanatomy/search/view/SearchViewQueryReload.mxml" />
+        <option value="$PROJECT_DIR$/../modules.flash/flash.search2.mxml/src/main/flex/edu/umich/med/mbni/pubanatomy/search/model/QueryResult.mxml" />
+        <option value="$PROJECT_DIR$/../modules.flash/flash.voxel.interact.mxml/src/main/flex/edu/umich/med/mbni/pubanatomy/voxel3d/model/Voxel3dStructureOn3dTreeGridData.mxml" />
+        <option value="$PROJECT_DIR$/../modules.flash/flash.desktop.web.integrate.mxml/src/main/flex/edu/umich/med/mbni/pubanatomy/integrate/view/Widget3dTreeScene.mxml" />
+        <option value="$PROJECT_DIR$/../modules.flash/flash.search2.mxml/src/main/flex/edu/umich/med/mbni/pubanatomy/search/view/SearchViewQueryResult.mxml" />
+        <option value="$PROJECT_DIR$/../modules.flash/flash.desktop.web.integrate.yanggang.mxml/src/main/flex/edu/umich/med/mbni/pubanatomy/YangAppSkin.mxml" />
+        <option value="$PROJECT_DIR$/../apps.flash/flash.desktop.web.integrate.yanggang.swf.mxml/flash.desktop.web.integrate.yanggang.swf.mxml.iml" />
+        <option value="$PROJECT_DIR$/../modules.flash/flash.desktop.web.integrate.mxml/src/main/flex/edu/umich/med/mbni/pubanatomy/integrate/model/MDLTooltipRpc.mxml" />
+        <option value="$PROJECT_DIR$/../modules.flash/flash.voxel.interact.mxml/src/main/flex/edu/umich/med/mbni/pubanatomy/voxel3d/model/Voxel3dOperationResetCamera.as" />
+        <option value="$PROJECT_DIR$/../modules.flash/flash.desktop.web.integrate.mxml/src/main/flex/edu/umich/med/mbni/pubanatomy/integrate/view/WidgetCamera.mxml" />
+        <option value="$PROJECT_DIR$/../modules.flash/flash.voxel.interact.mxml/src/main/flex/edu/umich/med/mbni/pubanatomy/voxel3d/view/V3dStructureTreeGridColumnTreeItemRenderer.mxml" />
+        <option value="$PROJECT_DIR$/../modules.flash/flash.atlas.mxml/src/main/flex/edu/umich/med/mbni/pubanatomy/atlas/view/StructureTreeGridColumnTreeItemRenderer.mxml" />
+        <option value="$PROJECT_DIR$/../modules.flash/flash.utils/src/main/flex/edu/umich/med/mbni/treedatagrid/TreeGridDataRow.mxml" />
+        <option value="$PROJECT_DIR$/../modules.flash/flash.atlas.mxml/src/main/flex/edu/umich/med/mbni/pubanatomy/atlas/view/StructureTreeGridDataCellTree.mxml" />
+        <option value="$PROJECT_DIR$/../apps.flash/flash.desktop.web.integrate.yanggang.swf.mxml/src/main/flex/AppMain.mxml" />
+        <option value="$PROJECT_DIR$/../apps.flash/flash.test.air/src/main/flex/AppMain.mxml" />
+        <option value="$PROJECT_DIR$/../modules.flash/flash.voxel.interact.mxml/src/main/flex/edu/umich/med/mbni/pubanatomy/voxel3d/model/Voxel3dStructureTreeGridDataRow.mxml" />
+        <option value="$PROJECT_DIR$/../modules.flash/flash.utils/src/main/flex/edu/umich/med/mbni/treedatagrid/TreeGridDataColumnTree.mxml" />
+        <option value="$PROJECT_DIR$/../modules.flash/flash.voxel.interact.mxml/src/main/flex/edu/umich/med/mbni/pubanatomy/voxel3d/view/V3dStructureTreeGridColumnGeneRendererVoxels.mxml" />
+        <option value="$PROJECT_DIR$/../modules.flash/flash.voxel.interact.mxml/src/main/flex/edu/umich/med/mbni/pubanatomy/voxel3d/view/V3dStructureTreeGridColumnVisibleRendererWrap.mxml" />
+        <option value="$PROJECT_DIR$/../modules.flash/flash.voxel.interact.mxml/src/main/flex/edu/umich/med/mbni/pubanatomy/voxel3d/view/V3dStructureTreeGridMultiAlphaAjust.mxml" />
+        <option value="$PROJECT_DIR$/../modules.flash/flash.utils/src/main/flex/edu/umich/med/mbni/treedatagrid/TreeGridData.mxml" />
+        <option value="$PROJECT_DIR$/../modules.flash/flash.atlas.mxml/src/main/flex/edu/umich/med/mbni/pubanatomy/atlas/model/StructureTreeGridData.mxml" />
+        <option value="$PROJECT_DIR$/../modules.flash/flash.utils/src/main/flex/edu/umich/med/mbni/utils/ModelOperationMenuChildren.as" />
+        <option value="$PROJECT_DIR$/../modules.flash/flash.atlas.mxml/src/main/flex/edu/umich/med/mbni/pubanatomy/atlas/model/StructureTreeGridDataColumnGene.mxml" />
+        <option value="$PROJECT_DIR$/../modules.flash/flash.atlas.mxml/src/main/flex/edu/umich/med/mbni/pubanatomy/atlas/model/OperationColumnGeneDataSelect.as" />
+        <option value="$PROJECT_DIR$/../modules.flash/flash.search2.mxml/src/main/flex/edu/umich/med/mbni/pubanatomy/search/view/SearchViewResultStatics.mxml" />
+        <option value="$PROJECT_DIR$/../modules.flash/flash.remote.data.service/src/main/flex/edu/umich/med/mbni/pubanatomy/flash/rs/RpcBase.mxml" />
+        <option value="$PROJECT_DIR$/../modules.flash/flash.interface.away3d/src/main/flex/edu/umich/med/mbni/pubanatomy/datadriven3dwindow/Dd3dViewMeshParticleSet.mxml" />
+        <option value="$PROJECT_DIR$/../modules.flash/flash.voxel.interact.mxml/src/main/flex/edu/umich/med/mbni/pubanatomy/voxel3d/model/Voxel3dStructureGeneExprType.mxml" />
+      </list>
+    </option>
+  </component>
+  <component name="KubernetesApiPersistence">
+    <option name="context" value="docker-desktop" />
+    <option name="namespace" value="default" />
+  </component>
+  <component name="MavenProjectNavigator">
+    <treeState />
+  </component>
+  <component name="ProjectFrameBounds">
+    <option name="x" value="-4" />
+    <option name="y" value="-4" />
+    <option name="width" value="1928" />
+    <option name="height" value="1060" />
+  </component>
+  <component name="ProjectId" id="1mIsCLeYWoEKsykduWYqZVCKJNm" />
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true">
+    <ConfirmationsSetting value="1" id="Add" />
+  </component>
+  <component name="ProjectReloadState">
+    <option name="STATE" value="0" />
+  </component>
+  <component name="ProjectView">
+    <navigator currentView="ProjectPane" proportions="" version="1">
+      <flattenPackages />
+      <showMembers />
+      <showModules />
+      <showLibraryContents />
+      <hideEmptyPackages />
+      <abbreviatePackageNames />
+      <autoscrollToSource />
+      <autoscrollFromSource />
+      <sortByType />
+    </navigator>
+    <panes>
+      <pane id="ProjectPane">
+        <subPane>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="_idea.flash" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="_idea.flash" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="flash.voxel.interact.mxml" />
+              <option name="myItemType" value="com.android.tools.idea.gradle.projectView.AndroidPsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="_idea.flash" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="flash.voxel.interact.mxml" />
+              <option name="myItemType" value="com.android.tools.idea.gradle.projectView.AndroidPsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="src" />
+              <option name="myItemType" value="com.android.tools.idea.gradle.projectView.AndroidPsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="main" />
+              <option name="myItemType" value="com.android.tools.idea.gradle.projectView.AndroidPsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="_idea.flash" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="flash.voxel.interact.mxml" />
+              <option name="myItemType" value="com.android.tools.idea.gradle.projectView.AndroidPsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="src" />
+              <option name="myItemType" value="com.android.tools.idea.gradle.projectView.AndroidPsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="main" />
+              <option name="myItemType" value="com.android.tools.idea.gradle.projectView.AndroidPsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="flex" />
+              <option name="myItemType" value="com.android.tools.idea.gradle.projectView.AndroidPsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="voxel3d" />
+              <option name="myItemType" value="com.android.tools.idea.gradle.projectView.AndroidPsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="view" />
+              <option name="myItemType" value="com.android.tools.idea.gradle.projectView.AndroidPsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="_idea.flash" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="flash.voxel.interact.mxml" />
+              <option name="myItemType" value="com.android.tools.idea.gradle.projectView.AndroidPsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="src" />
+              <option name="myItemType" value="com.android.tools.idea.gradle.projectView.AndroidPsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="main" />
+              <option name="myItemType" value="com.android.tools.idea.gradle.projectView.AndroidPsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="flex" />
+              <option name="myItemType" value="com.android.tools.idea.gradle.projectView.AndroidPsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="voxel3d" />
+              <option name="myItemType" value="com.android.tools.idea.gradle.projectView.AndroidPsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="_idea.flash" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="flash.voxel.interact.mxml" />
+              <option name="myItemType" value="com.android.tools.idea.gradle.projectView.AndroidPsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="src" />
+              <option name="myItemType" value="com.android.tools.idea.gradle.projectView.AndroidPsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="main" />
+              <option name="myItemType" value="com.android.tools.idea.gradle.projectView.AndroidPsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="flex" />
+              <option name="myItemType" value="com.android.tools.idea.gradle.projectView.AndroidPsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="voxel3d" />
+              <option name="myItemType" value="com.android.tools.idea.gradle.projectView.AndroidPsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="model" />
+              <option name="myItemType" value="com.android.tools.idea.gradle.projectView.AndroidPsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="_idea.flash" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="flash.interface.away3d" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewModuleNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="flash.interface.away3d" />
+              <option name="myItemType" value="com.android.tools.idea.gradle.projectView.AndroidPsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="_idea.flash" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="flash.interface.away3d" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewModuleNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="flash.interface.away3d" />
+              <option name="myItemType" value="com.android.tools.idea.gradle.projectView.AndroidPsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="src" />
+              <option name="myItemType" value="com.android.tools.idea.gradle.projectView.AndroidPsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="main" />
+              <option name="myItemType" value="com.android.tools.idea.gradle.projectView.AndroidPsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="_idea.flash" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="flash.interface.away3d" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewModuleNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="flash.interface.away3d" />
+              <option name="myItemType" value="com.android.tools.idea.gradle.projectView.AndroidPsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="src" />
+              <option name="myItemType" value="com.android.tools.idea.gradle.projectView.AndroidPsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="main" />
+              <option name="myItemType" value="com.android.tools.idea.gradle.projectView.AndroidPsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="flex" />
+              <option name="myItemType" value="com.android.tools.idea.gradle.projectView.AndroidPsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="pubanatomy" />
+              <option name="myItemType" value="com.android.tools.idea.gradle.projectView.AndroidPsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="datadriven3dwindow" />
+              <option name="myItemType" value="com.android.tools.idea.gradle.projectView.AndroidPsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="_idea.flash" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="flash.interface.away3d" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewModuleNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="flash.interface.away3d" />
+              <option name="myItemType" value="com.android.tools.idea.gradle.projectView.AndroidPsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="src" />
+              <option name="myItemType" value="com.android.tools.idea.gradle.projectView.AndroidPsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="main" />
+              <option name="myItemType" value="com.android.tools.idea.gradle.projectView.AndroidPsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="flex" />
+              <option name="myItemType" value="com.android.tools.idea.gradle.projectView.AndroidPsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="pubanatomy" />
+              <option name="myItemType" value="com.android.tools.idea.gradle.projectView.AndroidPsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="_idea.flash" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="flash.interface.away3d" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewModuleNode" />
+            </PATH_ELEMENT>
+          </PATH>
+        </subPane>
+      </pane>
+      <pane id="Scope" />
+      <pane id="PackagesPane" />
+    </panes>
+  </component>
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">
+    <property name="FileHistory.git4idea.history.GitHistoryProvider_flatOrder0" value="0" />
+    <property name="FileHistory.git4idea.history.GitHistoryProvider_flatOrder1" value="1" />
+    <property name="FileHistory.git4idea.history.GitHistoryProvider_flatOrder2" value="2" />
+    <property name="FileHistory.git4idea.history.GitHistoryProvider_flatOrder3" value="3" />
+    <property name="FileHistory.git4idea.history.GitHistoryProvider_flatWidth0" value="477" />
+    <property name="FileHistory.git4idea.history.GitHistoryProvider_flatWidth1" value="477" />
+    <property name="FileHistory.git4idea.history.GitHistoryProvider_flatWidth2" value="479" />
+    <property name="FileHistory.git4idea.history.GitHistoryProvider_flatWidth3" value="1055" />
+    <property name="FileHistory.git4idea.history.GitHistoryProvider_treeOrder0" value="0" />
+    <property name="FileHistory.git4idea.history.GitHistoryProvider_treeOrder1" value="1" />
+    <property name="FileHistory.git4idea.history.GitHistoryProvider_treeOrder2" value="2" />
+    <property name="FileHistory.git4idea.history.GitHistoryProvider_treeOrder3" value="3" />
+    <property name="FileHistory.git4idea.history.GitHistoryProvider_treeWidth0" value="500" />
+    <property name="FileHistory.git4idea.history.GitHistoryProvider_treeWidth1" value="492" />
+    <property name="FileHistory.git4idea.history.GitHistoryProvider_treeWidth2" value="499" />
+    <property name="FileHistory.git4idea.history.GitHistoryProvider_treeWidth3" value="997" />
+    <property name="FullScreen" value="false" />
+    <property name="GoToClass.includeLibraries" value="false" />
+    <property name="GoToClass.toSaveIncludeLibraries" value="false" />
+    <property name="GoToFile.includeJavaFiles" value="false" />
+    <property name="LayoutCode.rearrangeEntriesECMA Script Level 4" value="false" />
+    <property name="LayoutCode.rearrangeEntriesMxml" value="false" />
+    <property name="MemberChooser.copyJavadoc" value="false" />
+    <property name="MemberChooser.showClasses" value="true" />
+    <property name="MemberChooser.sorted" value="false" />
+    <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
+    <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
+    <property name="WebServerToolWindowFactoryState" value="false" />
+    <property name="aspect.path.notification.shown" value="true" />
+    <property name="dart.analysis.tool.window.visible" value="false" />
+    <property name="go.import.settings.migrated" value="true" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/../mvn.parent.java" />
+    <property name="options.lastSelected" value="preferences.sourceCode.General" />
+    <property name="options.searchVisible" value="true" />
+    <property name="options.splitter.details.proportions" value="0.2" />
+    <property name="options.splitter.main.proportions" value="0.3" />
+    <property name="project.structure.last.edited" value="SDKs" />
+    <property name="project.structure.proportion" value="0.15" />
+    <property name="project.structure.side.proportion" value="0.3628547" />
+    <property name="recentsLimit" value="5" />
+    <property name="restartRequiresConfirmation" value="true" />
+    <property name="show.migrate.to.gradle.popup" value="false" />
+    <property name="vue.rearranger.settings.migration" value="true" />
+  </component>
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="F:\mbni\pa\__\apps.flash\flash.test.air" />
+      <recent name="F:\mbni\pa\modules.flash\flash.search2.mxml\src\main\flex\edu\umich\med\mbni\pubanatomy\search\view" />
+    </key>
+    <key name="CreateActionScriptClassDialog.DESTINATION_PACKAGE_RECENT_KEY">
+      <recent name="edu.umich.med.mbni.pubanatomy.atlas.model" />
+    </key>
+  </component>
+  <component name="RunManager" selected="Flash App.AppMain-test air">
+    <configuration default="true" type="AndroidRunConfigurationType" factoryName="Android Application">
+      <module name="" />
+      <option name="ACTIVITY_CLASS" value="" />
+      <option name="MODE" value="default_activity" />
+      <option name="DEPLOY" value="true" />
+      <option name="ARTIFACT_NAME" value="" />
+      <option name="TARGET_SELECTION_MODE" value="EMULATOR" />
+      <option name="USE_LAST_SELECTED_DEVICE" value="false" />
+      <option name="PREFERRED_AVD" value="" />
+      <option name="USE_COMMAND_LINE" value="true" />
+      <option name="COMMAND_LINE" value="" />
+      <option name="WIPE_USER_DATA" value="false" />
+      <option name="DISABLE_BOOT_ANIMATION" value="false" />
+      <option name="NETWORK_SPEED" value="full" />
+      <option name="NETWORK_LATENCY" value="none" />
+      <option name="CLEAR_LOGCAT" value="false" />
+      <option name="SHOW_LOGCAT_AUTOMATICALLY" value="true" />
+      <option name="FILTER_LOGCAT_AUTOMATICALLY" value="true" />
+      <method />
+    </configuration>
+    <configuration default="true" type="AndroidTestRunConfigurationType" factoryName="Android Tests">
+      <module name="" />
+      <option name="TESTING_TYPE" value="0" />
+      <option name="INSTRUMENTATION_RUNNER_CLASS" value="" />
+      <option name="METHOD_NAME" value="" />
+      <option name="CLASS_NAME" value="" />
+      <option name="PACKAGE_NAME" value="" />
+      <option name="TARGET_SELECTION_MODE" value="EMULATOR" />
+      <option name="USE_LAST_SELECTED_DEVICE" value="false" />
+      <option name="PREFERRED_AVD" value="" />
+      <option name="USE_COMMAND_LINE" value="true" />
+      <option name="COMMAND_LINE" value="" />
+      <option name="WIPE_USER_DATA" value="false" />
+      <option name="DISABLE_BOOT_ANIMATION" value="false" />
+      <option name="NETWORK_SPEED" value="full" />
+      <option name="NETWORK_LATENCY" value="none" />
+      <option name="CLEAR_LOGCAT" value="false" />
+      <option name="SHOW_LOGCAT_AUTOMATICALLY" value="true" />
+      <option name="FILTER_LOGCAT_AUTOMATICALLY" value="true" />
+      <method />
+    </configuration>
+    <configuration default="true" type="Applet" factoryName="Applet">
+      <module name="" />
+      <option name="MAIN_CLASS_NAME" />
+      <option name="HTML_FILE_NAME" />
+      <option name="HTML_USED" value="false" />
+      <option name="WIDTH" value="400" />
+      <option name="HEIGHT" value="300" />
+      <option name="POLICY_FILE" value="$APPLICATION_HOME_DIR$/bin/appletviewer.policy" />
+      <option name="VM_PARAMETERS" />
+      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
+      <option name="ALTERNATIVE_JRE_PATH" />
+      <method />
+    </configuration>
+    <configuration name="&lt;template&gt;" type="WebApp" default="true" selected="false">
+      <Host>localhost</Host>
+      <Port>5050</Port>
+    </configuration>
+    <configuration default="true" type="Application" factoryName="Application">
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration default="true" type="CucumberJavaRunConfigurationType" factoryName="Cucumber java">
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="AppMain-test air" type="FlashRunConfigurationType" temporary="true">
+      <option name="BCName" value="flash.test.air" />
+      <option name="IOSSimulatorDevice" value="" />
+      <option name="IOSSimulatorSdkPath" value="" />
+      <option name="adlOptions" value="" />
+      <option name="airProgramParameters" value="" />
+      <option name="appDescriptorForEmulator" value="Android" />
+      <option name="clearAppDataOnEachLaunch" value="true" />
+      <option name="debugTransport" value="USB" />
+      <option name="debuggerSdkRaw" value="BC SDK" />
+      <option name="emulator" value="NexusOne" />
+      <option name="emulatorAdlOptions" value="" />
+      <option name="fastPackaging" value="true" />
+      <option name="fullScreenHeight" value="0" />
+      <option name="fullScreenWidth" value="0" />
+      <option name="launchUrl" value="false" />
+      <option name="launcherParameters">
+        <LauncherParameters>
+          <option name="browser" value="a7bb68e0-33c0-4d6f-a81a-aac1fdb870c8" />
+          <option name="launcherType" value="OSDefault" />
+          <option name="newPlayerInstance" value="false" />
+          <option name="playerPath" value="FlashPlayerDebugger.exe" />
+        </LauncherParameters>
+      </option>
+      <option name="mobileRunTarget" value="Emulator" />
+      <option name="moduleName" value="flash.test.air" />
+      <option name="overriddenMainClass" value="AppMain" />
+      <option name="overriddenOutputFileName" value="AppMain.swf" />
+      <option name="overrideMainClass" value="true" />
+      <option name="runTrusted" value="true" />
+      <option name="screenDpi" value="0" />
+      <option name="screenHeight" value="0" />
+      <option name="screenWidth" value="0" />
+      <option name="url" value="http://" />
+      <option name="usbDebugPort" value="7936" />
+      <RunnerSettings RunnerId="FlexDebugRunner" />
+      <RunnerSettings RunnerId="FlexRunner" />
+      <ConfigurationWrapper RunnerId="FlexDebugRunner" />
+      <ConfigurationWrapper RunnerId="FlexRunner" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="flash.desktop.web.integrate.swf.mxml" type="FlashRunConfigurationType" temporary="true">
+      <option name="BCName" value="flash.desktop.web.integrate.swf.mxml" />
+      <option name="IOSSimulatorDevice" value="" />
+      <option name="IOSSimulatorSdkPath" value="" />
+      <option name="adlOptions" value="" />
+      <option name="airProgramParameters" value="" />
+      <option name="appDescriptorForEmulator" value="Android" />
+      <option name="clearAppDataOnEachLaunch" value="true" />
+      <option name="debugTransport" value="USB" />
+      <option name="debuggerSdkRaw" value="BC SDK" />
+      <option name="emulator" value="NexusOne" />
+      <option name="emulatorAdlOptions" value="" />
+      <option name="fastPackaging" value="true" />
+      <option name="fullScreenHeight" value="0" />
+      <option name="fullScreenWidth" value="0" />
+      <option name="launchUrl" value="true" />
+      <option name="launcherParameters">
+        <LauncherParameters>
+          <option name="browser" value="16bf23d4-93e0-4ffc-bfd6-cb13575177b0" />
+          <option name="launcherType" value="Browser" />
+          <option name="newPlayerInstance" value="false" />
+          <option name="playerPath" value="FlashPlayerDebugger.exe" />
+        </LauncherParameters>
+      </option>
+      <option name="mobileRunTarget" value="Emulator" />
+      <option name="moduleName" value="flash.desktop.web.integrate.swf.mxml" />
+      <option name="overriddenMainClass" value="" />
+      <option name="overriddenOutputFileName" value="" />
+      <option name="overrideMainClass" value="false" />
+      <option name="runTrusted" value="true" />
+      <option name="screenDpi" value="0" />
+      <option name="screenHeight" value="0" />
+      <option name="screenWidth" value="0" />
+      <option name="url" value="http://iesucks:8089/rest/main" />
+      <option name="usbDebugPort" value="7936" />
+      <RunnerSettings RunnerId="FlexDebugRunner" />
+      <RunnerSettings RunnerId="FlexRunner" />
+      <ConfigurationWrapper RunnerId="FlexDebugRunner" />
+      <ConfigurationWrapper RunnerId="FlexRunner" />
+      <method v="2" />
+    </configuration>
+    <configuration name="flash.desktop.web.integrate.yanggang.swf.mxml" type="FlashRunConfigurationType" temporary="true" nameIsGenerated="true">
+      <option name="BCName" value="flash.desktop.web.integrate.yanggang.swf.mxml" />
+      <option name="IOSSimulatorDevice" value="" />
+      <option name="IOSSimulatorSdkPath" value="" />
+      <option name="adlOptions" value="" />
+      <option name="airProgramParameters" value="" />
+      <option name="appDescriptorForEmulator" value="Android" />
+      <option name="clearAppDataOnEachLaunch" value="true" />
+      <option name="debugTransport" value="USB" />
+      <option name="debuggerSdkRaw" value="BC SDK" />
+      <option name="emulator" value="NexusOne" />
+      <option name="emulatorAdlOptions" value="" />
+      <option name="fastPackaging" value="true" />
+      <option name="fullScreenHeight" value="0" />
+      <option name="fullScreenWidth" value="0" />
+      <option name="launchUrl" value="true" />
+      <option name="launcherParameters">
+        <LauncherParameters>
+          <option name="browser" value="16bf23d4-93e0-4ffc-bfd6-cb13575177b0" />
+          <option name="launcherType" value="Browser" />
+          <option name="newPlayerInstance" value="false" />
+          <option name="playerPath" value="FlashPlayerDebugger.exe" />
+        </LauncherParameters>
+      </option>
+      <option name="mobileRunTarget" value="Emulator" />
+      <option name="moduleName" value="flash.desktop.web.integrate.yanggang.swf.mxml" />
+      <option name="overriddenMainClass" value="" />
+      <option name="overriddenOutputFileName" value="" />
+      <option name="overrideMainClass" value="false" />
+      <option name="runTrusted" value="true" />
+      <option name="screenDpi" value="0" />
+      <option name="screenHeight" value="0" />
+      <option name="screenWidth" value="0" />
+      <option name="url" value="http://iesucks:8080/rest/main.yanggang/tst.swf" />
+      <option name="usbDebugPort" value="7936" />
+      <RunnerSettings RunnerId="FlexDebugRunner" />
+      <RunnerSettings RunnerId="FlexRunner" />
+      <ConfigurationWrapper RunnerId="FlexDebugRunner" />
+      <ConfigurationWrapper RunnerId="FlexRunner" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration default="true" type="GrailsRunConfigurationType" factoryName="Grails">
+      <setting name="vmparams" value="" />
+      <setting name="cmdLine" value="run-app" />
+      <setting name="passParentEnv" value="true" />
+      <setting name="grailsApplicationRoot" value="" />
+      <setting name="launchBrowser" value="false" />
+      <setting name="launchBrowserUrl" value="" />
+      <setting name="depsClasspath" value="false" />
+      <extension name="coverage" enabled="false" merge="false" sample_coverage="true" runner="idea" />
+      <method v="2" />
+    </configuration>
+    <configuration default="true" type="JUnit" factoryName="JUnit">
+      <option name="TEST_OBJECT" value="class" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="TEST_SEARCH_SCOPE">
+        <value defaultName="moduleWithDependencies" />
+      </option>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration default="true" type="TestNG">
+      <option name="TEST_OBJECT" value="CLASS" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="TEST_SEARCH_SCOPE">
+        <value defaultName="moduleWithDependencies" />
+      </option>
+      <properties />
+      <listeners />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration default="true" type="#org.jetbrains.idea.devkit.run.PluginConfigurationType">
+      <module name="" />
+      <option name="VM_PARAMETERS" value="-Xmx512m -Xms256m -XX:MaxPermSize=250m" />
+      <option name="PROGRAM_PARAMETERS" />
+      <predefined_log_file enabled="true" id="idea.log" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <list>
+      <item itemvalue="Flash App.flash.desktop.web.integrate.swf.mxml" />
+      <item itemvalue="Flash App.AppMain-test air" />
+      <item itemvalue="Flash App.flash.desktop.web.integrate.yanggang.swf.mxml" />
+    </list>
+    <recent_temporary>
+      <list>
+        <item itemvalue="Flash App.AppMain-test air" />
+        <item itemvalue="Flash App.flash.desktop.web.integrate.swf.mxml" />
+        <item itemvalue="Flash App.flash.desktop.web.integrate.yanggang.swf.mxml" />
+      </list>
+    </recent_temporary>
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="SvnConfiguration" myUseAcceleration="nothing" cleanupOnStartRun="true">
+    <configuration useDefault="false">C:\Users\garyyang\AppData\Roaming\Subversion</configuration>
+    <supportedVersion>125</supportedVersion>
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="d8e27e83-6b7e-47d7-8876-3edd44e50fc7" name="Default" comment="" />
+      <created>1384184983352</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1384184983352</updated>
+      <workItem from="1392909927286" duration="4000" />
+      <workItem from="1392910677585" duration="5052000" />
+      <workItem from="1397665952199" duration="3699000" />
+      <workItem from="1397748339043" duration="15352000" />
+      <workItem from="1397834126611" duration="2421000" />
+      <workItem from="1398364669351" duration="620000" />
+      <workItem from="1398372225437" duration="10923000" />
+      <workItem from="1398654335750" duration="5744000" />
+      <workItem from="1398803579601" duration="585000" />
+      <workItem from="1399993530270" duration="13432000" />
+      <workItem from="1400295620302" duration="1666000" />
+      <workItem from="1400508087064" duration="46711000" />
+      <workItem from="1401211676878" duration="21156000" />
+      <workItem from="1401380048195" duration="5278000" />
+      <workItem from="1401717393652" duration="9810000" />
+      <workItem from="1402080180384" duration="1963000" />
+      <workItem from="1402415335039" duration="2756000" />
+      <workItem from="1402583985836" duration="2231000" />
+      <workItem from="1402851076786" duration="23251000" />
+      <workItem from="1403721309423" duration="5966000" />
+      <workItem from="1403883508832" duration="1193000" />
+      <workItem from="1404135553844" duration="262000" />
+      <workItem from="1404137367942" duration="3936000" />
+      <workItem from="1609192312565" duration="1248000" />
+    </task>
+    <task id="LOCAL-00001" summary="performance improvement">
+      <created>1397767094350</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1397767094350</updated>
+    </task>
+    <task id="LOCAL-00002" summary="tree efficiency">
+      <created>1398797594032</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1398797594032</updated>
+    </task>
+    <task id="LOCAL-00003" summary="gae update">
+      <created>1399994224370</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1399994224370</updated>
+    </task>
+    <task id="LOCAL-00004" summary="small clean">
+      <created>1400530397099</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1400530397099</updated>
+    </task>
+    <task id="LOCAL-00005" summary="fix:&#10;&#10;3d tree auto close problem">
+      <created>1400542547071</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1400542547071</updated>
+    </task>
+    <task id="LOCAL-00006" summary="have to refresh image when loading dataset because 2d image need them to switch between different image mode.">
+      <created>1400606367830</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1400606367830</updated>
+    </task>
+    <task id="LOCAL-00007" summary="make datagrid allow having up to 2 same gene columns.">
+      <created>1401201764335</created>
+      <option name="number" value="00007" />
+      <option name="presentableId" value="LOCAL-00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1401201764335</updated>
+    </task>
+    <task id="LOCAL-00008" summary="make datagrid allow having up to 2 same gene columns. +">
+      <created>1401203913521</created>
+      <option name="number" value="00008" />
+      <option name="presentableId" value="LOCAL-00008" />
+      <option name="project" value="LOCAL" />
+      <updated>1401203913521</updated>
+    </task>
+    <task id="LOCAL-00009" summary="3d treegrid save/load">
+      <created>1401319285488</created>
+      <option name="number" value="00009" />
+      <option name="presentableId" value="LOCAL-00009" />
+      <option name="project" value="LOCAL" />
+      <updated>1401319285488</updated>
+    </task>
+    <task id="LOCAL-00010" summary="3d treegrid save/load">
+      <created>1402080333486</created>
+      <option name="number" value="00010" />
+      <option name="presentableId" value="LOCAL-00010" />
+      <option name="project" value="LOCAL" />
+      <updated>1402080333486</updated>
+    </task>
+    <task id="LOCAL-00011" summary="reset button">
+      <created>1403015215577</created>
+      <option name="number" value="00011" />
+      <option name="presentableId" value="LOCAL-00011" />
+      <option name="project" value="LOCAL" />
+      <updated>1403015215577</updated>
+    </task>
+    <task id="LOCAL-00012" summary="shortcut to load 3d children in tree">
+      <created>1403017342834</created>
+      <option name="number" value="00012" />
+      <option name="presentableId" value="LOCAL-00012" />
+      <option name="project" value="LOCAL" />
+      <updated>1403017342834</updated>
+    </task>
+    <task id="LOCAL-00013" summary="shortcut to load 3d children in tree -- fix">
+      <created>1403279817618</created>
+      <option name="number" value="00013" />
+      <option name="presentableId" value="LOCAL-00013" />
+      <option name="project" value="LOCAL" />
+      <updated>1403279817618</updated>
+    </task>
+    <option name="localTasksCounter" value="14" />
+    <servers />
+  </component>
+  <component name="TimeTrackingManager">
+    <option name="totallyTimeSpent" value="184011000" />
+  </component>
+  <component name="ToolWindowManager">
+    <frame x="-4" y="-4" width="1928" height="1060" extended-state="6" />
+    <editor active="false" />
+    <layout>
+      <window_info id="Palette&#9;" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Changes" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.47045952" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Designer" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Palette" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
+      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.28980893" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.26220807" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
+      <window_info id="IDEtalk Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="9" side_tool="false" content_ui="tabs" />
+      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="10" side_tool="true" content_ui="tabs" />
+      <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
+      <window_info id="IDEtalk" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.1178344" sideWeight="0.5" order="11" side_tool="false" content_ui="tabs" />
+      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32271764" sideWeight="0.5" order="13" side_tool="false" content_ui="tabs" />
+      <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="SLIDING" type="SLIDING" visible="false" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
+      <window_info id="Maven Projects" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32925338" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Application Servers" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="12" side_tool="false" content_ui="tabs" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.24813631" sideWeight="0.6224599" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.27192983" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="CDI" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
+      <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
+      <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
+      <window_info id="JetGradle" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
+      <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
+    </layout>
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+  <component name="Vcs.Log.UiProperties">
+    <option name="RECENTLY_FILTERED_USER_GROUPS">
+      <collection />
+    </option>
+    <option name="RECENTLY_FILTERED_BRANCH_GROUPS">
+      <collection />
+    </option>
+  </component>
+  <component name="VcsManagerConfiguration">
+    <option name="CHECK_CODE_SMELLS_BEFORE_PROJECT_COMMIT" value="false" />
+    <option name="CHECK_NEW_TODO" value="false" />
+    <MESSAGE value="performance improvement" />
+    <MESSAGE value="tree efficiency" />
+    <MESSAGE value="gae update" />
+    <MESSAGE value="small clean" />
+    <MESSAGE value="fix:&#10;&#10;3d tree auto close problem" />
+    <MESSAGE value="have to refresh image when loading dataset because 2d image need them to switch between different image mode." />
+    <MESSAGE value="make datagrid allow having up to 2 same gene columns." />
+    <MESSAGE value="make datagrid allow having up to 2 same gene columns. +" />
+    <MESSAGE value="3d treegrid save/load" />
+    <MESSAGE value="reset button" />
+    <MESSAGE value="shortcut to load 3d children in tree" />
+    <MESSAGE value="shortcut to load 3d children in tree -- fix" />
+    <option name="LAST_COMMIT_MESSAGE" value="shortcut to load 3d children in tree -- fix" />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" type="flex">
+          <url>file://$PROJECT_DIR$/../modules.flash/flash.utils/src/main/flex/edu/umich/med/mbni/utils/RootModelApp.mxml</url>
+          <line>39</line>
+          <option name="timeStamp" value="113" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
+  </component>
+  <component name="antWorkspaceConfiguration">
+    <option name="IS_AUTOSCROLL_TO_SOURCE" value="false" />
+    <option name="FILTER_TARGETS" value="false" />
+  </component>
+  <component name="editorHistoryManager">
+    <entry file="file://$PROJECT_DIR$/../modules.flash/flash.desktop.web.integrate.mxml/src/main/flex/edu/umich/med/mbni/pubanatomy/integrate/view/Widget3dTreeScene.mxml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="-24.846153" vertical-offset="340" max-vertical-offset="1309">
+          <caret line="112" column="43" selection-start-line="112" selection-start-column="43" selection-end-line="112" selection-end-column="43" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../modules.flash/flash.voxel.interact.mxml/src/main/flex/edu/umich/med/mbni/pubanatomy/voxel3d/view/V3dStructureTreeGridDataCellGene.mxml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="-29.5" vertical-offset="2395" max-vertical-offset="3281">
+          <caret line="189" column="30" selection-start-line="189" selection-start-column="30" selection-end-line="189" selection-end-column="30" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../modules.flash/flash.atlas.mxml/src/main/flex/edu/umich/med/mbni/pubanatomy/atlas/view/StructureTreeGridDataCellGene.mxml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="-14.115385" vertical-offset="1061" max-vertical-offset="1938">
+          <caret line="85" column="33" selection-start-line="85" selection-start-column="29" selection-end-line="85" selection-end-column="29" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../modules.flash/flash.atlas.mxml/src/main/flex/edu/umich/med/mbni/pubanatomy/atlas/view/StructureTreeGridColumnItemRenderer.mxml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="-17.0" vertical-offset="0" max-vertical-offset="561">
+          <caret line="26" column="17" selection-start-line="26" selection-start-column="17" selection-end-line="26" selection-end-column="17" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../modules.flash/flash.utils/src/main/flex/edu/umich/med/mbni/treedatagrid/TreeGridRendererRow.mxml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="-17.653847" vertical-offset="0" max-vertical-offset="561">
+          <caret line="27" column="28" selection-start-line="27" selection-start-column="21" selection-end-line="27" selection-end-column="21" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../modules.flash/flash.voxel.interact.mxml/src/main/flex/edu/umich/med/mbni/pubanatomy/voxel3d/view/V3dSectionImageModeSelector.mxml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="17.423077" vertical-offset="453" max-vertical-offset="1326">
+          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../modules.flash/flash.voxel.interact.mxml/src/main/flex/edu/umich/med/mbni/pubanatomy/voxel3d/view/V3dSectionImageClosestImgSelector.mxml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="-17.653847" vertical-offset="0" max-vertical-offset="850">
+          <caret line="28" column="73" selection-start-line="28" selection-start-column="58" selection-end-line="28" selection-end-column="58" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../modules.flash/flash.atlas.mxml/src/main/flex/edu/umich/med/mbni/pubanatomy/atlas/view/StructureTreeGridColumnGeneItemRendererBar.mxml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="874">
+          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../modules.flash/flash.voxel.interact.mxml/src/main/flex/edu/umich/med/mbni/pubanatomy/voxel3d/view/V3dStructureTreeGridColumnGeneRenderer.mxml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="-11.769231" vertical-offset="0" max-vertical-offset="442">
+          <caret line="18" column="36" selection-start-line="18" selection-start-column="36" selection-end-line="18" selection-end-column="36" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../modules.flash/flash.voxel.interact.mxml/src/main/flex/edu/umich/med/mbni/pubanatomy/voxel3d/view/V3dStructureTreeGridColumnGeneRendererVoxels.mxml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="-6.576923" vertical-offset="441" max-vertical-offset="867">
+          <caret line="36" column="85" selection-start-line="36" selection-start-column="85" selection-end-line="36" selection-end-column="85" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../modules.flash/flash.voxel.interact.mxml/src/main/flex/edu/umich/med/mbni/pubanatomy/voxel3d/view/V3dStructureTreeGridColumnVisibleRendererWrap.mxml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="-17.076923" vertical-offset="610" max-vertical-offset="1445">
+          <caret line="62" column="54" selection-start-line="62" selection-start-column="40" selection-end-line="62" selection-end-column="54" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../modules.flash/flash.voxel.section.interact.mxml/src/main/flex/edu/umich/med/mbni/pubanatomy/sectioninteract/view/ViewSectionPlaneWithCtrls.mxml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="-3.0" vertical-offset="959" max-vertical-offset="1615">
+          <caret line="62" column="32" selection-start-line="62" selection-start-column="32" selection-end-line="62" selection-end-column="32" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../modules.flash/flash.voxel.interact.mxml/src/main/flex/edu/umich/med/mbni/pubanatomy/voxel3d/view/V3dStructureTreeGrid.mxml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="-9.153846" vertical-offset="0" max-vertical-offset="1054">
+          <caret line="24" column="41" selection-start-line="24" selection-start-column="13" selection-end-line="24" selection-end-column="13" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../modules.flash/flash.atlas.mxml/src/main/flex/edu/umich/med/mbni/pubanatomy/atlas/model/StructureTreeGridData.mxml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="5967" max-vertical-offset="7310">
+          <caret line="351" column="82" selection-start-line="351" selection-start-column="25" selection-end-line="351" selection-end-column="25" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../modules.flash/flash.utils/src/main/flex/edu/umich/med/mbni/treedatagrid/TreeGridData.mxml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="-7.6153846" vertical-offset="771" max-vertical-offset="7480">
+          <caret line="62" column="68" selection-start-line="62" selection-start-column="68" selection-end-line="62" selection-end-column="68" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../modules.flash/flash.atlas.mxml/src/main/flex/edu/umich/med/mbni/pubanatomy/atlas/view/StructureTreeGridColumnGeneHeader.mxml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="-22.884615" vertical-offset="153" max-vertical-offset="1054">
+          <caret line="48" column="44" selection-start-line="48" selection-start-column="44" selection-end-line="48" selection-end-column="44" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../modules.flash/flash.atlas.mxml/src/main/flex/edu/umich/med/mbni/pubanatomy/atlas/view/StructureTreeGridColumnGeneHeaderExtr.mxml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="-17.923077" vertical-offset="401" max-vertical-offset="1530">
+          <caret line="51" column="57" selection-start-line="51" selection-start-column="57" selection-end-line="51" selection-end-column="57" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../modules.flash/flash.utils/src/main/flex/edu/umich/med/mbni/utils/ModelOperation.mxml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="-3.9230769" vertical-offset="0" max-vertical-offset="1241">
+          <caret line="6" column="28" selection-start-line="6" selection-start-column="28" selection-end-line="6" selection-end-column="28" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../modules.flash/flash.voxel.interact.mxml/src/main/flex/edu/umich/med/mbni/pubanatomy/voxel3d/view/V3dStructureTreeGridSelectionOperations.mxml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="-49.03846" vertical-offset="0" max-vertical-offset="2465">
+          <caret line="75" column="78" selection-start-line="75" selection-start-column="78" selection-end-line="75" selection-end-column="78" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../modules.flash/flash.utils/src/main/flex/edu/umich/med/mbni/utils/ModelOperationMenuItem.as">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="748">
+          <caret line="9" column="13" selection-start-line="9" selection-start-column="13" selection-end-line="9" selection-end-column="13" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../modules.flash/flash.atlas.mxml/src/main/flex/edu/umich/med/mbni/pubanatomy/atlas/model/MDLDataSet.mxml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="-155.5" vertical-offset="700" max-vertical-offset="5168">
+          <caret line="281" column="19" selection-start-line="281" selection-start-column="19" selection-end-line="281" selection-end-column="19" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../modules.flash/flash.utils/src/main/flex/edu/umich/med/mbni/utils/ModelOperationMenuChildren.as">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="1156">
+          <caret line="14" column="20" selection-start-line="14" selection-start-column="20" selection-end-line="14" selection-end-column="20" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../modules.flash/flash.atlas.mxml/src/main/flex/edu/umich/med/mbni/pubanatomy/atlas/model/OperationColumnGeneDataSelect.as">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="238" max-vertical-offset="867">
+          <caret line="14" column="38" selection-start-line="14" selection-start-column="38" selection-end-line="14" selection-end-column="38" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../modules.flash/flash.search2.mxml/src/main/flex/edu/umich/med/mbni/pubanatomy/search/view/SearchViewResult.mxml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="-10.461538" vertical-offset="0" max-vertical-offset="1530">
+          <caret line="16" column="35" selection-start-line="16" selection-start-column="35" selection-end-line="16" selection-end-column="35" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../../../4.12_4.0_12/frameworks/projects/spark/src/spark/skins/spark/ComboBoxButtonSkin.mxml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="43.076923" vertical-offset="1494" max-vertical-offset="3689">
+          <caret line="31" column="0" selection-start-line="31" selection-start-column="0" selection-end-line="31" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../modules.flash/flash.utils/src/main/flex/edu/umich/med/mbni/utils/MoreOptionsButton.mxml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="-5.230769" vertical-offset="0" max-vertical-offset="306">
+          <caret line="8" column="48" selection-start-line="8" selection-start-column="37" selection-end-line="8" selection-end-column="37" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../modules.flash/flash.search2.mxml/src/main/flex/edu/umich/med/mbni/pubanatomy/search/view/SearchViewResultStatics.mxml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="-29.961538" vertical-offset="3" max-vertical-offset="1207">
+          <caret line="49" column="56" selection-start-line="49" selection-start-column="56" selection-end-line="49" selection-end-column="56" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../apps.flash/flash.test.air/src/main/flex/AppCompiledConfig.mxml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="-4.576923" vertical-offset="0" max-vertical-offset="255">
+          <caret line="7" column="32" selection-start-line="7" selection-start-column="32" selection-end-line="7" selection-end-column="32" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../modules.flash/flash.utils/src/main/flex/edu/umich/med/mbni/utils/RootModelModule.mxml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="1921" max-vertical-offset="2363">
+          <caret line="120" column="23" selection-start-line="120" selection-start-column="23" selection-end-line="120" selection-end-column="23" />
+          <folding>
+            <marker date="1394804809997" expanded="false" signature="-1:-1" placeholder="..." />
+            <marker date="1394804809997" expanded="true" signature="-1:-1" placeholder="{...}" />
+            <marker date="1394804809997" expanded="true" signature="-1:-1" placeholder="{...}" />
+            <marker date="1394804809997" expanded="true" signature="-1:-1" placeholder="{...}" />
+            <marker date="1394804809997" expanded="true" signature="-1:-1" placeholder="{...}" />
+            <marker date="1394804809997" expanded="true" signature="-1:-1" placeholder="{...}" />
+            <marker date="1394804809997" expanded="true" signature="-1:-1" placeholder="{...}" />
+            <marker date="1394804809997" expanded="true" signature="-1:-1" placeholder="{...}" />
+            <marker date="1394804809997" expanded="true" signature="-1:-1" placeholder="{...}" />
+            <marker date="1394804809997" expanded="true" signature="-1:-1" placeholder="{...}" />
+            <marker date="1394804809997" expanded="true" signature="-1:-1" placeholder="{...}" />
+            <marker date="1394804809997" expanded="true" signature="-1:-1" placeholder="{...}" />
+            <marker date="1394804809997" expanded="true" signature="-1:-1" placeholder="{...}" />
+            <marker date="1394804809997" expanded="true" signature="-1:-1" placeholder="{...}" />
+            <marker date="1394804809997" expanded="true" signature="-1:-1" placeholder="{...}" />
+            <marker date="1394804809997" expanded="true" signature="-1:-1" placeholder="{...}" />
+            <marker date="1394804809997" expanded="true" signature="-1:-1" placeholder="{...}" />
+            <marker date="1394804809997" expanded="true" signature="-1:-1" placeholder="{...}" />
+            <marker date="1394804809997" expanded="true" signature="-1:-1" placeholder="{...}" />
+            <marker date="1394804809997" expanded="true" signature="-1:-1" placeholder="{...}" />
+            <marker date="1394804809997" expanded="true" signature="-1:-1" placeholder="{...}" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../modules.flash/flash.utils/src/main/flex/edu/umich/med/mbni/utils/RootModelApp.mxml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="1513" max-vertical-offset="1836">
+          <caret line="92" column="34" selection-start-line="92" selection-start-column="34" selection-end-line="92" selection-end-column="34" />
+          <folding>
+            <marker date="1395674611831" expanded="false" signature="-1:-1" placeholder="..." />
+            <marker date="1395674611831" expanded="true" signature="-1:-1" placeholder="{...}" />
+            <marker date="1395674611831" expanded="true" signature="-1:-1" placeholder="{...}" />
+            <marker date="1395674611831" expanded="true" signature="-1:-1" placeholder="{...}" />
+            <marker date="1395674611831" expanded="true" signature="-1:-1" placeholder="{...}" />
+            <marker date="1395674611831" expanded="true" signature="-1:-1" placeholder="{...}" />
+            <marker date="1395674611831" expanded="true" signature="-1:-1" placeholder="{...}" />
+            <marker date="1395674611831" expanded="true" signature="-1:-1" placeholder="{...}" />
+            <marker date="1395674611831" expanded="true" signature="-1:-1" placeholder="{...}" />
+            <marker date="1395674611831" expanded="true" signature="-1:-1" placeholder="{...}" />
+            <marker date="1395674611831" expanded="true" signature="-1:-1" placeholder="{...}" />
+            <marker date="1395674611831" expanded="true" signature="-1:-1" placeholder="{...}" />
+            <marker date="1395674611831" expanded="true" signature="-1:-1" placeholder="{...}" />
+            <marker date="1395674611831" expanded="true" signature="-1:-1" placeholder="{...}" />
+            <marker date="1395674611831" expanded="true" signature="-1:-1" placeholder="{...}" />
+            <marker date="1395674611831" expanded="true" signature="-1:-1" placeholder="{...}" />
+            <marker date="1395674611831" expanded="true" signature="-1:-1" placeholder="{...}" />
+            <marker date="1395674611831" expanded="true" signature="-1:-1" placeholder="{...}" />
+            <marker date="1395674611831" expanded="true" signature="-1:-1" placeholder="{...}" />
+            <marker date="1395674611831" expanded="true" signature="-1:-1" placeholder="{...}" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../modules.flash/flash.atlas.mxml/src/main/flex/edu/umich/med/mbni/pubanatomy/atlas/model/GetExpressionLevel.mxml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="86" max-vertical-offset="646">
+          <caret line="27" column="12" selection-start-line="27" selection-start-column="12" selection-end-line="27" selection-end-column="12" />
+          <folding>
+            <marker date="1383833506655" expanded="true" signature="-1:-1" placeholder="{...}" />
+            <marker date="1383833506655" expanded="true" signature="-1:-1" placeholder="{...}" />
+            <marker date="1383833506655" expanded="true" signature="-1:-1" placeholder="{...}" />
+            <marker date="1383833506655" expanded="true" signature="-1:-1" placeholder="{...}" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../modules.flash/flash.search2.mxml/src/main/flex/edu/umich/med/mbni/pubanatomy/search/model/SearchWithFacet.mxml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="307" max-vertical-offset="867">
+          <caret line="41" column="30" selection-start-line="41" selection-start-column="30" selection-end-line="41" selection-end-column="30" />
+          <folding>
+            <marker date="1383833505789" expanded="true" signature="-1:-1" placeholder="{...}" />
+            <marker date="1383833505789" expanded="true" signature="-1:-1" placeholder="{...}" />
+            <marker date="1383833505789" expanded="true" signature="-1:-1" placeholder="{...}" />
+            <marker date="1383833505789" expanded="true" signature="-1:-1" placeholder="[...]" />
+            <marker date="1383833505789" expanded="true" signature="-1:-1" placeholder="{...}" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../modules.flash/flash.remote.data.service/src/main/flex/edu/umich/med/mbni/pubanatomy/flash/rs/RpcSpringMvcGet.mxml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="17" max-vertical-offset="442">
+          <caret line="1" column="11" selection-start-line="1" selection-start-column="11" selection-end-line="1" selection-end-column="11" />
+          <folding>
+            <marker date="1383833504595" expanded="true" signature="-1:-1" placeholder="{...}" />
+            <marker date="1383833504595" expanded="true" signature="-1:-1" placeholder="{...}" />
+            <marker date="1383833504595" expanded="true" signature="-1:-1" placeholder="{...}" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../modules.flash/flash.remote.data.service/src/main/flex/edu/umich/med/mbni/pubanatomy/flash/rs/RpcInList.mxml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="2214" max-vertical-offset="2516">
+          <caret line="141" column="8" selection-start-line="141" selection-start-column="8" selection-end-line="141" selection-end-column="8" />
+          <folding>
+            <marker date="1400612717846" expanded="true" signature="-1:-1" placeholder="{...}" />
+            <marker date="1400612717846" expanded="true" signature="-1:-1" placeholder="{...}" />
+            <marker date="1400612717846" expanded="true" signature="-1:-1" placeholder="{...}" />
+            <marker date="1400612717846" expanded="true" signature="-1:-1" placeholder="{...}" />
+            <marker date="1400612717846" expanded="true" signature="-1:-1" placeholder="{...}" />
+            <marker date="1400612717846" expanded="true" signature="-1:-1" placeholder="{...}" />
+            <marker date="1400612717846" expanded="true" signature="-1:-1" placeholder="{...}" />
+            <marker date="1400612717846" expanded="true" signature="-1:-1" placeholder="{...}" />
+            <marker date="1400612717846" expanded="true" signature="-1:-1" placeholder="{...}" />
+            <marker date="1400612717846" expanded="true" signature="-1:-1" placeholder="{...}" />
+            <marker date="1400612717846" expanded="true" signature="-1:-1" placeholder="{...}" />
+            <marker date="1400612717846" expanded="true" signature="-1:-1" placeholder="{...}" />
+            <marker date="1400612717846" expanded="true" signature="-1:-1" placeholder="{...}" />
+            <marker date="1400612717846" expanded="true" signature="-1:-1" placeholder="{...}" />
+            <marker date="1400612717846" expanded="true" signature="-1:-1" placeholder="{...}" />
+            <marker date="1400612717846" expanded="true" signature="-1:-1" placeholder="{...}" />
+            <marker date="1400612717846" expanded="true" signature="-1:-1" placeholder="{...}" />
+            <marker date="1400612717846" expanded="true" signature="-1:-1" placeholder="{...}" />
+            <marker date="1400612717846" expanded="true" signature="-1:-1" placeholder="{...}" />
+            <marker date="1400612717846" expanded="true" signature="-1:-1" placeholder="{...}" />
+            <marker date="1400612717846" expanded="true" signature="-1:-1" placeholder="{...}" />
+            <marker date="1400612717846" expanded="true" signature="-1:-1" placeholder="{...}" />
+            <marker date="1400612717846" expanded="true" signature="-1:-1" placeholder="{...}" />
+            <marker date="1400612717846" expanded="true" signature="-1:-1" placeholder="{...}" />
+            <marker date="1400612717846" expanded="true" signature="-1:-1" placeholder="{...}" />
+            <marker date="1400612717846" expanded="true" signature="-1:-1" placeholder="{...}" />
+            <marker date="1400612717846" expanded="true" signature="-1:-1" placeholder="{...}" />
+            <marker date="1400612717846" expanded="true" signature="-1:-1" placeholder="{...}" />
+            <marker date="1400612717846" expanded="true" signature="-1:-1" placeholder="{...}" />
+            <marker date="1400612717846" expanded="true" signature="-1:-1" placeholder="{...}" />
+            <marker date="1400612717846" expanded="true" signature="-1:-1" placeholder="{...}" />
+            <marker date="1400612717846" expanded="true" signature="-1:-1" placeholder="{...}" />
+            <marker date="1400612717846" expanded="true" signature="-1:-1" placeholder="{...}" />
+            <marker date="1400612717846" expanded="true" signature="-1:-1" placeholder="{...}" />
+            <marker date="1400612717846" expanded="true" signature="-1:-1" placeholder="{...}" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../apps.flash/flash.test.air/src/main/flex/AppMain.mxml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="204" max-vertical-offset="408">
+          <caret line="12" column="33" selection-start-line="12" selection-start-column="33" selection-end-line="12" selection-end-column="33" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../modules.flash/flash.atlas.mxml/src/main/flex/edu/umich/med/mbni/pubanatomy/atlas/model/GetAppInitArgs.mxml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="1768" max-vertical-offset="1955">
+          <caret line="106" column="46" selection-start-line="106" selection-start-column="46" selection-end-line="106" selection-end-column="46" />
+          <folding>
+            <marker date="1383833506641" expanded="false" signature="-1:-1" placeholder="..." />
+            <marker date="1383833506641" expanded="true" signature="-1:-1" placeholder="{...}" />
+            <marker date="1383833506641" expanded="true" signature="-1:-1" placeholder="{...}" />
+            <marker date="1383833506641" expanded="true" signature="-1:-1" placeholder="{...}" />
+            <marker date="1383833506641" expanded="true" signature="-1:-1" placeholder="{...}" />
+            <marker date="1383833506641" expanded="true" signature="-1:-1" placeholder="{...}" />
+            <marker date="1383833506641" expanded="true" signature="-1:-1" placeholder="{...}" />
+            <marker date="1383833506641" expanded="true" signature="-1:-1" placeholder="{...}" />
+            <marker date="1383833506641" expanded="true" signature="-1:-1" placeholder="{...}" />
+            <marker date="1383833506641" expanded="true" signature="-1:-1" placeholder="{...}" />
+            <marker date="1383833506641" expanded="true" signature="-1:-1" placeholder="{...}" />
+            <marker date="1383833506641" expanded="true" signature="-1:-1" placeholder="{...}" />
+            <marker date="1383833506641" expanded="true" signature="-1:-1" placeholder="{...}" />
+            <marker date="1383833506641" expanded="true" signature="-1:-1" placeholder="{...}" />
+            <marker date="1383833506641" expanded="true" signature="-1:-1" placeholder="{...}" />
+            <marker date="1383833506641" expanded="true" signature="-1:-1" placeholder="{...}" />
+            <marker date="1383833506641" expanded="true" signature="-1:-1" placeholder="{...}" />
+            <marker date="1383833506641" expanded="true" signature="-1:-1" placeholder="{...}" />
+            <marker date="1383833506641" expanded="true" signature="-1:-1" placeholder="{...}" />
+            <marker date="1383833506641" expanded="true" signature="-1:-1" placeholder="{...}" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../modules.flash/flash.remote.data.service/src/main/flex/edu/umich/med/mbni/pubanatomy/flash/rs/RpcBase.mxml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.7291667" vertical-offset="1143" max-vertical-offset="2975">
+          <caret line="94" column="12" selection-start-line="94" selection-start-column="0" selection-end-line="94" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../modules.flash/flash.atlas.mxml/src/main/flex/edu/umich/med/mbni/pubanatomy/atlas/model/StructureTreeGridDataColumnGene.mxml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="2.5681446" vertical-offset="0" max-vertical-offset="4046">
+          <caret line="97" column="44" selection-start-line="97" selection-start-column="44" selection-end-line="97" selection-end-column="44" />
+          <folding>
+            <marker date="1403727772833" expanded="false" signature="301:413" placeholder="..." />
+            <marker date="1403727772833" expanded="true" signature="536:605" placeholder="{...}" />
+            <marker date="1403727772833" expanded="true" signature="777:829" placeholder="{...}" />
+            <marker date="1403727772833" expanded="true" signature="900:1096" placeholder="{...}" />
+            <marker date="1403727772833" expanded="true" signature="949:1086" placeholder="{...}" />
+            <marker date="1403727772833" expanded="true" signature="1243:1912" placeholder="{...}" />
+            <marker date="1403727772833" expanded="true" signature="1635:1822" placeholder="{...}" />
+            <marker date="1403727772833" expanded="true" signature="1851:1866" placeholder="{...}" />
+            <marker date="1403727772833" expanded="true" signature="1978:2511" placeholder="{...}" />
+            <marker date="1403727772833" expanded="true" signature="2024:2074" placeholder="{...}" />
+            <marker date="1403727772833" expanded="true" signature="2109:2167" placeholder="{...}" />
+            <marker date="1403727772833" expanded="true" signature="2202:2260" placeholder="{...}" />
+            <marker date="1403727772833" expanded="true" signature="2287:2345" placeholder="{...}" />
+            <marker date="1403727772833" expanded="true" signature="2376:2434" placeholder="{...}" />
+            <marker date="1403727772833" expanded="true" signature="2451:2501" placeholder="{...}" />
+            <marker date="1403727772833" expanded="false" signature="2577:2809" placeholder="..." />
+            <marker date="1403727772833" expanded="true" signature="2870:3516" placeholder="{...}" />
+            <marker date="1403727772833" expanded="true" signature="2913:2952" placeholder="{...}" />
+            <marker date="1403727772833" expanded="true" signature="3571:4708" placeholder="{...}" />
+            <marker date="1403727772833" expanded="true" signature="3701:4471" placeholder="{...}" />
+            <marker date="1403727772833" expanded="true" signature="3776:4457" placeholder="{...}" />
+            <marker date="1403727772833" expanded="true" signature="3949:4245" placeholder="[...]" />
+            <marker date="1403727772833" expanded="true" signature="4488:4606" placeholder="{...}" />
+            <marker date="1403727772833" expanded="true" signature="5137:5182" placeholder="{...}" />
+            <marker date="1403727772833" expanded="true" signature="5240:5307" placeholder="{...}" />
+            <marker date="1403727772833" expanded="true" signature="5352:6682" placeholder="{...}" />
+            <marker date="1403727772833" expanded="true" signature="5401:5440" placeholder="{...}" />
+            <marker date="1403727772833" expanded="true" signature="5603:5761" placeholder="{...}" />
+            <marker date="1403727772833" expanded="true" signature="5665:5747" placeholder="{...}" />
+            <marker date="1403727772833" expanded="true" signature="5841:6672" placeholder="{...}" />
+            <marker date="1403727772833" expanded="true" signature="6027:6448" placeholder="{...}" />
+            <marker date="1403727772833" expanded="true" signature="6524:6658" placeholder="{...}" />
+            <marker date="1403727772833" expanded="true" signature="7121:7189" placeholder="{...}" />
+            <marker date="1403727772833" expanded="true" signature="7235:8943" placeholder="{...}" />
+            <marker date="1403727772833" expanded="true" signature="7296:7385" placeholder="{...}" />
+            <marker date="1403727772833" expanded="true" signature="7458:8616" placeholder="{...}" />
+            <marker date="1403727772833" expanded="true" signature="7580:8578" placeholder="{...}" />
+            <marker date="1403727772833" expanded="true" signature="7698:8223" placeholder="{...}" />
+            <marker date="1403727772833" expanded="true" signature="7881:8201" placeholder="{...}" />
+            <marker date="1403727772833" expanded="true" signature="7946:8070" placeholder="{...}" />
+            <marker date="1403727772833" expanded="true" signature="8103:8175" placeholder="{...}" />
+            <marker date="1403727772833" expanded="true" signature="8273:8560" placeholder="{...}" />
+            <marker date="1403727772833" expanded="true" signature="8315:8392" placeholder="{...}" />
+            <marker date="1403727772833" expanded="true" signature="8421:8538" placeholder="{...}" />
+            <marker date="1403727772833" expanded="true" signature="8656:8741" placeholder="{...}" />
+            <marker date="1403727772833" expanded="true" signature="9641:9695" placeholder="{...}" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../modules.flash/flash.remote.data.service/src/main/flex/edu/umich/med/mbni/pubanatomy/flash/rs/RpcSpringMVC.mxml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="-10.461538" vertical-offset="0" max-vertical-offset="1190">
+          <caret line="16" column="40" selection-start-line="16" selection-start-column="0" selection-end-line="16" selection-end-column="0" />
+          <folding>
+            <marker date="1383833504584" expanded="true" signature="-1:-1" placeholder="{...}" />
+            <marker date="1383833504584" expanded="true" signature="-1:-1" placeholder="{...}" />
+            <marker date="1383833504584" expanded="true" signature="-1:-1" placeholder="{...}" />
+            <marker date="1383833504584" expanded="true" signature="-1:-1" placeholder="{...}" />
+            <marker date="1383833504584" expanded="true" signature="-1:-1" placeholder="{...}" />
+            <marker date="1383833504584" expanded="true" signature="-1:-1" placeholder="{...}" />
+            <marker date="1383833504584" expanded="true" signature="-1:-1" placeholder="{...}" />
+            <marker date="1383833504584" expanded="true" signature="-1:-1" placeholder="{...}" />
+            <marker date="1383833504584" expanded="true" signature="-1:-1" placeholder="{...}" />
+            <marker date="1383833504584" expanded="true" signature="-1:-1" placeholder="{...}" />
+            <marker date="1383833504584" expanded="true" signature="-1:-1" placeholder="{...}" />
+            <marker date="1383833504584" expanded="true" signature="-1:-1" placeholder="{...}" />
+            <marker date="1383833504584" expanded="true" signature="-1:-1" placeholder="{...}" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../modules.flash/flash.voxel.interact.mxml/src/main/flex/edu/umich/med/mbni/pubanatomy/voxel3d/model/Voxel3dOperationGeneExprOnOff3dStage.as">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="731">
+          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding>
+            <element signature="n#!!doc" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../modules.flash/flash.interface.away3d/src/main/flex/edu/umich/med/mbni/pubanatomy/datadriven3dwindow/Dd3dViewMeshBase.mxml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="-8.307693" vertical-offset="753" max-vertical-offset="1785">
+          <caret line="61" column="31" selection-start-line="61" selection-start-column="31" selection-end-line="61" selection-end-column="31" />
+          <folding>
+            <marker date="1383833503324" expanded="false" signature="-1:-1" placeholder="..." />
+            <marker date="1383833503324" expanded="true" signature="-1:-1" placeholder="{...}" />
+            <marker date="1383833503324" expanded="true" signature="-1:-1" placeholder="{...}" />
+            <marker date="1383833503324" expanded="true" signature="-1:-1" placeholder="{...}" />
+            <marker date="1383833503324" expanded="true" signature="-1:-1" placeholder="{...}" />
+            <marker date="1383833503324" expanded="true" signature="-1:-1" placeholder="{...}" />
+            <marker date="1383833503324" expanded="true" signature="-1:-1" placeholder="{...}" />
+            <marker date="1383833503324" expanded="true" signature="-1:-1" placeholder="{...}" />
+            <marker date="1383833503324" expanded="true" signature="-1:-1" placeholder="{...}" />
+            <marker date="1383833503324" expanded="true" signature="-1:-1" placeholder="{...}" />
+            <marker date="1383833503324" expanded="true" signature="-1:-1" placeholder="{...}" />
+            <marker date="1383833503324" expanded="true" signature="-1:-1" placeholder="{...}" />
+            <marker date="1383833503324" expanded="true" signature="-1:-1" placeholder="{...}" />
+            <marker date="1383833503324" expanded="true" signature="-1:-1" placeholder="{...}" />
+            <marker date="1383833503324" expanded="true" signature="-1:-1" placeholder="{...}" />
+            <marker date="1383833503324" expanded="true" signature="-1:-1" placeholder="{...}" />
+            <marker date="1383833503324" expanded="true" signature="-1:-1" placeholder="{...}" />
+            <marker date="1383833503324" expanded="true" signature="-1:-1" placeholder="{...}" />
+            <marker date="1383833503324" expanded="true" signature="-1:-1" placeholder="{...}" />
+            <marker date="1383833503324" expanded="true" signature="-1:-1" placeholder="{...}" />
+            <marker date="1383833503324" expanded="true" signature="-1:-1" placeholder="{...}" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../modules.flash/flash.interface.away3d/src/main/flex/edu/umich/med/mbni/pubanatomy/datadriven3dwindow/Dd3dViewMeshInteract.mxml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="1496">
+          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding>
+            <marker date="1383943504919" expanded="false" signature="274:465" placeholder="..." />
+            <marker date="1383943504919" expanded="true" signature="574:624" placeholder="{...}" />
+            <marker date="1383943504919" expanded="true" signature="697:1432" placeholder="{...}" />
+            <marker date="1383943504919" expanded="true" signature="744:1422" placeholder="{...}" />
+            <marker date="1383943504919" expanded="true" signature="817:1063" placeholder="{...}" />
+            <marker date="1383943504919" expanded="true" signature="1084:1339" placeholder="{...}" />
+            <marker date="1383943504919" expanded="true" signature="1494:2037" placeholder="{...}" />
+            <marker date="1383943504919" expanded="true" signature="1527:1566" placeholder="{...}" />
+            <marker date="1383943504919" expanded="true" signature="1691:1826" placeholder="{...}" />
+            <marker date="1383943504919" expanded="true" signature="1886:2027" placeholder="{...}" />
+            <marker date="1383943504919" expanded="true" signature="2147:2307" placeholder="{...}" />
+            <marker date="1383943504919" expanded="true" signature="2225:2297" placeholder="{...}" />
+            <marker date="1383943504919" expanded="true" signature="2372:3054" placeholder="{...}" />
+            <marker date="1383943504919" expanded="true" signature="2506:2705" placeholder="{...}" />
+            <marker date="1383943504919" expanded="true" signature="2756:2804" placeholder="{...}" />
+            <marker date="1383943504919" expanded="true" signature="2821:2871" placeholder="{...}" />
+            <marker date="1383943504919" expanded="true" signature="2905:2954" placeholder="{...}" />
+            <marker date="1383943504919" expanded="true" signature="2971:3020" placeholder="{...}" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../modules.flash/flash.interface.away3d/src/main/flex/edu/umich/med/mbni/pubanatomy/datadriven3dwindow/Dd3dViewMeshParticleSet.mxml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="-13.076923" vertical-offset="85" max-vertical-offset="782">
+          <caret line="25" column="56" selection-start-line="25" selection-start-column="56" selection-end-line="25" selection-end-column="56" />
+          <folding>
+            <marker date="1383833503281" expanded="true" signature="273:344" placeholder="..." />
+            <marker date="1383833503281" expanded="true" signature="451:517" placeholder="{...}" />
+            <marker date="1383833503281" expanded="true" signature="575:1421" placeholder="{...}" />
+            <marker date="1383833503281" expanded="true" signature="592:1231" placeholder="{...}" />
+            <marker date="1383833503281" expanded="true" signature="670:1216" placeholder="{...}" />
+            <marker date="1383833503281" expanded="true" signature="1271:1411" placeholder="{...}" />
+            <marker date="1383833503281" expanded="true" signature="1289:1397" placeholder="{...}" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../modules.flash/flash.voxel.interact.mxml/src/main/flex/edu/umich/med/mbni/pubanatomy/voxel3d/model/Voxel3dStructureOn3dTreeGridData.mxml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="-8.115385" vertical-offset="2611" max-vertical-offset="4964">
+          <caret line="171" column="34" selection-start-line="171" selection-start-column="34" selection-end-line="171" selection-end-column="34" />
+          <folding>
+            <marker date="1401890405401" expanded="false" signature="313:631" placeholder="..." />
+            <marker date="1401890405401" expanded="true" signature="1020:1245" placeholder="{...}" />
+            <marker date="1401890405401" expanded="true" signature="1135:1174" placeholder="{...}" />
+            <marker date="1401890405401" expanded="true" signature="1296:2118" placeholder="{...}" />
+            <marker date="1401890405401" expanded="true" signature="1313:1928" placeholder="{...}" />
+            <marker date="1401890405401" expanded="true" signature="1486:1713" placeholder="{...}" />
+            <marker date="1401890405401" expanded="true" signature="1812:1914" placeholder="{...}" />
+            <marker date="1401890405401" expanded="true" signature="1968:2108" placeholder="{...}" />
+            <marker date="1401890405401" expanded="true" signature="1986:2094" placeholder="{...}" />
+            <marker date="1401890405401" expanded="true" signature="2168:3326" placeholder="{...}" />
+            <marker date="1401890405401" expanded="true" signature="2392:2485" placeholder="{...}" />
+            <marker date="1401890405401" expanded="true" signature="2677:2819" placeholder="{...}" />
+            <marker date="1401890405401" expanded="true" signature="3015:3225" placeholder="{...}" />
+            <marker date="1401890405401" expanded="true" signature="3066:3157" placeholder="{...}" />
+            <marker date="1401890405401" expanded="true" signature="3475:3529" placeholder="{...}" />
+            <marker date="1401890405401" expanded="true" signature="3585:4568" placeholder="{...}" />
+            <marker date="1401890405401" expanded="true" signature="3711:3753" placeholder="{...}" />
+            <marker date="1401890405401" expanded="true" signature="3814:4401" placeholder="{...}" />
+            <marker date="1401890405401" expanded="true" signature="3946:4384" placeholder="{...}" />
+            <marker date="1401890405401" expanded="true" signature="4118:4366" placeholder="{...}" />
+            <marker date="1401890405401" expanded="true" signature="4180:4286" placeholder="{...}" />
+            <marker date="1401890405401" expanded="true" signature="4418:4463" placeholder="{...}" />
+            <marker date="1401890405401" expanded="true" signature="4636:4959" placeholder="{...}" />
+            <marker date="1401890405401" expanded="true" signature="4736:4949" placeholder="{...}" />
+            <marker date="1401890405401" expanded="true" signature="4819:4902" placeholder="{...}" />
+            <marker date="1401890405401" expanded="true" signature="5038:5107" placeholder="{...}" />
+            <marker date="1401890405401" expanded="true" signature="5636:5865" placeholder="{...}" />
+            <marker date="1401890405401" expanded="true" signature="6034:6082" placeholder="{...}" />
+            <marker date="1401890405401" expanded="true" signature="6175:6419" placeholder="{...}" />
+            <marker date="1401890405401" expanded="true" signature="6585:7423" placeholder="{...}" />
+            <marker date="1401890405401" expanded="true" signature="6678:7413" placeholder="{...}" />
+            <marker date="1401890405401" expanded="true" signature="6727:6910" placeholder="{...}" />
+            <marker date="1401890405401" expanded="true" signature="7112:7292" placeholder="{...}" />
+            <marker date="1401890405401" expanded="false" signature="7573:7753" placeholder="..." />
+            <marker date="1401890405401" expanded="true" signature="7795:9294" placeholder="{...}" />
+            <marker date="1401890405401" expanded="true" signature="7923:8052" placeholder="{...}" />
+            <marker date="1401890405401" expanded="true" signature="8234:8395" placeholder="{...}" />
+            <marker date="1401890405401" expanded="true" signature="8690:9195" placeholder="{...}" />
+            <marker date="1401890405401" expanded="true" signature="8986:9058" placeholder="{...}" />
+            <marker date="1401890405401" expanded="true" signature="9109:9181" placeholder="{...}" />
+            <marker date="1401890405401" expanded="true" signature="9346:10026" placeholder="{...}" />
+            <marker date="1401890405401" expanded="true" signature="9503:9571" placeholder="{...}" />
+            <marker date="1401890405401" expanded="true" signature="9714:9944" placeholder="{...}" />
+            <marker date="1401890405401" expanded="true" signature="10207:11164" placeholder="{...}" />
+            <marker date="1401890405401" expanded="true" signature="10252:11077" placeholder="{...}" />
+            <marker date="1401890405401" expanded="true" signature="10608:11063" placeholder="{...}" />
+            <marker date="1401890405401" expanded="true" signature="10802:10884" placeholder="{...}" />
+            <marker date="1401890405401" expanded="true" signature="10975:11045" placeholder="{...}" />
+            <marker date="1401890405401" expanded="true" signature="11203:11489" placeholder="{...}" />
+            <marker date="1401890405401" expanded="true" signature="11528:11626" placeholder="{...}" />
+            <marker date="1401890405401" expanded="true" signature="11742:11904" placeholder="{...}" />
+            <marker date="1401890405401" expanded="true" signature="11956:12446" placeholder="{...}" />
+            <marker date="1401890405401" expanded="true" signature="12130:12248" placeholder="{...}" />
+            <marker date="1401890405401" expanded="true" signature="12277:12436" placeholder="{...}" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../modules.flash/flash.voxel.interact.mxml/src/main/flex/edu/umich/med/mbni/pubanatomy/voxel3d/model/Voxel3dOperation3dModelAlpha.as">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="527">
+          <caret line="20" column="38" selection-start-line="20" selection-start-column="38" selection-end-line="20" selection-end-column="38" />
+          <folding>
+            <element signature="n#!!doc" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../modules.flash/flash.voxel.interact.mxml/src/main/flex/edu/umich/med/mbni/pubanatomy/voxel3d/view/V3dStructureTreeGridMultiAlphaAjust.mxml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="-9.153846" vertical-offset="0" max-vertical-offset="493">
+          <caret line="15" column="63" selection-start-line="15" selection-start-column="63" selection-end-line="15" selection-end-column="63" />
+          <folding>
+            <marker date="1403625195457" expanded="false" signature="545:705" placeholder="..." />
+            <marker date="1403625195457" expanded="true" signature="837:1047" placeholder="{...}" />
+            <marker date="1403625195457" expanded="true" signature="944:1034" placeholder="{...}" />
+            <marker date="1403625195457" expanded="true" signature="1102:1161" placeholder="{...}" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../modules.flash/flash.atlas.mxml/src/main/flex/edu/umich/med/mbni/pubanatomy/atlas/model/StructureItem.mxml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="-8.038462" vertical-offset="233" max-vertical-offset="1564">
+          <caret line="26" column="20" selection-start-line="26" selection-start-column="20" selection-end-line="26" selection-end-column="20" />
+          <folding>
+            <marker date="1383833506632" expanded="true" signature="633:688" placeholder="{...}" />
+            <marker date="1383833506632" expanded="true" signature="856:980" placeholder="{...}" />
+            <marker date="1383833506632" expanded="true" signature="896:970" placeholder="{...}" />
+            <marker date="1383833506632" expanded="true" signature="1185:1341" placeholder="{...}" />
+            <marker date="1383833506632" expanded="true" signature="1421:1458" placeholder="{...}" />
+            <marker date="1383833506632" expanded="true" signature="1551:1873" placeholder="{...}" />
+            <marker date="1383833506632" expanded="true" signature="1613:1832" placeholder="{...}" />
+            <marker date="1383833506632" expanded="true" signature="1746:1818" placeholder="{...}" />
+            <marker date="1383833506632" expanded="true" signature="2510:2552" placeholder="{...}" />
+            <marker date="1383833506632" expanded="true" signature="2609:2839" placeholder="{...}" />
+            <marker date="1383833506632" expanded="true" signature="2714:2829" placeholder="{...}" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../modules.flash/flash.voxel.interact.mxml/src/main/flex/edu/umich/med/mbni/pubanatomy/voxel3d/model/Voxel3dStructureModel.mxml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="-16.576923" vertical-offset="351" max-vertical-offset="952">
+          <caret line="48" column="75" selection-start-line="48" selection-start-column="75" selection-end-line="48" selection-end-column="75" />
+          <folding>
+            <marker date="1383833507160" expanded="false" signature="226:422" placeholder="..." />
+            <marker date="1383833507160" expanded="true" signature="558:946" placeholder="{...}" />
+            <marker date="1383833507160" expanded="true" signature="681:936" placeholder="{...}" />
+            <marker date="1383833507160" expanded="true" signature="1087:1126" placeholder="{...}" />
+            <marker date="1383833507160" expanded="true" signature="1185:1235" placeholder="{...}" />
+            <marker date="1383833507160" expanded="true" signature="1294:1360" placeholder="{...}" />
+            <marker date="1383833507160" expanded="true" signature="1447:1598" placeholder="{...}" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../modules.flash/flash.interface.away3d/src/main/flex/edu/umich/med/mbni/pubanatomy/datadriven3dwindow/Dd3dModelMeshBase.mxml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="-14.384615" vertical-offset="0" max-vertical-offset="1088">
+          <caret line="22" column="20" selection-start-line="22" selection-start-column="20" selection-end-line="22" selection-end-column="20" />
+          <folding>
+            <marker date="1383833503289" expanded="true" signature="299:341" placeholder="{...}" />
+            <marker date="1383833503289" expanded="true" signature="402:568" placeholder="{...}" />
+            <marker date="1383833503289" expanded="true" signature="441:558" placeholder="{...}" />
+            <marker date="1383833503289" expanded="true" signature="1041:1083" placeholder="{...}" />
+            <marker date="1383833503289" expanded="true" signature="1290:1328" placeholder="{...}" />
+            <marker date="1383833503289" expanded="true" signature="1394:1547" placeholder="{...}" />
+            <marker date="1383833503289" expanded="true" signature="1429:1537" placeholder="{...}" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../modules.flash/flash.interface.away3d/src/main/flex/edu/umich/med/mbni/pubanatomy/datadriven3dwindow/Dd3dModelMeshParticleSet.mxml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="-0.65384614" vertical-offset="0" max-vertical-offset="2091">
+          <caret line="1" column="0" selection-start-line="1" selection-start-column="0" selection-end-line="1" selection-end-column="0" />
+          <folding>
+            <marker date="1397766873625" expanded="true" signature="473:514" placeholder="{...}" />
+            <marker date="1397766873625" expanded="true" signature="605:645" placeholder="{...}" />
+            <marker date="1397766873625" expanded="true" signature="734:774" placeholder="{...}" />
+            <marker date="1397766873625" expanded="true" signature="889:4668" placeholder="{...}" />
+            <marker date="1397766873625" expanded="true" signature="923:4658" placeholder="{...}" />
+            <marker date="1397766873625" expanded="true" signature="1194:4454" placeholder="{...}" />
+            <marker date="1397766873625" expanded="true" signature="4718:4799" placeholder="{...}" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../modules.flash/flash.voxel.interact.mxml/src/main/flex/edu/umich/med/mbni/pubanatomy/voxel3d/model/Voxel3dStructureGeneExprType.mxml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.6296296" vertical-offset="0" max-vertical-offset="1768">
+          <caret line="21" column="59" selection-start-line="21" selection-start-column="0" selection-end-line="21" selection-end-column="0" />
+          <folding>
+            <marker date="1404309233824" expanded="true" signature="508:776" placeholder="..." />
+            <marker date="1404309233824" expanded="true" signature="1145:1319" placeholder="{...}" />
+            <marker date="1404309233824" expanded="true" signature="1366:2102" placeholder="{...}" />
+            <marker date="1404309233824" expanded="true" signature="1421:2092" placeholder="{...}" />
+            <marker date="1404309233824" expanded="true" signature="1553:1603" placeholder="/*...*/" />
+            <marker date="1404309233824" expanded="true" signature="1735:1994" placeholder="{...}" />
+            <marker date="1404309233824" expanded="true" signature="1777:1852" placeholder="{...}" />
+            <marker date="1404309233824" expanded="true" signature="1908:1976" placeholder="{...}" />
+            <marker date="1404309233824" expanded="true" signature="2015:2078" placeholder="{...}" />
+            <marker date="1404309233824" expanded="true" signature="2164:2854" placeholder="{...}" />
+            <marker date="1404309233824" expanded="true" signature="2385:2820" placeholder="{...}" />
+            <marker date="1404309233824" expanded="true" signature="2928:3464" placeholder="{...}" />
+            <marker date="1404309233824" expanded="true" signature="3020:3065" placeholder="{...}" />
+            <marker date="1404309233824" expanded="true" signature="3504:3515" placeholder="{...}" />
+            <marker date="1404309233824" expanded="true" signature="4024:4110" placeholder="{...}" />
+            <marker date="1404309233824" expanded="true" signature="4158:4323" placeholder="{...}" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+  </component>
+  <component name="masterDetails">
+    <states>
+      <state key="ArtifactsStructureConfigurable.UI">
+        <settings>
+          <artifact-editor />
+          <splitter-proportions>
+            <option name="proportions">
+              <list>
+                <option value="0.2" />
+              </list>
+            </option>
+          </splitter-proportions>
+        </settings>
+      </state>
+      <state key="FacetStructureConfigurable.UI">
+        <settings>
+          <last-edited>No facets are configured</last-edited>
+          <splitter-proportions>
+            <option name="proportions">
+              <list>
+                <option value="0.2" />
+              </list>
+            </option>
+          </splitter-proportions>
+        </settings>
+      </state>
+      <state key="GlobalLibrariesConfigurable.UI">
+        <settings>
+          <splitter-proportions>
+            <option name="proportions">
+              <list>
+                <option value="0.2" />
+              </list>
+            </option>
+          </splitter-proportions>
+        </settings>
+      </state>
+      <state key="JdkListConfigurable.UI">
+        <settings>
+          <last-edited>4.11_3.9_11.5</last-edited>
+          <splitter-proportions>
+            <option name="proportions">
+              <list>
+                <option value="0.3628547" />
+              </list>
+            </option>
+          </splitter-proportions>
+        </settings>
+      </state>
+      <state key="ModuleStructureConfigurable.UI">
+        <settings>
+          <last-edited>flash.atlas.mxml</last-edited>
+          <splitter-proportions>
+            <option name="proportions">
+              <list>
+                <option value="0.3628547" />
+                <option value="0.6" />
+              </list>
+            </option>
+          </splitter-proportions>
+        </settings>
+      </state>
+      <state key="ProjectLibrariesConfigurable.UI">
+        <settings>
+          <splitter-proportions>
+            <option name="proportions">
+              <list>
+                <option value="0.2" />
+              </list>
+            </option>
+          </splitter-proportions>
+        </settings>
+      </state>
+    </states>
+  </component>
+</project>

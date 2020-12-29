@@ -1,0 +1,52 @@
+<?xml version="1.0"?>
+<dd3d:Dd3dModelMeshStructure xmlns:fx="http://ns.adobe.com/mxml/2009"
+                             xmlns:dd3d="edu.umich.med.mbni.pubanatomy.datadriven3dwindow.*">
+    <fx:Script><![CDATA[
+        import edu.umich.med.mbni.pubanatomy.flash.dto.DtoModel;
+        import edu.umich.med.mbni.pubanatomy.flash.dto.DtoModelMeshArray;
+        import edu.umich.med.mbni.pubanatomy.voxel3d.rs.GetModelMeshArr;
+
+
+        [Bindable]
+        public var structureItem:Voxel3dStructure;
+
+        public function loadMesh( force:Boolean = false ):void{
+            if( force || ( structureItem.on3dStage && _loader == null && _dtoModelMeshArr == null && dtoModel != null ) ){
+                _loader = new GetModelMeshArr();
+                dispatchEvent( new Event( "loaderChanged" ) );
+                _loader.structureModelItem = this;
+                _loader.force = force;
+                _loader.callRemote();
+            }
+        }
+
+        private var _loader:GetModelMeshArr;
+        [Bindable(event="loaderChanged")]
+        public function get loader():GetModelMeshArr{
+            return _loader;
+        }
+
+        private function set rfrScale( ignoreVar:* ):void{
+            scale = getDefaultScale();
+        }
+
+        override public function getDefaultScale():Number{
+            return structureItem.model.config.scale3d;
+        }
+
+        public function onDtoModelMeshArr( dtoModelMeshArray:DtoModelMeshArray ):void{
+            setDtoModelMeshArr( dtoModelMeshArray );
+            _loader = null;
+            dispatchEvent( new Event( "loaderChanged" ) );
+        }
+
+        [Bindable]
+        public var dtoModel:DtoModel;
+        ]]></fx:Script>
+    <fx:Binding source="structureItem.atlasStructure.dtoStructure.visualModel" destination="dtoModel"/>
+
+    <fx:Binding source="structureItem.atlasStructure.color" destination="color"/>
+    <fx:Binding source="structureItem.atlasStructure.alpha" destination="alpha"/>
+    <fx:Binding source="structureItem.model.config.scale3d" destination="rfrScale"/>
+
+</dd3d:Dd3dModelMeshStructure>

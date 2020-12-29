@@ -1,0 +1,65 @@
+<?xml version="1.0"?>
+<view:WebWinBase xmlns:fx="http://ns.adobe.com/mxml/2009" xmlns:view="edu.umich.med.mbni.pubanatomy.integrate.view.*"
+                 xmlns:s="library://ns.adobe.com/flex/spark"
+                 xmlns:mx="library://ns.adobe.com/flex/mx" xmlns:ww="edu.umich.med.mbni.webdesktop.*"
+                 title="Editing {model.toolTipId}">
+    <fx:Script><![CDATA[
+        import edu.umich.med.mbni.pubanatomy.integrate.view.TooltipExPub;
+
+        import mx.managers.ToolTipManager;
+
+        [Bindable(event="dataChanged")]
+        public function get model():MDLTooltipExPubYang{
+            return data as MDLTooltipExPubYang;
+        }
+
+        override protected function onCreated( event:Event ):void{
+            if( model != null ){
+                var tip:TooltipExPub = ToolTipManager.currentToolTip as TooltipExPub;
+                _scaleFrom = new Point( tip.width / width, tip.height / height );
+                _moveFrom = new Point( tip.x, tip.y );
+                _fadeFrom = 1;
+                ToolTipManager.currentToolTip = null;
+                ToolTipManager.destroyToolTip( tip );
+            }
+            super.onCreated( event );
+        }
+
+        [Bindable]
+        private var _editing:String;
+
+        private function onCommit():void{
+            var saveTooltipHelp:SaveTooltipHelp = new SaveTooltipHelp();
+            saveTooltipHelp.tipModel = model;
+            saveTooltipHelp.shortTip = shortTipTxt.text;
+            saveTooltipHelp.htmlHelp = htmlHelpTxt.htmlText;
+            saveTooltipHelp.callRemote();
+            rootView.rootAppModel.webWinModels.removeItem( data );
+        }
+        ]]></fx:Script>
+    <view:layout>
+        <s:VerticalLayout/>
+    </view:layout>
+
+    <s:Group width="100%">
+        <s:layout>
+            <s:HorizontalLayout/>
+        </s:layout>
+        <ww:TiBoTlePanel title="{model.tipList.length} dynamic values available:" height="100%">
+            <s:List dataProvider="{model.tipList}" labelFunction="getDynamicValTip"
+                    toolTip="ask Gary to add more" height="100%"/>
+        </ww:TiBoTlePanel>
+        <ww:TiBoTlePanel title="Edit 1st level tip, 200 charactors limit.it's {shortTipTxt.text.length } now" width="100%">
+            <s:TextArea text="{model.shortTip}" id="shortTipTxt" minHeight="150" editable="true" width="100%"/>
+        </ww:TiBoTlePanel>
+    </s:Group>
+    <mx:RichTextEditor htmlText="{model.htmlHelp}" id="htmlHelpTxt" width="100%"
+                       title="Edit 2nd level help, dynamic value not supported, 5000 length limits, now it's {htmlHelpTxt.htmlText.length}"/>
+    <s:Button id="commitBtn" label="Commit" click="onCommit();"
+              enabled="{htmlHelpTxt.htmlText.length&lt;5001&amp;&amp;shortTipTxt.text.length &lt;201}"/>
+    <fx:Script><![CDATA[
+        private function getDynamicValTip( tip:String ):String{
+            return "{" + model.dynamicTips.indexOf( tip ) + "} --> " + tip;
+        }
+        ]]></fx:Script>
+</view:WebWinBase>

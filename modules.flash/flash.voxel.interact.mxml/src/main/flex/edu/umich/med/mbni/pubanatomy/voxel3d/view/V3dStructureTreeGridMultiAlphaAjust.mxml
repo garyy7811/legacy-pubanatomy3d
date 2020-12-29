@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<utils:PopupSlider xmlns:fx="http://ns.adobe.com/mxml/2009" xmlns:utils="edu.umich.med.mbni.utils.*"
+                   liveDragging="true" change="v3dtreegriddata.rootModelVoxel3d.callInNext.putIn( onChanged, this, null, 3 );"
+                   minimum="0.05" maximum="1" height="120" width="24"
+                   stepSize="0.033333" snapInterval="0.05" value="1" dataTipFormatFunction="formatTip"
+        removedFromStage="v3dtreegriddata.isAjustingSelectedItemsAlpha = false;">
+    <fx:Script><![CDATA[
+        import edu.umich.med.mbni.pubanatomy.atlas.model.StructureTreeGridDataRow;
+        import edu.umich.med.mbni.pubanatomy.voxel3d.model.Voxel3dStructureOn3dTreeGridData;
+
+        [Bindable]
+        public var v3dtreegriddata:Voxel3dStructureOn3dTreeGridData;
+
+        private function onChanged():void{
+            v3dtreegriddata.selectedItems.forEach( function ( t:Object, idx:int, v:Vector.<Object> ):void{
+                ( t as StructureTreeGridDataRow ).structure.alpha = value;
+            } );
+        }
+
+        private function formatTip( v:Number ):String{
+            return Math.round( v * 100 ) + "%";
+        }
+        ]]></fx:Script>
+</utils:PopupSlider>

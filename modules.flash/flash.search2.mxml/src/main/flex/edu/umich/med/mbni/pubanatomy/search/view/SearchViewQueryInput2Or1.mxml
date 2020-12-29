@@ -1,0 +1,109 @@
+<?xml version="1.0"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009"
+         xmlns:s="library://ns.adobe.com/flex/spark"
+         xmlns:view="edu.umich.med.mbni.pubanatomy.search.view.*"
+        >
+    <fx:Script><![CDATA[
+        import edu.umich.med.mbni.pubanatomy.search.model.QueryRelate2Terms;
+        import edu.umich.med.mbni.pubanatomy.search.model.QueryTermR;
+        import edu.umich.med.mbni.pubanatomy.search.model.QueryTermT;
+
+        [Bindable]
+        public var termSuggestGroup:ViewTermSuggestGroup;
+
+        [Bindable]
+        public var drdr:SearchViewQueryInputDrDr;
+        ]]></fx:Script>
+    <s:states>
+        <s:State name="l"/>
+        <s:State name="tR" stateGroups="t"/>
+        <s:State name="tT" stateGroups="t"/>
+        <s:State name="r2h" stateGroups="r2"/>
+        <s:State name="r2v" stateGroups="r2"/>
+    </s:states>
+    <fx:Script><![CDATA[
+        private function set rfrState( ignoreVar:* ):void{
+            drdr.model.query.queryResult.searchModel.callInNext.putIn( refreshState, this, null, 3 );
+        }
+
+        private function refreshState():void{
+            if( drdr.model == null ){
+                return;
+            }
+            if( drdr.model.term == null ){
+                if( drdr.model.operator == QueryRelate2Terms.OPERATOR_AND
+                        || drdr.model.operator == QueryRelate2Terms.OPERATOR_OR ){
+
+                    _operator = ( drdr.model.operator == QueryRelate2Terms.OPERATOR_AND ? "AND" : "OR");
+                }
+                else if( drdr.model.operator == QueryRelate2Terms.OPERATOR_NOT ){
+                    _operator = "NOT";
+                }
+
+                if( drdr.model.isVertical ){
+                    currentState = "r2v";
+                    layout = verticalLayout;
+                }
+                else{
+                    currentState = "r2h";
+                    layout = horizontalLayout;
+                }
+            }
+            else{
+                if( drdr.model.query.focusedOnTerm != drdr.model.term ){
+                    currentState = "l";
+                }
+                else if( drdr.model.term is QueryTermR ){
+                    currentState = "tR";
+                }
+                else if( drdr.model.term is QueryTermT ){
+                    currentState = "tT";
+                }
+            }
+            CONFIG::debugging{
+                trace( drdr.model.queryStrAsChild + ".currentState: _operator:" + currentState + "/" + _operator );
+            }//debug
+        }
+
+        [Bindable]
+        private var _operator:String;
+
+        ]]></fx:Script>
+    <fx:Declarations>
+        <s:HorizontalLayout id="horizontalLayout" horizontalAlign="left" verticalAlign="middle"/>
+        <s:VerticalLayout id="verticalLayout" horizontalAlign="left" verticalAlign="middle"/>
+    </fx:Declarations>
+    <fx:Binding source="drdr.model.isVertical" destination="rfrState"/>
+    <fx:Binding source="drdr.model.term" destination="rfrState"/>
+    <fx:Binding source="drdr.model.child1" destination="rfrState"/>
+    <fx:Binding source="drdr.model.child2" destination="rfrState"/>
+    <fx:Binding source="drdr.model.query.focusedOnTerm" destination="rfrState"/>
+    <fx:Binding source="drdr.model.parent" destination="rfrState"/>
+    <fx:Binding source="drdr.model.queryStrAsChild" destination="rfrState"/>
+    <fx:Binding source="drdr.model.query.queryResult.searchModel.callInNext" destination="rfrState"/>
+
+    <view:ViewTermSuggestTextInput id="termTxt" left="3" right="3" top="2" bottom="2"
+                                   includeIn="tT" queryTerm="{drdr.model.term as QueryTermT}"
+                                   termSuggestGroup="{termSuggestGroup}"
+
+                                   fontSize="17"
+
+                                   selectionChange="/*(drdr.model.term as QueryTermT).refreshSplitCheck();*/"
+
+                                   commitTxt="drdr.model.term.commit();"
+                                   revertTxt="drdr.model.term.revert();"
+            />
+    <view:ViewTermRange id="termRange" left="3" right="3" top="2" bottom="2"
+                        includeIn="tR" queryTerm="{drdr.model.term as QueryTermR}"/>
+    <view:ViewTermLabel queryTerm="{drdr.model.term}" left="3" right="3" top="2" bottom="2"
+                        width="100%" height="100%" includeIn="l"/>
+
+    <view:SearchViewQueryInputDrDr id="child1" includeIn="r2" left="3" right="3" top="2" bottom="2"
+                                   model="{drdr.model.child1}" termSuggestGroup="{termSuggestGroup}"
+                                   drdrParent="{drdr}"/>
+    <view:SearchViewQueryInput2Or1Operator id="operator" model="{drdr.model}"
+                                           includeIn="r2" left="3" right="3" top="2" bottom="2"/>
+    <view:SearchViewQueryInputDrDr id="child2" includeIn="r2" model="{drdr.model.child2}"
+                                   termSuggestGroup="{termSuggestGroup}" drdrParent="{drdr}"
+                                   left="3" right="3" top="2" bottom="2"/>
+</s:Group>

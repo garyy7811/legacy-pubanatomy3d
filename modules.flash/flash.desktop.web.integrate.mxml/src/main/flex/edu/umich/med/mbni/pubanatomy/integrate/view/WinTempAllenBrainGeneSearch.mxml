@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+<view:WebWinBase xmlns:fx="http://ns.adobe.com/mxml/2009"
+                 xmlns:s="library://ns.adobe.com/flex/spark"
+                 xmlns:view="edu.umich.med.mbni.pubanatomy.integrate.view.*"
+                 title="Search Data Set from AllenBrain by Gene Symbol/Name:"
+                 creationComplete="txt.setFocus();"
+        >
+    <fx:Script><![CDATA[
+        import edu.umich.med.mbni.pubanatomy.integrate.model.MDLTempAbaDatasetSearchRpcGene;
+
+        [Bindable(event="dataChanged")]
+        public function get model():MDLTempAbaDatasetSearchRpcGene{
+            return data as MDLTempAbaDatasetSearchRpcGene;
+        }
+
+        private function setSN( v:Boolean ):void{
+            model.symbolOrName = v;
+        }
+
+        ]]></fx:Script>
+    <view:layout>
+        <s:VerticalLayout paddingLeft="3" paddingBottom="3" paddingTop="3" paddingRight="3"/>
+    </view:layout>
+    <s:HGroup>
+        <s:Label text="Search By Gene: "/>
+        <s:RadioButton label="Symbol" selected="{model.symbolOrName}" change="setSN( true );"/>
+        <s:RadioButton label="Name" selected="{!model.symbolOrName}" change="setSN( false );"/>
+    </s:HGroup>
+    <s:TextInput id="txt" width="100%" text="@{model.inputText}" prompt="Input here"/>
+    <view:TmpGeneDataSetDataGrid model="{model}"/>
+</view:WebWinBase>

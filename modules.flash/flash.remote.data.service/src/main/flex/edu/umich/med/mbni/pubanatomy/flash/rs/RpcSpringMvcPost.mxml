@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<rs:RpcSpringMVC xmlns:fx="http://ns.adobe.com/mxml/2009" xmlns:rs="edu.umich.med.mbni.pubanatomy.flash.rs.*">
+    <fx:Script><![CDATA[
+
+
+        override protected function getRequestData():Object{
+            var ba:ByteArray = new ByteArray();
+            if( args != null ){
+                ba.writeObject( args );
+            }
+            else{
+                ba.writeObject( null );
+            }
+            return ba;
+        }
+
+        ]]></fx:Script>
+</rs:RpcSpringMVC>

@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<utils:MoreOptionsButton xmlns:fx="http://ns.adobe.com/mxml/2009" xmlns:utils="edu.umich.med.mbni.utils.*"
+        click="onClick();">
+    <fx:Script><![CDATA[
+        import edu.umich.med.mbni.pubanatomy.atlas.model.StructureTreeGridData;
+
+        [Bindable]
+        public var data:StructureTreeGridData;
+
+        private function onClick():void{
+            data.showConfigMenu();
+        }
+
+        ]]></fx:Script>
+</utils:MoreOptionsButton>

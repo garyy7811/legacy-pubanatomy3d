@@ -1,0 +1,105 @@
+<?xml version="1.0"?>
+<s:SkinnableContainer xmlns:fx="http://ns.adobe.com/mxml/2009" backgroundAlpha="0"
+                      xmlns:s="library://ns.adobe.com/flex/spark"
+                      resize="onResize( event );"
+                      elementAdd="refreshTopWindow();"
+                      elementRemove="refreshTopWindow();"
+                      skinClass="edu.umich.med.mbni.webdesktop.WebWinContainerSkin"
+        >
+    <fx:Script><![CDATA[
+        import mx.events.ResizeEvent;
+
+        [Bindable]
+        public var windowsBar:WebWinBar;
+
+        private var _swapping:Boolean = false;
+
+        [Bindable(event="swappingChanged")]
+        public function get swapping():Boolean{
+            return _swapping;
+        }
+
+        private function setSwapping( value:Boolean ):void{
+            if( value != _swapping ){
+                _swapping = value;
+                dispatchEvent( new Event( "swappingChanged" ) );
+            }
+        }
+
+        internal function moveToFront( window:WebWindow ):void{
+            var idx:int = getElementIndex( window );
+            CONFIG::debugging{
+                if( idx < 0 ){
+                    throw new Error( this + ".moveToFront " );
+                }
+            }
+
+            if( window != _topWindow ){
+                setSwapping( true );
+                addElement( removeElementAt( idx ) );
+                setSwapping( false );
+            }
+        }
+
+        private var _topWindow:WebWindow;
+
+        [Bindable(event="topWindowChanged")]
+        public function get topWindow():WebWindow{
+            return _topWindow;
+        }
+
+        private function setTopWindow( value:WebWindow ):void{
+            if( value != _topWindow ){
+                _topWindow = value;
+                dispatchEvent( new Event( "topWindowChanged" ) );
+            }
+        }
+
+        internal function refreshTopWindow():void{
+            if( numElements == 0 ){
+                setTopWindow( null );
+            }
+            for( var j:int = numElements - 1; j >= 0; j -- ){
+                var win:WebWindow = getElementAt( j ) as WebWindow;
+                if( win.status != WebWindowStatus.MINIMIZED ){
+                    setTopWindow( win );
+                    return;
+                }
+            }
+        }
+
+        private function onResize( event:ResizeEvent ):void{
+            for( var j:int = numElements - 1; j >= 0; j -- ){
+                var win:WebWindow = getElementAt( j ) as WebWindow;
+                if( win.width > width ){
+                    win.width = width;
+                }
+                win.maxWidth = width;
+                if( win.height > height ){
+                    win.height = height;
+                }
+                win.maxHeight = height;
+
+                if( win.status == WebWindowStatus.MINIMIZED ){
+                    if( win._restorePosition.x + 2 * win.width / 3 > width ){
+                        win._restorePosition.x = width - 2 * win.width / 3;
+                    }
+
+                    if( win._restorePosition.y + win.titleGroup.height > height ){
+                        win._restorePosition.y = height - win.titleGroup.height;
+                    }
+                }
+                else{
+                    if( win.x + 2 * win.width / 3 > width ){
+                        win.x = width - 2 * win.width / 3;
+                    }
+
+                    if( win.y + win.titleGroup.height > height ){
+                        win.y = height - win.titleGroup.height;
+                    }
+                }
+
+            }
+        }
+        ]]></fx:Script>
+</s:SkinnableContainer>

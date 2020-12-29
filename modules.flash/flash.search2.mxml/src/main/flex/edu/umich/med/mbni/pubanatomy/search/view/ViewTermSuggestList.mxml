@@ -1,0 +1,33 @@
+<?xml version="1.0"?>
+<s:List xmlns:fx="http://ns.adobe.com/mxml/2009"
+        xmlns:s="library://ns.adobe.com/flex/spark"
+        click="onClick();" allowMultipleSelection="false"
+        >
+    <fx:Script><![CDATA[
+        override protected function keyDownHandler( event:KeyboardEvent ):void{
+            if( event.keyCode == Keyboard.UP && selectedIndex == 0 ){
+                event.keyCode = Keyboard.ESCAPE;
+            }
+            super.keyDownHandler( event );
+        }
+
+        private function onClick():void{
+            dispatchEvent( new KeyboardEvent( KeyboardEvent.KEY_DOWN, true, false, 0, Keyboard.ENTER ) );
+        }
+
+
+        CONFIG::debugging{
+            override public function set selectedIndex( value:int ):void{
+                super.selectedIndex = value;
+                trace( this + ".selectedIndex: arguments:" + arguments );
+            }
+        }
+
+        CONFIG::debugging{
+            override public function set selectedItem( value:* ):void{
+                super.selectedItem = value;
+                trace( this + ".selectedItem: value:" + value );
+            }
+        }
+        ]]></fx:Script>
+</s:List>

@@ -1,0 +1,44 @@
+<?xml version="1.0"?>
+<view:StructureTreeGridDataCell xmlns:fx="http://ns.adobe.com/mxml/2009"
+                                xmlns:view="edu.umich.med.mbni.pubanatomy.atlas.view.*">
+    <fx:Script><![CDATA[
+        import edu.umich.med.mbni.pubanatomy.voxel3d.model.Voxel3dStructureTreeGridDataColumnVisible;
+        import edu.umich.med.mbni.pubanatomy.voxel3d.model.Voxel3dStructureTreeGridDataRow;
+
+        [Bindable(event="rowChanged")]
+        public function get rowV3d():Voxel3dStructureTreeGridDataRow{
+            return row as Voxel3dStructureTreeGridDataRow;
+        }
+
+        [Bindable(event="colChanged")]
+        public function get colV3dVisible():Voxel3dStructureTreeGridDataColumnVisible{
+            return col as Voxel3dStructureTreeGridDataColumnVisible;
+        }
+        ]]></fx:Script>
+
+    <fx:Script><![CDATA[
+        [Bindable]
+        public var currentState:String;
+
+        private function set rfrState( ignoreVar:* ):void{
+            rowV3d.v3dStructure.model.callInNext.putIn( refreshState );
+        }
+
+        private function refreshState():void{
+            if( !rowV3d.loaded ){
+                currentState = 'loading';
+                return;
+            }
+            if( !rowV3d.v3dStructure.structure3dModel.visible ){
+                currentState = 'invisible';
+                return;
+            }
+
+            currentState = ( rowV3d.v3dStructure.structure3dModel.alpha < 1 || mouseOver ) ? 'visibleAlpha' : 'visible';
+        }
+        ]]></fx:Script>
+    <fx:Binding source="mouseOver" destination="rfrState"/>
+    <fx:Binding source="rowV3d.loaded" destination="rfrState"/>
+    <fx:Binding source="rowV3d.v3dStructure.structure3dModel.visible" destination="rfrState"/>
+    <fx:Binding source="rowV3d.v3dStructure.structure3dModel.alpha" destination="rfrState"/>
+</view:StructureTreeGridDataCell>

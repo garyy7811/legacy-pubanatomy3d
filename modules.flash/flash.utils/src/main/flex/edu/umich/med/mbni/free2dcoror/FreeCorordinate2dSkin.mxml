@@ -1,0 +1,324 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Skin xmlns:fx="http://ns.adobe.com/mxml/2009" xmlns:s="library://ns.adobe.com/flex/spark"
+        xmlns:fb="http://ns.adobe.com/flashbuilder/2009" alpha.disabled="0.5"
+        currentState="vbh1Hor1Ver1">
+    <fx:Metadata>
+    <![CDATA[
+        [HostComponent("edu.umich.med.mbni.free2dcoror.FreeCorordinate2d")]
+        ]]>
+    </fx:Metadata>
+    <fx:Script fb:purpose="styling">
+        <![CDATA[
+        import mx.core.DragSource;
+        import mx.events.DragEvent;
+        import mx.managers.DragManager;
+
+        override protected function updateDisplayList( unscaledWidth:Number, unscaledHeight:Number ):void{
+            // Push backgroundColor and backgroundAlpha directly.
+            // Handle undefined backgroundColor by hiding the background object.
+            if( isNaN( getStyle( "backgroundColor" ) ) ){
+                background.visible = false;
+            }
+            else{
+                background.visible = true;
+                bgFill.color = getStyle( "backgroundColor" );
+                bgFill.alpha = getStyle( "backgroundAlpha" );
+            }
+
+            super.updateDisplayList( unscaledWidth, unscaledHeight );
+        }
+
+        override public function setCurrentState( stateName:String, playTransition:Boolean = true ):void{
+            super.setCurrentState( stateName, playTransition );
+            if( stateName == "normal" ){
+                rfrState = null;
+            }
+        }
+
+        private function set rfrState( ignoreVar:* ):void{
+            if( hostComponent.dirVerBigHor && hostComponent.dirHor && hostComponent.dirVer ){
+                currentState = "vbh1Hor1Ver1";
+            }
+            else if( hostComponent.dirVerBigHor && hostComponent.dirHor && !hostComponent.dirVer ){
+                currentState = "vbh1Hor1Ver0";
+            }
+            else if( hostComponent.dirVerBigHor && !hostComponent.dirHor && hostComponent.dirVer ){
+                currentState = "vbh1Hor0Ver1";
+            }
+            else if( hostComponent.dirVerBigHor && !hostComponent.dirHor && !hostComponent.dirVer ){
+                currentState = "vbh1Hor0Ver0";
+            }
+            else if( !hostComponent.dirVerBigHor && hostComponent.dirHor && hostComponent.dirVer ){
+                currentState = "vbh0Hor1Ver1";
+            }
+            else if( !hostComponent.dirVerBigHor && hostComponent.dirHor && !hostComponent.dirVer ){
+                currentState = "vbh0Hor1Ver0";
+            }
+            else if( !hostComponent.dirVerBigHor && !hostComponent.dirHor && hostComponent.dirVer ){
+                currentState = "vbh0Hor0Ver1";
+            }
+            else if( !hostComponent.dirVerBigHor && !hostComponent.dirHor && !hostComponent.dirVer ){
+                currentState = "vbh0Hor0Ver0";
+            }
+        }
+        ]]>
+    </fx:Script>
+    <fx:Binding source="hostComponent.dirVerBigHor" destination="rfrState"/>
+    <fx:Binding source="hostComponent.dirHor" destination="rfrState"/>
+    <fx:Binding source="hostComponent.dirVer" destination="rfrState"/>
+    <s:states>
+        <s:State name="vbh1Hor1Ver1" stateGroups="hor1,ver1,vbh1hor1,vbh1ver1"/>
+        <s:State name="vbh1Hor1Ver0" stateGroups="hor1,ver0,vbh1hor1,vbh1ver0"/>
+        <s:State name="vbh1Hor0Ver1" stateGroups="hor0,ver1,vbh1hor0,vbh1ver1"/>
+        <s:State name="vbh1Hor0Ver0" stateGroups="hor0,ver0,vbh1hor0,vbh1ver0"/>
+
+        <s:State name="vbh0Hor1Ver1" stateGroups="hor1,ver1,vbh0hor1,vbh0ver1"/>
+        <s:State name="vbh0Hor1Ver0" stateGroups="hor1,ver0,vbh0hor1,vbh0ver0"/>
+        <s:State name="vbh0Hor0Ver1" stateGroups="hor0,ver1,vbh0hor0,vbh0ver1"/>
+        <s:State name="vbh0Hor0Ver0" stateGroups="hor0,ver0,vbh0hor0,vbh0ver0"/>
+
+        <s:State name="normal"/>
+        <s:State name="disabled"/>
+    </s:states>
+
+    <fx:Script><![CDATA[
+        private function set rfrClipping( ignoreVar:* ):void{
+            if( contentGroup.clipAndEnableScrolling ){
+                hostComponent.clippingRectangle = new Rectangle( contentGroup.horizontalScrollPosition,
+                                                                 contentGroup.verticalScrollPosition,
+                                                                 contentGroup.width,
+                                                                 contentGroup.height
+                );
+            }
+            else{
+                hostComponent.clippingRectangle = null;
+            }
+        }
+        ]]></fx:Script>
+    <fx:Binding source="contentGroup.clipAndEnableScrolling" destination="rfrClipping"/>
+    <fx:Binding source="contentGroup.verticalScrollPosition" destination="rfrClipping"/>
+    <fx:Binding source="contentGroup.horizontalScrollPosition" destination="rfrClipping"/>
+    <fx:Binding source="contentGroup.contentWidth" destination="rfrClipping"/>
+    <fx:Binding source="contentGroup.contentHeight" destination="rfrClipping"/>
+    <fx:Binding source="contentGroup.width" destination="rfrClipping"/>
+    <fx:Binding source="contentGroup.height" destination="rfrClipping"/>
+
+    <s:Rect id="background" left="0" right="0" top="0" bottom="0">
+        <s:fill>
+            <!--- @private -->
+            <s:SolidColor id="bgFill" color="#FFFFFF"/>
+        </s:fill>
+    </s:Rect>
+    <s:Scroller left="{hostComponent.margin}" right="{hostComponent.margin}"
+                top="{hostComponent.margin}" bottom="{hostComponent.margin}">
+        <s:Group id="contentGroup"/>
+    </s:Scroller>
+    <s:Line id="verLine"
+            top.ver1="0"
+            bottom.ver1="{verArrow.height}"
+            bottom.ver0="0"
+            top.ver0="{verArrow.height}"
+            left.hor1="{hostComponent.margin}"
+            right.hor0="{hostComponent.margin}">
+        <s:stroke>
+            <s:SolidColorStroke color="{hostComponent.lineColor}" weight="{hostComponent.lineWeight}"/>
+        </s:stroke>
+    </s:Line>
+    <s:Line id="horLine"
+            top.ver1="{hostComponent.margin}"
+            bottom.ver0="{hostComponent.margin}"
+            left.hor0="{horArrow.width}"
+            right.hor0="0"
+            right.hor1="{horArrow.width}"
+            left.hor1="0"
+            >
+        <s:stroke>
+            <s:SolidColorStroke color="{hostComponent.lineColor}" weight="{hostComponent.lineWeight}"/>
+        </s:stroke>
+    </s:Line>
+
+    <s:Group id="verArrow" width="{hostComponent.margin}" height="{hostComponent.margin}"
+             left.hor1="{hostComponent.margin/2}"
+             right.hor0="{hostComponent.margin/2}"
+             bottom.ver1="0"
+             top.ver0="0"
+             mouseDown="onMouseDown( event );"
+             mouseMove="onMouseMove( event );"
+            >
+        <s:Path data="M 24.99 21.66 L 0.01 21.66 12.50 0.03 Z "
+                left="2" top="2" right="2" bottom="2"
+                rotation="180"
+                rotation.ver0="0" rotation.ver1="180">
+            <s:stroke>
+                <s:SolidColorStroke color="0xFFFFFF" weight="2"/>
+            </s:stroke>
+            <s:fill>
+                <s:SolidColor color="0x000000"/>
+            </s:fill>
+        </s:Path>
+    </s:Group>
+    <s:Group id="horArrow" width="{hostComponent.margin}" height="{hostComponent.margin}"
+             top.ver1="{hostComponent.margin/2}"
+             bottom.ver0="{hostComponent.margin/2}"
+             right.hor1="0"
+             left.hor0="0"
+             mouseDown="onMouseDown( event );"
+             mouseMove="onMouseMove( event );"
+            >
+        <s:Path data="M 103.72 59.90 L 0.04 119.76 0.04 0.04 Z "
+                left="2" top="2" right="2" bottom="2"
+                rotation.hor0="180" rotation.hor1="0">
+            <s:stroke>
+                <s:SolidColorStroke color="0xFFFFFF" weight="2"/>
+            </s:stroke>
+            <s:fill>
+                <s:SolidColor color="0x000000"/>
+            </s:fill>
+        </s:Path>
+    </s:Group>
+    <s:Label id="horLabel" text="{hostComponent.hTxt}"
+
+             top.vbh1ver1="{hostComponent.margin/4}"
+             bottom.vbh1ver0="{hostComponent.margin/4}"
+             left.vbh1hor0="{hostComponent.margin}"
+             right.vbh1hor1="{hostComponent.margin}"
+
+             left.vbh0hor1="{hostComponent.margin/4}"
+             right.vbh0hor0="{hostComponent.margin/4}"
+             top.vbh0ver0="{hostComponent.margin}"
+             bottom.vbh0ver1="{hostComponent.margin}"
+
+             color="{hostComponent.textColor}"
+            />
+
+    <s:Label id="verLabel" text="{hostComponent.vTxt}"
+
+             left.vbh1hor1="{hostComponent.margin/4}"
+             right.vbh1hor0="{hostComponent.margin/4}"
+             top.vbh1ver0="{hostComponent.margin}"
+             bottom.vbh1ver1="{hostComponent.margin}"
+
+             top.vbh0ver1="{hostComponent.margin/4}"
+             bottom.vbh0ver0="{hostComponent.margin/4}"
+             left.vbh0hor0="{hostComponent.margin}"
+             right.vbh0hor1="{hostComponent.margin}"
+
+             color="{hostComponent.textColor}"
+            />
+    <s:BorderContainer minHeight="1" minWidth="1" backgroundColor="0xffffff"
+                       borderVisible="false" color="{hostComponent.textColor}"
+                       left.hor1="{hostComponent.margin/4}"
+                       right.hor0="{hostComponent.margin/4}"
+                       top.ver1="{hostComponent.margin/4}"
+                       bottom.ver0="{hostComponent.margin/4}">
+        <s:Label id="cornerLabel" text="{hostComponent.cTxt}" textAlign="center"/>
+    </s:BorderContainer>
+    <fx:Script><![CDATA[
+        [Bindable]
+        private var _dragging:Group;
+        [Bindable]
+        private var _mouseDown:Group;
+
+        private function onMouseMove( event:MouseEvent ):void{
+            if( event.target == _mouseDown ){
+                var ds:DragSource = new DragSource();
+                DragManager.doDrag( event.target as Group, ds, event );
+                _dragging = event.target as Group;
+            }
+        }
+
+        private function onDragDrop( event:DragEvent ):void{
+            if( event.target == dropCorner ){
+                if( _dragging == horArrow ){
+                    hostComponent.setDirHor( !hostComponent.dirHor );
+                }
+                else{
+                    hostComponent.setDirVer( !hostComponent.dirVer );
+                }
+            }
+            else if( event.target == dropEmpty ){
+                if( _dragging == verArrow ){
+                    hostComponent.setDirHor( !hostComponent.dirHor );
+                }
+                else{
+                    hostComponent.setDirVer( !hostComponent.dirVer );
+                }
+            }
+            else if( event.target == dropOppo ){
+                hostComponent.setDirVerBigHor( !hostComponent.dirVerBigHor );
+            }
+        }
+
+        private function onDragEnter( event:DragEvent ):void{
+            if( event.dragInitiator == _dragging ){
+                //                DragManager.showFeedback( DragManager.MOVE );
+                //                DragManager.acceptDragDrop( SkinnableContainer( event.target ) )
+            }
+        }
+
+        private function onMouseDown( event:MouseEvent ):void{
+            stage.addEventListener( MouseEvent.MOUSE_UP, onMouseUp );
+            _mouseDown = event.target as Group;
+        }
+
+        private function onMouseUp( event:MouseEvent ):void{
+            stage.removeEventListener( MouseEvent.MOUSE_UP, onMouseUp );
+            _mouseDown = null;
+            _dragging = null;
+        }
+
+
+        private function set rfrDragging( ignoreVar:* ):void{
+            if( _dragging != null ){
+                dropOppo.left = null;
+                dropOppo.right = null;
+                dropOppo.top = null;
+                dropOppo.bottom = null;
+                if( _dragging.left != null && _dragging.left < hostComponent.margin && _dragging.top != null &&
+                        _dragging.top < hostComponent.margin ){
+                    dropOppo.right = 0;
+                    dropOppo.bottom = 0;
+                }
+                else if( _dragging.right != null && _dragging.right < hostComponent.margin && _dragging.top != null &&
+                        _dragging.top < hostComponent.margin ){
+                    dropOppo.left = 0;
+                    dropOppo.bottom = 0;
+                }
+                else if( _dragging.left != null && _dragging.left < hostComponent.margin && _dragging.bottom != null &&
+                        _dragging.bottom < hostComponent.margin ){
+                    dropOppo.right = 0;
+                    dropOppo.top = 0;
+                }
+                else if( _dragging.right != null && _dragging.right < hostComponent.margin &&
+                        _dragging.bottom != null && _dragging.bottom < hostComponent.margin ){
+                    dropOppo.left = 0;
+                    dropOppo.top = 0;
+                }
+            }
+        }
+        ]]></fx:Script>
+    <fx:Binding source="_dragging" destination="rfrDragging"/>
+    <s:SkinnableContainer id="dropCorner"
+                          left.hor1="0"
+                          right.hor0="0"
+                          top.ver1="0"
+                          bottom.ver0="0"
+                          visible="{_dragging!=null}"
+                          backgroundAlpha="0.4" backgroundColor="0xFFFFFF"
+                          dragEnter="onDragEnter( event );" dragDrop="onDragDrop( event );"
+                          width="{hostComponent.margin*2}" height="{hostComponent.margin*2}"/>
+    <s:SkinnableContainer id="dropEmpty"
+                          right.hor1="0"
+                          left.hor0="0"
+                          bottom.ver1="0"
+                          top.ver0="0"
+                          visible="{_dragging!=null}"
+                          backgroundAlpha="0.4" backgroundColor="0xFFFFFF"
+                          dragEnter="onDragEnter( event );" dragDrop="onDragDrop( event );"
+                          width="{hostComponent.margin*2}" height="{hostComponent.margin*2}"/>
+    <s:SkinnableContainer id="dropOppo"
+                          visible="{_dragging!=null}"
+                          backgroundAlpha="0.4" backgroundColor="0xFFFFFF"
+                          dragEnter="onDragEnter( event );" dragDrop="onDragDrop( event );"
+                          width="{hostComponent.margin*2}" height="{hostComponent.margin*2}"/>
+</s:Skin>

@@ -1,0 +1,38 @@
+<?xml version="1.0"?>
+<as3lib:MxmlEventDispatcher xmlns:fx="http://ns.adobe.com/mxml/2009"
+                            xmlns:as3lib="com.flashflexpro.as3lib.*">
+    <fx:Script><![CDATA[
+        protected var _row:TreeGridDataRow;
+
+        [Bindable(event="rowChanged")]
+        public function get row():TreeGridDataRow{
+            return _row;
+        }
+
+        public function set row( value:TreeGridDataRow ):void{
+            if( value != _row ){
+                _row = value;
+                dispatchEvent( new Event( "rowChanged" ) );
+            }
+        }
+
+        protected var _col:TreeGridDataColumn;
+        [Bindable(event="colChanged")]
+        public function get col():TreeGridDataColumn{
+            return _col;
+        }
+
+        public function set col( value:TreeGridDataColumn ):void{
+            if( value != _col ){
+                _col = value;
+                dispatchEvent( new Event( "colChanged" ) );
+            }
+        }
+
+        public function destroy():void{
+            _row = null;
+            _col = null;
+        }
+
+        ]]></fx:Script>
+</as3lib:MxmlEventDispatcher>

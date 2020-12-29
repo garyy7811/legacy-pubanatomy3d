@@ -1,0 +1,53 @@
+<?xml version="1.0"?>
+<m:RootModelSection2dStructures xmlns:fx="http://ns.adobe.com/mxml/2009"
+                                xmlns:s="library://ns.adobe.com/flex/spark"
+                                xmlns:as3lib="com.flashflexpro.as3lib.*"
+                                xmlns:m="edu.umich.med.mbni.pubanatomy.sectioninteract.model.*">
+    <fx:Script><![CDATA[
+        import edu.umich.med.mbni.pubanatomy.voxel3d.model.Voxel3dPlane;
+
+        private function getSectionPlaneFromV3d( v:Voxel3dPlane ):ModelSectionPlane{
+            var sectionPlane:ModelSectionPlane = new ModelSectionPlane();
+            sectionPlane.rootModelSection2d = this as RootModelSection2d;
+            sectionPlane.v3dPlane = v;
+            return sectionPlane;
+        }
+
+        private function destroySectionPlane( s:ModelSectionPlane ):void{
+            s.destroy();
+        }
+
+        private function addOnSection2dPlane( p:ModelSectionPlane ):ModelSectionPlane{
+            if( p.onSection2d && onSection2dPlanes.getItemIndex( p ) < 0 ){
+                onSection2dPlanes.addItem( p );
+            }
+            return p;
+        }
+
+        private function removeOnSection2dPlane( p:ModelSectionPlane ):void{
+            onSection2dPlanes.removeItem( p );
+        }
+        ]]></fx:Script>
+    <fx:Declarations>
+
+        <!--{-->
+        <as3lib:Sync2Lists id="syncV3dPlanetoSectionPlane"
+                           source="{rootModelVoxel3d.planeLst}"
+                           getDestInst="getSectionPlaneFromV3d"
+                           destroyInst="destroySectionPlane">
+            <as3lib:destination>
+                <s:ArrayList id="allSectionPlanes"/>
+            </as3lib:destination>
+        </as3lib:Sync2Lists>
+        <as3lib:Sync2Lists source="{allSectionPlanes}"
+                           getDestInst="addOnSection2dPlane"
+                           destroyInst="removeOnSection2dPlane">
+            <as3lib:destination>
+                <s:ArrayList id="__onSection2dPlanesDummy"/>
+            </as3lib:destination>
+        </as3lib:Sync2Lists>
+        <s:ArrayList id="onSection2dPlanes"/>
+        <!--}-->
+    </fx:Declarations>
+
+</m:RootModelSection2dStructures>

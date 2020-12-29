@@ -1,0 +1,41 @@
+<?xml version="1.0"?>
+<rs:RpcSpringMvcGet xmlns:fx="http://ns.adobe.com/mxml/2009"
+                     xmlns:rs="edu.umich.med.mbni.pubanatomy.flash.rs.*"
+                     path="search" remoteMethodName="suggest">
+    <fx:Script><![CDATA[
+        import mx.collections.ArrayCollection;
+
+        import spark.collections.Sort;
+        import spark.collections.SortField;
+
+        [Bindable]
+        public var autoListModel:ViewTermSuggestModel;
+
+        [Bindable]
+        public var prefixStr:String;
+
+        override protected function onObjResult( r:* = null ):void{
+            var terms:ArrayCollection = new ArrayCollection();
+            if( r != null ){
+                for( var key:String in r ){
+                    terms.addItem( new ViewTermSuggestCountVO( key, r[ key ] ) );
+                }
+                var sort:Sort = new Sort();
+                sort.fields = [ new SortField( "count", true )];
+                terms.sort = sort;
+                terms.refresh();
+            }
+            autoListModel.onResult( prefixStr, terms );
+        }
+
+        override public function callRemote():Boolean{
+            model = autoListModel.searchModel;
+
+            args = [ autoListModel.queryTerm.field.queryField, prefixStr.toLowerCase(), 15 ];
+            CONFIG::debugging{
+                trace( this + ".callRemote:" + args );
+            }//debug
+            return super.callRemote();
+        }
+        ]]></fx:Script>
+</rs:RpcSpringMvcGet>

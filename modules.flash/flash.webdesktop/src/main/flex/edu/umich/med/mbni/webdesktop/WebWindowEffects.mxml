@@ -1,0 +1,46 @@
+<?xml version="1.0"?>
+<win:WebWindowDrag xmlns:fx="http://ns.adobe.com/mxml/2009"
+                   xmlns:s="library://ns.adobe.com/flex/spark"
+                   xmlns:win="edu.umich.med.mbni.webdesktop.*">
+    <fx:Script><![CDATA[
+        import mx.events.EffectEvent;
+
+        [Bindable]
+        protected var _scaleFrom:Point;
+        [Bindable]
+        protected var _scaleTo:Point;
+
+        [Bindable]
+        protected var _moveFrom:Point;
+
+        [Bindable]
+        protected var _moveTo:Point;
+
+        [Bindable]
+        protected var _fadeFrom:Number = NaN;
+
+        [Bindable]
+        protected var _fadeTo:Number;
+
+        protected function onEffectStart( event:EffectEvent ):void{
+        }
+
+        protected function onEffectEnd( event:EffectEvent ):void{
+        }
+        ]]></fx:Script>
+    <fx:Declarations>
+        <s:Parallel id="effect" target="{this}"
+                    effectStart="onEffectStart( event );"
+                    effectEnd="onEffectEnd( event );">
+            <s:Scale
+                    scaleXFrom="{_scaleFrom.x}" scaleXTo="{_scaleTo.x}"
+                    scaleYFrom="{_scaleFrom.y}" scaleYTo="{_scaleTo.y}"
+                    />
+            <s:Move
+                    xFrom="{_moveFrom.x}" xTo="{_moveTo.x}"
+                    yFrom="{_moveFrom.y}" yTo="{_moveTo.y}"
+                    />
+            <s:Fade alphaFrom="{_fadeFrom}" alphaTo="{_fadeTo}"/>
+        </s:Parallel>
+    </fx:Declarations>
+</win:WebWindowDrag>

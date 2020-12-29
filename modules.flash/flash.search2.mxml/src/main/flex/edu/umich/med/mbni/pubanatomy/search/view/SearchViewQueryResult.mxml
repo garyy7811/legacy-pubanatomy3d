@@ -1,0 +1,80 @@
+<?xml version="1.0"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" xmlns:s="library://ns.adobe.com/flex/spark"
+         xmlns:searchView="edu.umich.med.mbni.pubanatomy.search.view.*">
+    <fx:Script><![CDATA[
+        import edu.umich.med.mbni.pubanatomy.search.model.QueryResult;
+
+        [Bindable]
+        public var model:QueryResult;
+
+        [Bindable]
+        public var suggestGroup:ViewTermSuggestGroup;
+        ]]></fx:Script>
+    <s:layout>
+        <s:VerticalLayout horizontalAlign="center" paddingRight="2" paddingTop="2" paddingBottom="2" paddingLeft="2"/>
+    </s:layout>
+
+    <fx:Binding source="searchButton.enabled" destination="rfrFocusedOnSearchBtn"/>
+    <fx:Binding source="model.queryModel.rootTerm.queryStr" destination="rfrFocusedOnSearchBtn"/>
+    <s:Group>
+
+        <s:Scroller width="100%">
+            <s:HGroup verticalAlign="middle" horizontalAlign="center">
+                <s:HGroup gap="1"  verticalAlign="middle">
+                    <s:Button label="Save" click="model.onSave()" width="47"
+                              toolTip="#t(queryrsave)p#"/>
+                    <s:Button label="Load" click="model.onLoad()" width="49"
+                              toolTip="#t(queryrload)p#"/>
+                </s:HGroup>
+                <searchView:SearchViewQueryInput termSuggestGroup="{suggestGroup}"
+                                                 queryResult="{model}"/>
+                <s:VGroup horizontalAlign="center">
+                    <s:HGroup verticalAlign="middle">
+                        <s:Button click="model.sendQuery();" focusEnabled="true"
+                                  label="Search" id="searchButton" keyDown="onKeyDown( event );"
+                                  fontWeight="bold" fontSize="16" enabled="{model.resultIsDirty}"
+                                  toolTip="#t(queryrsearchbtn)p#"
+                                >
+                            <fx:Script><![CDATA[
+                                private function set rfrFocusedOnSearchBtn( v:* ):void{
+                                    model.queryModel.queryResult.searchModel.callInNext.putIn( refreshFocusedOnSearchBtn );
+                                }
+
+                                private function refreshFocusedOnSearchBtn():void{
+                                    if( searchButton.enabled &&
+                                            model.queryModel.rootQueryStr.length > 0 ){
+                                        searchButton.setFocus();
+                                    }
+                                }
+
+                                private function onKeyDown( event:KeyboardEvent ):void{
+                                    if( event.keyCode == Keyboard.ENTER
+                                            && getFocus() == searchButton
+                                            && searchButton.enabled ){
+                                        model.sendQuery();
+                                    }
+                                }
+                                ]]></fx:Script>
+                        </s:Button>
+                        <s:Button click="model.revert();" label="revert" enabled="{model.canRevert}"
+                                  skinClass="edu.umich.med.mbni.utils.UpLabelOverBtnSkin" focusEnabled="false"
+                                  toolTip="#t(queryrevertbtn)p#"
+                                />
+                    </s:HGroup>
+
+                    <s:HGroup gap="0">
+                        <s:Button skinClass="mx.skins.spark.DateChooserPrevMonthSkin"
+                                  enabled="{model.history.navIndex>0}"
+                                  click="model.goBack();" toolTip="#t(querybackbtn)p#"
+                                />
+                        <s:Button skinClass="mx.skins.spark.DateChooserNextMonthSkin"
+                                  enabled="{model.history.history.length - model.history.navIndex> 1 }"
+                                  click="model.goForward();" toolTip="#t(queryforwardbtn)p#"
+                                />
+                    </s:HGroup>
+                </s:VGroup>
+            </s:HGroup>
+        </s:Scroller>
+    </s:Group>
+    <searchView:SearchViewResult model="{model}" width="100%" height="100%"/>
+</s:Group>

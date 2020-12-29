@@ -1,0 +1,287 @@
+<?xml version="1.0"?>
+<!--
+  ~ Copyright (C) 2011 flashflexpro@gmail.com  All Rights Reserved.  No
+  ~   use, copying or distribution of this work may be made except in
+  ~   accordance with a valid license agreement from flashflexpro@gmail.com
+  ~   This notice must be included on all copies, modifications and
+  ~   derivatives of this work.
+  ~
+  ~   flashflexpro@gmail.com MAKES NO REPRESENTATIONS OR WARRANTIES ABOUT
+  ~   THE SUITABILITY OF THE SOFTWARE, EITHER EXPRESS OR IMPLIED,
+  ~   INCLUDING BUT NOT LIMITED TO THE IMPLIED WARRANTIES OF
+  ~   MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, OR
+  ~   NON-INFRINGEMENT. flashflexpro@gmail.com SHALL NOT BE LIABLE FOR ANY DAMAGES SUFFERED
+  ~   BY LICENSEE AS A RESULT OF USING, MODIFYING OR DISTRIBUTING THIS
+  ~   SOFTWARE OR ITS DERIVATIVES.
+  -->
+
+<as3lib:MxmlEventDispatcher xmlns:mx="http://www.adobe.com/2006/mxml" xmlns:as3lib="com.flashflexpro.as3lib.*">
+    <mx:Script><![CDATA[
+        import mx.collections.IList;
+        import mx.events.CollectionEvent;
+        import mx.events.CollectionEventKind;
+        import mx.events.PropertyChangeEvent;
+
+        private var _enabled:Boolean = true;
+
+        [Bindable(event="enabledChanged")]
+        public function get enabled():Boolean{
+            return _enabled;
+        }
+
+        public function set enabled( value:Boolean ):void{
+            if( value != _enabled ){
+                _enabled = value;
+                dispatchEvent( new Event( "enabledChanged" ) );
+            }
+        }
+
+
+        public static const WORKING_CHANGED:String = "workingChanged";
+        private var _working:Boolean = false;
+        [Bindable(event="workingChanged")]
+        public function get working():Boolean{
+            return _working;
+        }
+
+        private var _source:IList;
+
+        [Bindable(event="sourceChanged")]
+        public function get source():IList{
+            return _source;
+        }
+
+        public function set source( value:IList ):void{
+            if( value != _source ){
+                _source = value;
+                dispatchEvent( new Event( "sourceChanged" ) );
+                if( trigerOnReady ){
+                    onSrcChange();
+                }
+            }
+        }
+
+        private var _destination:IList;
+        [Bindable(event="destinationChanged")]
+        public function get destination():IList{
+            return _destination;
+        }
+        public function set destination( value:IList ):void{
+            if( value != _destination ){
+                _destination = value;
+                dispatchEvent( new Event( "destinationChanged" ) );
+                if( trigerOnReady ){
+                    onSrcChange();
+                }
+            }
+        }
+
+        private var _getDestInst:Function;
+
+        [Bindable(event="getDestInstChanged")]
+        public function get getDestInst():Function{
+            return _getDestInst;
+        }
+
+        /**
+         * Plz do a parameter verification at the beginning of the function
+         * @param value
+         */
+        public function set getDestInst( value:Function ):void{
+            if( value != _getDestInst ){
+                _getDestInst = value;
+                dispatchEvent( new Event( "getDestInstChanged" ) );
+                if( trigerOnReady ){
+                    onSrcChange();
+                }
+            }
+        }
+
+        private function exeGetDestInst( src:* ):*{
+            CONFIG::debugging{
+                try{
+                    return _getDestInst( src );
+                }
+                catch( e:Error ){
+                    trace( e.getStackTrace() );
+                }
+            }
+            return _getDestInst( src );
+        }
+
+        private var _destroyInst:Function;
+        /**
+         * Plz do a parameter verification at the beginning of the function
+         */
+        [Bindable(event="destroyInstChanged")]
+        public function get destroyInst():Function{
+            return _destroyInst;
+        }
+
+        public function set destroyInst( value:Function ):void{
+            if( value != _destroyInst ){
+                _destroyInst = value;
+                dispatchEvent( new Event( "destroyInstChanged" ) );
+            }
+        }
+
+        //array of property names
+        public var propertiesReplaceOnUpdate:Array;
+
+        public var trigerOnReady:Boolean = true;
+
+        private function onSrcChange( event:CollectionEvent = null ):void{
+            if( !(source != null && destination != null && _getDestInst != null) ){
+                return;
+            }
+            if( event != null && event.kind == CollectionEventKind.UPDATE && propertiesReplaceOnUpdate == null ){
+                return;
+            }
+            _working = true;
+            dispatchEvent( new Event( WORKING_CHANGED ) );
+            if( !_initialized || event == null ){
+                initialize();
+            }
+            else{
+                var j:int = 0;
+                var removing:Object;
+                switch( event.kind ){
+                    case CollectionEventKind.ADD:
+                    {
+                        var addingListLen:int = event.items.length;
+                        for( j = 0; j < addingListLen; j++ ){
+                            destination.addItemAt( exeGetDestInst( event.items[ j ] ), event.location + j );
+                        }
+                        break;
+                    }
+                    case CollectionEventKind.REPLACE:
+                    {
+                        for( j = 0; j < event.items.length; j++ ){
+                            var eachReplaceItem:PropertyChangeEvent = event.items[ j ] as PropertyChangeEvent;
+                            removing = destination.removeItemAt( event.location + j );
+                            if( destroyInst != null ){
+                                destroyInst.apply( null, [ removing ] );
+                            }
+                            destination.addItemAt( exeGetDestInst( eachReplaceItem.newValue ), event.location + j );
+                        }
+                        break;
+                    }
+
+                    case CollectionEventKind.REMOVE:
+                    {
+                        for( j = event.items.length - 1; j >= 0; j-- ){
+                            removing = destination.getItemAt( event.location + j );
+                            if( destroyInst != null ){
+                                destroyInst.apply( null, [ removing ] );
+                            }
+                            destination.removeItemAt( event.location + j );
+                        }
+                        break;
+                    }
+
+                    case CollectionEventKind.MOVE:
+                    {
+                        if( event.items.length > 1 ){
+                            throw new Error( "CollectionEventKind.MOVE items.length bigger than 1" );
+                        }
+                        var itemAt:Object = destination.removeItemAt( event.oldLocation );
+                        destination.addItemAt( itemAt, event.location );
+                        break;
+                    }
+                    case CollectionEventKind.UPDATE:
+                    {
+                        var tmpIndex:int;
+                        for( var i:int = 0; i < event.items.length; i++ ){
+                            var tmpPc:PropertyChangeEvent = event.items[i] as PropertyChangeEvent;
+                            CONFIG::debugging{
+                                if( tmpPc == null ){
+                                    throw new Error( this + ".onSrcChange " );
+                                }
+                            }
+                            if( propertiesReplaceOnUpdate.indexOf( tmpPc.property ) >= 0 ){
+                                tmpIndex = source.getItemIndex( tmpPc.source );
+                                removing = destination.removeItemAt( tmpIndex );
+                                if( destroyInst != null ){
+                                    destroyInst.apply( null, [ removing ] );
+                                }
+                                destination.addItemAt( exeGetDestInst( tmpPc.source ), tmpIndex );
+                            }
+                        }
+                        break;
+                    }
+                    case CollectionEventKind.REFRESH:
+                    {
+                    }
+                    case CollectionEventKind.RESET:
+                    {
+                        initialize();
+                    }
+                }
+            }
+            _working = false;
+            dispatchEvent( new Event( WORKING_CHANGED ) );
+        }
+
+        private var _initialized:Boolean = false;
+
+        private function set destChanged( v:* ):void{
+            onSrcChange();
+        }
+
+        private function initialize():void{
+            if( destroyInst != null ){
+                while( destination.length > 0 ){
+                    var removing:Object = destination.getItemAt( 0 );
+                    destroyInst.apply( null, [ removing ] );
+                    destination.removeItemAt( 0 );
+                }
+            }
+            else{
+                if( destination.length > 0 ){
+                    destination.removeAll();
+                }
+            }
+            for( var j:int = 0; j < source.length; j++ ){
+                var srcObj:Object = source.getItemAt( j );
+                var destObj:Object = exeGetDestInst( srcObj );
+                destination.addItem( destObj );
+            }
+            _initialized = true;
+        }
+
+        public function getDestBySource( src:Object ):Object{
+
+            CONFIG::debugging{
+
+                var num:uint = 0;
+                for( var j:int = source.length - 1; j >= 0; j-- ){
+                    if( source.getItemAt( j ) == src ){
+                        num++
+                    }
+                    if( num > 1 ){
+                        throw new Error( this + ".getDestBySource " );
+                    }
+                }
+            }
+
+            var itemIndex:int = source.getItemIndex( src );
+            if( itemIndex < 0 ){
+                return null;
+            }
+            return destination.getItemAt( itemIndex );
+        }
+
+        public function destroy():void{
+            srcWatcher.destroy();
+            _source = null;
+            _destination = null;
+            _getDestInst = null;
+        }
+        ]]></mx:Script>
+    <mx:Binding source="destination" destination="destChanged"/>
+    <!--have to make trigerWhenSetUpEvent false because when srcWatcher's ready, this Sync2lists might not be ready,
+    for example getDestInst function is null-->
+    <as3lib:ChainEndWatcher id="srcWatcher" enabled="{enabled}" trigerOnReady="false"
+                            eventDispatcher="{source}" eventHandler="{onSrcChange}"
+                            eventType="{CollectionEvent.COLLECTION_CHANGE}"/>
+</as3lib:MxmlEventDispatcher>

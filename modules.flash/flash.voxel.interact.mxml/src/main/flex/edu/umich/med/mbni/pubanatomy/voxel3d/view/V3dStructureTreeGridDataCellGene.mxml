@@ -1,0 +1,190 @@
+<?xml version="1.0"?>
+<view:StructureTreeGridDataCellGene xmlns:fx="http://ns.adobe.com/mxml/2009"
+                                    xmlns:view="edu.umich.med.mbni.pubanatomy.atlas.view.*">
+    <fx:Script><![CDATA[
+        import edu.umich.med.mbni.pubanatomy.voxel3d.model.Voxel3dStructureGeneExprType;
+        import edu.umich.med.mbni.pubanatomy.voxel3d.model.Voxel3dStructureTreeGridDataColumnGene;
+        import edu.umich.med.mbni.pubanatomy.voxel3d.model.Voxel3dStructureTreeGridDataRow;
+
+        [Bindable(event="colChanged")]
+        public function get colGene3d():Voxel3dStructureTreeGridDataColumnGene{
+            return col as Voxel3dStructureTreeGridDataColumnGene;
+        }
+
+        [Bindable(event="rowChanged")]
+        public function get row3d():Voxel3dStructureTreeGridDataRow{
+            return row as Voxel3dStructureTreeGridDataRow;
+        }
+
+        override protected function refreshGeneExpr():void{
+            super.refreshGeneExpr();
+            if( geneExpr != null && !isNaN( geneExpr.levelAvgExC ) ){
+                toolTipDynamics += "\n\ncheck/uncheck to add/remove"
+                        + structureDataRow.structure.dtoStructure.name + "'s expression level voxels to/from 3D stage!";
+            }
+            else{
+                toolTipDynamics += "\n\n" + structureDataRow.structure.dtoStructure.name + " exclude children has no expression level voxels";
+            }
+        }
+
+        [Bindable]
+        public var voxel3dGeneExprType:Voxel3dStructureGeneExprType;
+
+        private function set rfrV3dExprTp( ignoreVar:* ):void{
+            row3d.treeGridData.rootModel.callInNext.putIn( refreshV3dExprTp );
+        }
+
+        private function refreshV3dExprTp():void{
+            if( row3d.v3dStructure != null
+                    && colGene.selectedDataSet != null
+                    && row3d.structureTreeGridData != null
+                    && row3d.structureTreeGridData.selectedGeneExprType
+                    ){
+                voxel3dGeneExprType = row3d.v3dStructure.getV3dGeneStructureExprByGeneAndType( colGene.selectedDataSet, row3d.structureTreeGridData.selectedGeneExprType );
+            }
+            CONFIG::debugging{
+                _debug_rfrState_log += "refreshV3dExprTp-->" + voxel3dGeneExprType;
+            }//debug
+        }
+        ]]></fx:Script>
+    <fx:Binding source="row3d.treeGridData.rootModel.callInNext" destination="rfrV3dExprTp"/>
+    <fx:Binding source="row3d.v3dStructure" destination="rfrV3dExprTp"/>
+    <fx:Binding source="row3d.v3dStructure.geneList.length" destination="rfrV3dExprTp"/>
+    <fx:Binding source="row3d.structureTreeGridData.selectedGeneExprType" destination="rfrV3dExprTp"/>
+    <fx:Binding source="colGene.selectedDataSet" destination="rfrV3dExprTp"/>
+    <fx:Script><![CDATA[
+        import edu.umich.med.mbni.treemodel.TreeBranchItem;
+
+        [Bindable]
+        public var expr3dState:String = "loading";
+
+        CONFIG::debugging{
+            private var _debug_wait_parentCellData_self_rfr_num:uint = 0;
+            private var _debug_rfrState_log:String = "";
+        }//debug
+
+        private function set rfrState( ignoreVar:* ):void{
+            expr3dState = "none";
+            if( geneExpr == null || voxel3dGeneExprType == null || colGene3d == null || colGene3d.selectedDataSet == null ){
+                return;
+            }
+            row.treeGridData.rootModel.callInNext.putIn( refreshState, this, null, row.depth );
+        }
+
+        private function refreshState():void{
+            if( colGene3d.getExprLevel != null || colGene3d.selectedDataSet.geneExprDistributing ){
+                expr3dState = "loading";
+                return;
+            }
+
+            if( colGene3d.childrenIncludeOrEx ){
+                if( isNaN( geneExpr.levelAvgInC ) ){
+                    expr3dState = "none";
+                    CONFIG::debugging{
+                        _debug_rfrState_log += "wowo\r\n";
+                    }//debug
+                    return;
+                }
+                CONFIG::debugging{
+                    _debug_rfrState_log += "1\r\n";
+                }//debug
+
+                var allp:Vector.<TreeBranchItem> = row3d.getAllParents();
+                if( allp.length > 0 ){
+                    for( var j:int = allp.length - 1; j >= 0; j-- ){
+                        var p:Voxel3dStructureTreeGridDataRow = allp[j] as Voxel3dStructureTreeGridDataRow;
+                        var g:V3dStructureTreeGridDataCellGene = p.col2cell[ colGene3d.cellDataKey ] as V3dStructureTreeGridDataCellGene;
+
+                        if( g == null ){
+                            row3d.treeGridData.rootModel.callInNext.putIn(
+                                    function ():void{
+                                        rfrState = null;
+                                    }
+                            );
+                            CONFIG::debugging{
+                                _debug_wait_parentCellData_self_rfr_num++;
+                                CONFIG::debugging{
+                                    _debug_rfrState_log += "_debug_wait_parentCellData_self_rfr_num:" + _debug_wait_parentCellData_self_rfr_num + "\r\n";
+                                }//debug
+                            }//debug
+                            return;
+                        }
+
+                        if( g.expr3dState == "inclVisibleAsRoot" ){
+                            expr3dState = "inclVisibleAsChild";
+                            return;
+                        }
+                    }//end of for
+                    expr3dState = voxel3dGeneExprType.on3dStage ? "inclVisibleAsRoot" : "inclInVisible";
+                    CONFIG::debugging{
+                        _debug_rfrState_log += "P\r\n";
+                    }//debug
+                }
+                else if( expr3dState == "none" || expr3dState == "loading" ){
+                    expr3dState = voxel3dGeneExprType.on3dStage ? "inclVisibleAsRoot" : "inclInVisible";
+                    CONFIG::debugging{
+                        _debug_rfrState_log += "k\r\n";
+                    }//debug
+                }
+
+                CONFIG::debugging{
+                    _debug_rfrState_log += "2\r\n";
+                }//debug
+            }
+            else{
+                if( isNaN( geneExpr.levelAvgExC ) ){
+                    expr3dState = "none";
+                }
+                else{
+                    expr3dState = ( voxel3dGeneExprType.on3dStage ? "exclVisible" : "exclInvisible" );
+                }
+            }
+
+        }
+        ]]></fx:Script>
+    <fx:Binding source="row.treeGridData.rootModel.callInNext" destination="rfrState"/>
+    <fx:Binding source="row3d.parent" destination="rfrState"/>
+    <fx:Binding source="row3d.isInDataGrid" destination="rfrState"/>
+    <fx:Binding source="geneExpr.levelAvgExC" destination="rfrState"/>
+    <fx:Binding source="geneExpr.levelAvgInC" destination="rfrState"/>
+    <fx:Binding source="voxel3dGeneExprType.on3dStage" destination="rfrState"/>
+    <fx:Binding source="colGene3d.childrenIncludeOrEx" destination="rfrState"/>
+    <fx:Binding source="colGene3d.selectedDataSet.geneExprDistributing" destination="rfrState"/>
+    <fx:Binding source="colGene3d.getExprLevel" destination="rfrState"/>
+
+    <fx:Script><![CDATA[
+        import edu.umich.med.mbni.pubanatomy.atlas.model.StructureItem;
+        import edu.umich.med.mbni.pubanatomy.voxel3d.model.Voxel3dStructure;
+
+        public function onUserInput( on:Boolean ):void{
+            if( delayOn ){
+                return;
+            }
+            voxel3dGeneExprType.on3dStage = on;
+            if( colGene3d.childrenIncludeOrEx ){
+                expr3dState = on ? "inclVisibleAsRoot" : "inclInVisible";
+
+                row3d.v3dStructure.atlasStructure.allChildren.toArray().forEach( function ( v:StructureItem, idx:int, a:Array ):void{
+                    var vvtr:Voxel3dStructure = row3d.v3dTreeGridData.rootModelVoxel3d.syncAllStructuresToVoxels.getDestBySource( v ) as Voxel3dStructure;
+                    var v3dGeneStructureExprByGeneAndType:Voxel3dStructureGeneExprType = vvtr.getV3dGeneStructureExprByGeneAndType( colGene.selectedDataSet, row3d.structureTreeGridData.selectedGeneExprType );
+                    v3dGeneStructureExprByGeneAndType.on3dStage = on;
+                } );
+
+                row3d.allChildren.toArray().forEach( function ( e:Voxel3dStructureTreeGridDataRow, idx:int, a:Array ):void{
+                    ( e.col2cell[ colGene3d.cellDataKey ] as V3dStructureTreeGridDataCellGene ).rfrState = null;
+                } );
+            }
+
+
+            delayOn = true;
+            row3d.treeGridData.rootModel.callInNext.putIn( enableAfterDelay, this, null, 23 );
+        }
+
+        [Bindable]
+        public var delayOn:Boolean = false;
+
+        private function enableAfterDelay():void{
+            delayOn = false;
+        }
+        ]]></fx:Script>
+</view:StructureTreeGridDataCellGene>

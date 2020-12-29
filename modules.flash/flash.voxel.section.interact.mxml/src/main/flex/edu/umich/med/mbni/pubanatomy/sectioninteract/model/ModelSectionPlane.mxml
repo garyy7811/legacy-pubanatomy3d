@@ -1,0 +1,143 @@
+<?xml version="1.0"?>
+<m:ModelSectionPlaneRfrEdge2Structures xmlns:fx="http://ns.adobe.com/mxml/2009"
+                                       xmlns:m="edu.umich.med.mbni.pubanatomy.sectioninteract.model.*">
+    <fx:Script><![CDATA[
+        import edu.umich.med.mbni.pubanatomy.datadriven3dwindow.Dd3dModelMeshPlane;
+        import edu.umich.med.mbni.pubanatomy.voxel3d.model.Voxel3dPlane;
+
+        [Bindable]
+        public var showSectionTree:Boolean = true;
+
+        public function onMouseOnPlane( x:Number, y:Number ):void{
+            v3dPlane.scene3d.mouseLastPosition = v3dPlane.onPlanePointTo3d( view2model( new Point( x, y ) ) );
+            if( _draggingMate == null ){
+                var min:Number = Number.MAX_VALUE;
+                for( var j:int = on2dStageMates.length - 1; j >= 0; j-- ){
+                    var mate:ModelSectionPlane = on2dStageMates.getItemAt( j ) as ModelSectionPlane;
+                    var msVal:Number = v3dPlane.scene3d.mouseLastPosition[ Dd3dModelMeshPlane.axisNames[ mate.v3dPlane.projectionDirection ] ] * viewScale;
+                    var mpVal:Number = mate.v3dPlane.projectionPosition * viewScale;
+                    var mg:Number = Math.abs( msVal - mpVal );
+                    if( mg < rootModelSection2d.sectionMouseOverTolerance && mg < min ){
+                        setMouseClosestDraggableMate( mate );
+                        min = mg;
+                    }
+                }
+                if( min > rootModelSection2d.sectionMouseOverTolerance ){
+                    setMouseClosestDraggableMate( null );
+                }
+            }
+            else{
+                _draggingMate.v3dPlane.projectionPosition = v3dPlane.scene3d.mouseLastPosition[ Dd3dModelMeshPlane.axisNames[ _draggingMate.v3dPlane.projectionDirection ] ];
+            }
+        }
+
+        public function onMouseOut():void{
+            if( rootModelSection2d.rootModelVoxel3d.mouseOverPlane == v3dPlane ){
+                rootModelSection2d.rootModelVoxel3d.mouseOverPlane = null;
+            }
+        }
+
+        {
+            private var _mouseClosestDraggableMate:ModelSectionPlane;
+            [Bindable(event="mouseClosestMateChanged")]
+            public function get mouseClosestDraggableMate():ModelSectionPlane{
+                return _mouseClosestDraggableMate;
+            }
+
+            protected function setMouseClosestDraggableMate( value:ModelSectionPlane ):void{
+                if( value != _mouseClosestDraggableMate ){
+                    _mouseClosestDraggableMate = value;
+                    dispatchEvent( new Event( "mouseClosestMateChanged" ) );
+                }
+            }
+
+            private var _draggingMate:ModelSectionPlane;
+            public static const draggingMate_CHANGED:String = "draggingMateChanged";
+
+            [Bindable(event="draggingMateChanged")]
+            public function get draggingMate():ModelSectionPlane{
+                return _draggingMate;
+            }
+
+            protected function setDraggingMate( value:ModelSectionPlane ):void{
+                if( value != _draggingMate ){
+                    _draggingMate = value;
+                    dispatchEvent( new Event( draggingMate_CHANGED ) );
+                }
+            }
+        }
+
+        public function onMouseDown():void{
+            setDraggingMate( _mouseClosestDraggableMate );
+        }
+
+        public function onMouseUp():void{
+            setDraggingMate( null );
+        }
+        ]]></fx:Script>
+    <fx:Script><![CDATA[
+        import edu.umich.med.mbni.pubanatomy.voxel3d.model.Voxel3dOperationAddPlaneFromPlane;
+        import edu.umich.med.mbni.utils.ModelOperationMenuChildren;
+        import edu.umich.med.mbni.utils.ModelOperationMenuType;
+
+        public function onMenu( mp:Point, strMns:ModelOperationMenuChildren ):void{
+            var rt:ModelOperationMenuChildren = new ModelOperationMenuChildren( (strMns == null) ? [ ] : [strMns ] );
+            if( strMns != null ){
+                rt.children.addItem( new ModelOperationMenuType() );
+            }
+
+            if( v3dPlane.imageSectionMode == Voxel3dPlane.IMG_SECTION_MODE_XYZ ){
+
+                var v:Vector3D = new Vector3D();
+                v[ v3dPlane.horizontalTxt] = Math.round( mp.x );
+                v[ v3dPlane.verticalTxt] = Math.round( mp.y );
+                v[ v3dPlane.projectionTxt ] = v3dPlane.projectionPosition;
+
+                var addPlaneV:Voxel3dOperationAddPlaneFromPlane = rootModelSection2d.instantiate( Voxel3dOperationAddPlaneFromPlane ) as Voxel3dOperationAddPlaneFromPlane;
+                addPlaneV.rootModel = rootModelSection2d.rootModelVoxel3d;
+                addPlaneV.hitVoxel = v;
+                rt.children.addItem( addPlaneV );
+
+                addPlaneV.projectDir = v3dPlane.verticalDirection;
+                var addPlaneH:Voxel3dOperationAddPlaneFromPlane = rootModelSection2d.instantiate( Voxel3dOperationAddPlaneFromPlane ) as Voxel3dOperationAddPlaneFromPlane;
+                addPlaneH.rootModel = rootModelSection2d.rootModelVoxel3d;
+                addPlaneH.hitVoxel = v;
+                addPlaneH.projectDir = v3dPlane.horizontalDirection;
+                rt.children.addItem( addPlaneH );
+
+            }
+
+
+            rootModelSection2d.setMenuOperations( rt );
+        }
+        ]]></fx:Script>
+
+    <fx:Binding source="v3dPlane.imageSectionMode" destination="rfrBusy"/>
+    <fx:Binding source="v3dPlane.image.sectionsLoader" destination="rfrBusy"/>
+    <fx:Binding source="v3dPlane.image.svgImg" destination="rfrBusy"/>
+    <fx:Binding source="v3dPlane.image.svgLoader" destination="rfrBusy"/>
+    <fx:Binding source="loadingXyzSection" destination="rfrBusy"/>
+    <fx:Script><![CDATA[
+        private function set rfrBusy( v:* ):void{
+            if( v3dPlane.imageSectionMode == Voxel3dPlane.IMG_SECTION_MODE_CLIP ){
+                loading = ( v3dPlane.image.sectionsLoader != null );
+            }
+            else if( v3dPlane.imageSectionMode == Voxel3dPlane.IMG_SECTION_MODE_SVG ){
+                loading = ( v3dPlane.image.svgLoader != null );
+            }
+            else if( v3dPlane.imageSectionMode == Voxel3dPlane.IMG_SECTION_MODE_XYZ ){
+                loading = ( loadingXyzSection != null );
+            }
+            else{
+                throw new Error();
+            }
+        }
+
+        [Bindable]
+        public var loading:Boolean = true;
+        ]]></fx:Script>
+    <fx:Declarations>
+        <m:StructureOnSection2dTreeGridData sectionPlane="{this}" id="treeGridData"/>
+    </fx:Declarations>
+
+</m:ModelSectionPlaneRfrEdge2Structures>

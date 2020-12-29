@@ -1,0 +1,34 @@
+<?xml version="1.0"?>
+<as3lib:MxmlEventDispatcher xmlns:fx="http://ns.adobe.com/mxml/2009" xmlns:s="library://ns.adobe.com/flex/spark"
+                            xmlns:mx="library://ns.adobe.com/flex/mx" xmlns:as3lib="com.flashflexpro.as3lib.*">
+    <fx:Script><![CDATA[
+        private var _oauthconn:OAuthConnection;
+
+        private function onOauth():void{
+            if( _oauthconn != null ){
+                _oauthconn.destroy();
+            }
+            var callBackStr:String = "pubanatomy" + getTimer();
+            _oauthconn = new OAuthConnection( callBackStr, onOAuthCallBack, null );
+            var url:String = "https://accounts.google.com/o/oauth2/auth?response_type=code";
+            url += "&client_id=373290557739.apps.googleusercontent.com";
+            url += "&redirect_uri=http://brainarray.mbni.med.umich.edu/yanggang-test/oauth";
+            url += "&scope=" + escape( "https://www.googleapis.com/auth/userinfo.email" );
+            url += "&state=" + callBackStr;
+
+            if( ExternalInterface.available ){
+                ExternalInterface.call( "window.open", url, "win", "height=600, width=800, status=no, toolbar=no" );
+            }
+            else{
+                var ur:URLRequest = new URLRequest( url );
+                ur.method = URLRequestMethod.GET;
+                navigateToURL( ur, "_blank" );
+            }
+        }
+
+        private function onOAuthCallBack( params:Object ):void{
+            _oauthconn.destroy();
+            trace( params );
+        }
+        ]]></fx:Script>
+</as3lib:MxmlEventDispatcher>

@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<rs:RpcInList xmlns:fx="http://ns.adobe.com/mxml/2009"
+              xmlns:rs="edu.umich.med.mbni.pubanatomy.flash.rs.*"
+              responseDataFormat="{URLLoaderDataFormat.TEXT}"
+              requestContentType="{REQUEST_CONTENT_TYPE_GET_BY_VARS}"
+              requestHttpMethod="{URLRequestMethod.GET}"
+        >
+
+</rs:RpcInList>
